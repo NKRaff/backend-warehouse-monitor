@@ -5,7 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc && tsc-alias",
+    "format": "biome check --write src/",
+    "start:dev": "tsx watch src/main.ts",
+    "start:prod": "node dist/src/main.js"
   },
   "repository": {
     "type": "git",

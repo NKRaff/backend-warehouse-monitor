@@ -32,15 +32,19 @@ export class ClientMQTT {
     })
 
     this.clientMQTT.on('connect', () => {
-      console.log('Cliente MQTT conectado')
+      console.log('📡 Cliente MQTT conectado')
     })
 
     this.clientMQTT.on('message', (topic, message, _packet) => {
+      const parts = topic.split('/')
+      const deviceId = parts[2]
+      const dataType = parts[3]
       console.log(`\nTopico: ${topic}\nMensagem: ${message}`)
     })
   }
 
-  public subscribeTopic(topic: string) {
-    this.clientMQTT.subscribe(topic, { qos: 1 })
+  public subscribeTopic(deviceId: string) {
+    this.clientMQTT.subscribe(`/device/${deviceId}/umidade`, { qos: 1 })
+    this.clientMQTT.subscribe(`/device/${deviceId}/temperatura`, { qos: 1 })
   }
 }

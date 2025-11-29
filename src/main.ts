@@ -3,8 +3,6 @@ import { CriarAmbienteUseCase } from './application/ambiente/use-cases/criar-amb
 import { ListarAmbientesUseCase } from './application/ambiente/use-cases/listar-ambientes.usecase.js'
 import { MongooseAmbienteRepository } from './infra/database/ambiente/ambiente.repository.js'
 import { MongooseORM } from './infra/database/mongoose.config.js'
-import { MongooseTemperaturaRepository } from './infra/database/sensor/repositories/temperatura.repository.js'
-import { MongooseUmidadeRepository } from './infra/database/sensor/repositories/umidade.repository.js'
 import { Routes } from './infra/http/routes/routes.js'
 import { ServerHTTP } from './infra/http/server.js'
 import { ClientMQTT } from './infra/mqtt/client.js'
@@ -17,8 +15,6 @@ async function main() {
   await orm.connectDatabase()
 
   // Instanciar repositorios
-  const TemperaturaRepo = MongooseTemperaturaRepository.create()
-  const UmidadeRepo = MongooseUmidadeRepository.create()
   const ambienteRepo = MongooseAmbienteRepository.create()
 
   // Instanciar use cases

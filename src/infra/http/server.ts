@@ -15,7 +15,7 @@ export class ServerHTTP {
 
   public start() {
     this.app.listen(process.env.PORT || 3000, () => {
-      console.log(`🖥️  Server running in port ${process.env.PORT}`)
+      console.log(`🖥️  Server rodando na porta ${process.env.PORT}`)
     })
   }
 }

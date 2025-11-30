@@ -3,8 +3,8 @@ import { model, Schema } from 'mongoose'
 const dispositivoSchema = new Schema(
   {
     _id: { type: String },
-    nome: { type: String, default: 'Sem Nome' },
-    ambienteId: { type: String, required: true, ref: 'Ambiente' },
+    nome: { type: String },
+    ambienteId: { type: String, ref: 'Ambiente' },
   },
   { timestamps: true },
 )

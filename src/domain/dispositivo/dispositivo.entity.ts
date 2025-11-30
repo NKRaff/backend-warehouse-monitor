@@ -1,13 +1,13 @@
 export type DispositivoProps = {
   id: string
-  nome: string
-  ambienteId: string
+  nome?: string
+  ambienteId?: string
 }
 
 export class Dispositivo {
   private constructor(private props: DispositivoProps) {}
 
-  public static create(id: string, nome: string, ambienteId: string) {
+  public static create(id: string, nome?: string, ambienteId?: string) {
     return new Dispositivo({ id, nome, ambienteId })
   }
 
@@ -15,11 +15,11 @@ export class Dispositivo {
     return this.props.id
   }
 
-  public get nome(): string {
+  public get nome() {
     return this.props.nome
   }
 
-  public get ambienteId(): string {
+  public get ambienteId() {
     return this.props.ambienteId
   }
 }

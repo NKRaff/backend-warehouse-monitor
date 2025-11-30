@@ -1,7 +1,7 @@
 export type CadastrarDispositivoInputDto = {
   id: string
-  nome: string
-  ambienteId: string
+  nome?: string
+  ambienteId?: string
 }
 
 export type CadastrarDispositivoOutputDto = {

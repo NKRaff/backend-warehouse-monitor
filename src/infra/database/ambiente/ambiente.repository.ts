@@ -27,11 +27,7 @@ export class MongooseAmbienteRepository implements AmbienteRepository {
 
   public async findAll(): Promise<Ambiente[]> {
     const ambientesDoc = await AmbienteModel.find().lean<AmbienteMongo[]>()
-    return ambientesDoc.map((doc) => {
-      const ambiente = Ambiente.create(doc._id, doc.nome, doc.tipo, doc.descricao)
-      console.log(ambiente)
-      return ambiente
-    })
+    return ambientesDoc.map((doc) => Ambiente.create(doc._id, doc.nome, doc.tipo, doc.descricao))
   }
 
   public async findById(id: string): Promise<Ambiente> {

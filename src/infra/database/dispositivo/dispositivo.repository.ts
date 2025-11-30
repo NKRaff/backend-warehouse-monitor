@@ -22,6 +22,8 @@ export class MongooseDispositivoRepository implements DispositivoRepository {
 
   public async findAll(): Promise<Dispositivo[]> {
     const dispositivosDoc = await DispositivoModel.find()
-    return dispositivosDoc.map((doc) => Dispositivo.create(doc.id, doc.nome, doc.ambienteId))
+    return dispositivosDoc.map((doc) =>
+      Dispositivo.create(doc.id, doc.nome || undefined, doc.ambienteId || undefined),
+    )
   }
 }

@@ -11,6 +11,15 @@ export class Dispositivo {
     return new Dispositivo({ id, nome, ambienteId })
   }
 
+  public update(nome?: string, ambienteId?: string) {
+    if (!nome) this.props.nome = nome
+    if (!ambienteId) this.props.ambienteId = ambienteId
+  }
+
+  public removerAmbiente() {
+    this.props.ambienteId = undefined
+  }
+
   public get id(): string {
     return this.props.id
   }

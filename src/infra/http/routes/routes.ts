@@ -1,3 +1,4 @@
+import type { AtualizarAmbienteController } from '@/interface/ambiente/atualizar-ambientes/atualizar-ambientes.controller.js'
 import type { CriarAmbienteController } from '@/interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
 import type { ListarAmbientesController } from '@/interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
 import type { CadastrarDispositivoController } from '@/interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
@@ -13,6 +14,7 @@ export class Routes {
   private constructor(
     private readonly criarAmbienteController: CriarAmbienteController,
     private readonly listarAmbientesController: ListarAmbientesController,
+    private readonly atualizarAmbienteController: AtualizarAmbienteController,
     private readonly cadastrarDispositivoController: CadastrarDispositivoController,
     private readonly cadastrarMedicaoController: CadastrarMedicaoController,
   ) {
@@ -23,12 +25,14 @@ export class Routes {
   public static create(
     criarAmbienteController: CriarAmbienteController,
     listarAmbientesController: ListarAmbientesController,
+    atualizarAmbienteController: AtualizarAmbienteController,
     cadastrarDispositivoController: CadastrarDispositivoController,
     cadastrarMedicaoController: CadastrarMedicaoController,
   ) {
     return new Routes(
       criarAmbienteController,
       listarAmbientesController,
+      atualizarAmbienteController,
       cadastrarDispositivoController,
       cadastrarMedicaoController,
     )
@@ -37,7 +41,11 @@ export class Routes {
   public setupRoutes() {
     this.routes.use(
       '/ambiente',
-      AmbienteRoutes.create(this.criarAmbienteController, this.listarAmbientesController).routes,
+      AmbienteRoutes.create(
+        this.criarAmbienteController,
+        this.listarAmbientesController,
+        this.atualizarAmbienteController,
+      ).routes,
     )
 
     this.routes.use(

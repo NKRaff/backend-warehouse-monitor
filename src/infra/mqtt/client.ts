@@ -1,3 +1,4 @@
+import type { CadastrarMedicaoController } from '@/interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
 import mqtt, { type MqttClient } from 'mqtt'
 
 export type clientOptions = {
@@ -8,17 +9,20 @@ export type clientOptions = {
 export class ClientMQTT {
   private readonly clientMQTT: MqttClient
 
-  private constructor(options: clientOptions) {
+  private constructor(
+    options: clientOptions,
+    private readonly cadastrarMedicaoController: CadastrarMedicaoController,
+  ) {
     this.clientMQTT = mqtt.connect(process.env.BROKER_URL || 'mqtt://test.mosquitto.org', options)
     this.eventHandle()
   }
 
-  public static create() {
+  public static create(cadastrarMedicaoController: CadastrarMedicaoController) {
     const options: clientOptions = {
       username: process.env.BROKER_CLIENT_USERNAME || '',
       password: process.env.BROKER_CLIENT_PASSWORD || '',
     }
-    return new ClientMQTT(options)
+    return new ClientMQTT(options, cadastrarMedicaoController)
   }
 
   private eventHandle() {
@@ -37,9 +41,9 @@ export class ClientMQTT {
 
     this.clientMQTT.on('message', (topic, message, _packet) => {
       const parts = topic.split('/')
-      const deviceId = parts[2]
-      const dataType = parts[3]
-      console.log(`\nTopico: ${topic}\nMensagem: ${message}`)
+      const dispositivoId = parts[2]
+      const tipo = parts[3]
+      this.cadastrarMedicaoController.handle({ dispositivoId, tipo, valor: message })
     })
   }
 

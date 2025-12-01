@@ -22,10 +22,15 @@ export class CadastrarMedicaoUseCase
   }
 
   public async execute(input: CadastrarMedicaoInputDto): Promise<CadastrarMedicaoOutputDto> {
+    const dispositivo = await this.dispositivoRepo.findById(input.dispositivoId)
+    if (!dispositivo.ambienteId)
+      throw new Error(
+        'Não é possível registrar medição: dispositivo não está associado a um ambiente.',
+      )
     const medicao = Medicao.create(
       v7(),
       input.dispositivoId,
-      input.ambienteId,
+      dispositivo.ambienteId,
       input.tipo,
       input.valor,
     )

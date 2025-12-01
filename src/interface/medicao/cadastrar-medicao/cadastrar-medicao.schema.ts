@@ -6,7 +6,11 @@ const TipoMedicaoSchema = z.union(tipos.map((t) => z.literal(t)))
 
 export const CadastrarMedicaoSchema = z.object({
   dispositivoId: z.string().min(17).max(17),
-  ambienteId: z.string(),
   tipo: TipoMedicaoSchema,
-  valor: z.number(),
+  valor: z
+    .string()
+    .transform((v) => Number(v))
+    .refine((v) => !Number.isNaN(v), {
+      message: 'Valor deve ser um número válido',
+    }),
 })

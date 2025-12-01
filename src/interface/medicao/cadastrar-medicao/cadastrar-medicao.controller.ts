@@ -14,7 +14,10 @@ export class CadastrarMedicaoController {
     return new CadastrarMedicaoController(useCase)
   }
 
-  public async handle(input: unknown) {
+  public async handle(input: any) {
+    if (Buffer.isBuffer(input.valor)) {
+      input.valor = input.valor.toString()
+    }
     const dto = CadastrarMedicaoSchema.parse(input)
     return await this.useCase.execute(dto)
   }

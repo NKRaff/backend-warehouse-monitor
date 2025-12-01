@@ -6,6 +6,8 @@ export type MedicaoProps = {
   ambienteId: string
   tipo: TipoMedicao
   valor: number
+  createdAt: Date
+  updatedAt: Date
 }
 
 export class Medicao {
@@ -17,8 +19,19 @@ export class Medicao {
     ambienteId: string,
     tipo: TipoMedicao,
     valor: number,
+    createdAt?: Date,
+    updatedAt?: Date,
   ) {
-    return new Medicao({ id, dispositivoId, ambienteId, tipo, valor })
+    const now = new Date()
+    return new Medicao({
+      id,
+      dispositivoId,
+      ambienteId,
+      tipo,
+      valor,
+      createdAt: createdAt || now,
+      updatedAt: updatedAt || now,
+    })
   }
 
   public get id(): string {

@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import { AtualizarAmbienteUseCase } from './application/ambiente/use-cases/atualizar-ambiente.usecase.js'
 import { CriarAmbienteUseCase } from './application/ambiente/use-cases/criar-ambiente.usecase.js'
 import { ListarAmbientesUseCase } from './application/ambiente/use-cases/listar-ambientes.usecase.js'
 import { CadastrarDispositivoUseCase } from './application/dispositivo/use-cases/cadastrar-dispositivo.usecase.js'
@@ -10,6 +11,7 @@ import { MongooseORM } from './infra/database/mongoose.config.js'
 import { Routes } from './infra/http/routes/routes.js'
 import { ServerHTTP } from './infra/http/server.js'
 import { ClientMQTT } from './infra/mqtt/client.js'
+import { AtualizarAmbienteController } from './interface/ambiente/atualizar-ambientes/atualizar-ambientes.controller.js'
 import { CriarAmbienteController } from './interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
 import { ListarAmbientesController } from './interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
 import { CadastrarDispositivoController } from './interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
@@ -28,6 +30,7 @@ async function main() {
   // Instanciar use cases
   const criarAmbienteUseCase = CriarAmbienteUseCase.create(ambienteRepo)
   const listarAmbientesUseCase = ListarAmbientesUseCase.create(ambienteRepo)
+  const atualizarAmbienteUseCase = AtualizarAmbienteUseCase.create(ambienteRepo)
 
   const cadastrarDispositivoUseCase = CadastrarDispositivoUseCase.create(dispositivoRepo)
 
@@ -36,6 +39,7 @@ async function main() {
   // Instanciar controllers
   const criarAmbienteController = CriarAmbienteController.create(criarAmbienteUseCase)
   const listarAmbientesController = ListarAmbientesController.create(listarAmbientesUseCase)
+  const atualizarAmbienteController = AtualizarAmbienteController.create(atualizarAmbienteUseCase)
 
   const cadastrarDispositivoController = CadastrarDispositivoController.create(
     cadastrarDispositivoUseCase,
@@ -51,6 +55,7 @@ async function main() {
   const routes = Routes.create(
     criarAmbienteController,
     listarAmbientesController,
+    atualizarAmbienteController,
     cadastrarDispositivoController,
     cadastrarMedicaoController,
   ).routes

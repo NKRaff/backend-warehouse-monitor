@@ -14,6 +14,11 @@ export class Ambiente {
     return new Ambiente({ id, nome, tipo, descricao: descricao || 'Sem descrição' })
   }
 
+  public update(nome?: string, descricao?: string) {
+    if (nome) this.props.nome = nome
+    if (descricao) this.props.descricao = descricao
+  }
+
   public get id(): string {
     return this.props.id
   }

@@ -44,7 +44,7 @@ async function main() {
   const cadastrarMedicaoController = CadastrarMedicaoController.create(cadastrarMedicaoUseCase)
 
   // Conecta no Broker MQTT
-  const clientMQTT = ClientMQTT.create()
+  const clientMQTT = ClientMQTT.create(cadastrarMedicaoController)
   clientMQTT.subscribeTopic('+')
 
   // Instanciar as rotas

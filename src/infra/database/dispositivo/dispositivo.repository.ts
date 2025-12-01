@@ -1,6 +1,5 @@
 import type { DispositivoRepository } from '@/domain/dispositivo/despositivo.repository.js'
 import { Dispositivo } from '@/domain/dispositivo/dispositivo.entity.js'
-import { AmbienteModel } from '../ambiente/ambiente.model.js'
 import { DispositivoModel } from './dispositivo.model.js'
 
 type DispositivoMongo = {
@@ -30,7 +29,7 @@ export class MongooseDispositivoRepository implements DispositivoRepository {
   }
 
   public async findById(id: string): Promise<Dispositivo> {
-    const dispositivoDoc = await AmbienteModel.findById(id).lean<DispositivoMongo>()
+    const dispositivoDoc = await DispositivoModel.findById(id).lean<DispositivoMongo>()
     if (!dispositivoDoc) throw new Error('Nenhum dispositivo com esse Id encontrado')
     return Dispositivo.create(dispositivoDoc._id, dispositivoDoc.nome, dispositivoDoc.ambienteId)
   }

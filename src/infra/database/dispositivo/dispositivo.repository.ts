@@ -34,6 +34,13 @@ export class MongooseDispositivoRepository implements DispositivoRepository {
     return Dispositivo.create(dispositivoDoc._id, dispositivoDoc.nome, dispositivoDoc.ambienteId)
   }
 
+  public async findByAmbienteId(id: string): Promise<Dispositivo[]> {
+    const dispositivosDoc = await DispositivoModel.find({ ambienteId: id }).lean<
+      DispositivoMongo[]
+    >()
+    return dispositivosDoc.map((doc) => Dispositivo.create(doc._id, doc.nome, doc.ambienteId))
+  }
+
   public async update(dispositivo: Dispositivo): Promise<void> {
     const dispositivoDoc = await DispositivoModel.findByIdAndUpdate(dispositivo.id, {
       nome: dispositivo.nome,

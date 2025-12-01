@@ -65,7 +65,7 @@ export class AmbienteRoutes {
 
     this.routes.delete('/:id', async (req, res) => {
       try {
-        const result = await this.removerAmbienteController.handle(req.params.id)
+        const result = await this.removerAmbienteController.handle({ id: req.params.id })
         res.status(200).json(result)
       } catch (error) {
         res.status(400).json(error)

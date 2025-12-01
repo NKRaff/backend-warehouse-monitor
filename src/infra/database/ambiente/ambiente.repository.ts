@@ -1,6 +1,13 @@
-import { Ambiente, type AmbienteProps } from '@/domain/ambiente/ambiente.entity.js'
+import { Ambiente, type TipoAmbiente } from '@/domain/ambiente/ambiente.entity.js'
 import type { AmbienteRepository } from '@/domain/ambiente/ambiente.repository.js'
 import { AmbienteModel } from './ambiente.model.js'
+
+type AmbienteMongo = {
+  _id: string
+  nome: string
+  tipo: TipoAmbiente
+  descricao: string
+}
 
 export class MongooseAmbienteRepository implements AmbienteRepository {
   private constructor() {}
@@ -19,15 +26,15 @@ export class MongooseAmbienteRepository implements AmbienteRepository {
   }
 
   public async findAll(): Promise<Ambiente[]> {
-    const ambientesDoc = await AmbienteModel.find().lean<AmbienteProps[]>()
-    return ambientesDoc.map((doc) => Ambiente.create(doc.id, doc.nome, doc.tipo, doc.descricao))
+    const ambientesDoc = await AmbienteModel.find().lean<AmbienteMongo[]>()
+    return ambientesDoc.map((doc) => Ambiente.create(doc._id, doc.nome, doc.tipo, doc.descricao))
   }
 
   public async findById(id: string): Promise<Ambiente> {
-    const ambienteDoc = await AmbienteModel.findById(id).lean<AmbienteProps>()
+    const ambienteDoc = await AmbienteModel.findById(id).lean<AmbienteMongo>()
     if (!ambienteDoc) throw new Error('Nenhum ambiente com esse Id foi encontrado.')
     return Ambiente.create(
-      ambienteDoc.id,
+      ambienteDoc._id,
       ambienteDoc.nome,
       ambienteDoc.tipo,
       ambienteDoc.descricao,

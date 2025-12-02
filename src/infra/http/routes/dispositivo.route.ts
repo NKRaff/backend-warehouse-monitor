@@ -64,7 +64,7 @@ export class DispositivoRoutes {
 
     this.routes.delete('/:id', async (req, res) => {
       try {
-        const result = await this.removerDispositivoController.handle(req.params.id)
+        const result = await this.removerDispositivoController.handle({ id: req.params.id })
         res.status(200).json(result)
       } catch (error) {
         res.status(400).json(error)

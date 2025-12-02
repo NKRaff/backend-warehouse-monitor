@@ -2,6 +2,7 @@ import type { AtualizarAmbienteController } from '@/interface/ambiente/atualizar
 import type { CriarAmbienteController } from '@/interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
 import type { ListarAmbientesController } from '@/interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
 import type { RemoverAmbienteController } from '@/interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
+import type { AtualizarDispositivoController } from '@/interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
 import type { CadastrarDispositivoController } from '@/interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
 import type { ListarDispositivosController } from '@/interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
 import type { CadastrarMedicaoController } from '@/interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
@@ -21,6 +22,7 @@ export class Routes {
 
     private readonly cadastrarDispositivoController: CadastrarDispositivoController,
     private readonly listarDispositivosController: ListarDispositivosController,
+    private readonly atualizarDispositivoController: AtualizarDispositivoController,
 
     private readonly cadastrarMedicaoController: CadastrarMedicaoController,
   ) {
@@ -36,6 +38,7 @@ export class Routes {
 
     cadastrarDispositivoController: CadastrarDispositivoController,
     listarDispositivosController: ListarDispositivosController,
+    atualizarDispositivoController: AtualizarDispositivoController,
 
     cadastrarMedicaoController: CadastrarMedicaoController,
   ) {
@@ -47,6 +50,7 @@ export class Routes {
 
       cadastrarDispositivoController,
       listarDispositivosController,
+      atualizarDispositivoController,
 
       cadastrarMedicaoController,
     )
@@ -68,6 +72,7 @@ export class Routes {
       DispositivoRoutes.create(
         this.cadastrarDispositivoController,
         this.listarDispositivosController,
+        this.atualizarDispositivoController,
       ).routes,
     )
 

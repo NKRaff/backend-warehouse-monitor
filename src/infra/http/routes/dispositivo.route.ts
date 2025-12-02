@@ -1,3 +1,4 @@
+import type { AtualizarDispositivoController } from '@/interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
 import type { CadastrarDispositivoController } from '@/interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
 import type { ListarDispositivosController } from '@/interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
 import { Router } from 'express'
@@ -8,6 +9,7 @@ export class DispositivoRoutes {
   private constructor(
     private readonly cadastrarDispositivoController: CadastrarDispositivoController,
     private readonly listarDispositivoController: ListarDispositivosController,
+    private readonly atualizarDispositivoController: AtualizarDispositivoController,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -16,8 +18,13 @@ export class DispositivoRoutes {
   public static create(
     cadastrarDispositivoController: CadastrarDispositivoController,
     listarDispositivoController: ListarDispositivosController,
+    atualizarDispositivoController: AtualizarDispositivoController,
   ) {
-    return new DispositivoRoutes(cadastrarDispositivoController, listarDispositivoController)
+    return new DispositivoRoutes(
+      cadastrarDispositivoController,
+      listarDispositivoController,
+      atualizarDispositivoController,
+    )
   }
 
   private setupRoutes() {
@@ -33,6 +40,18 @@ export class DispositivoRoutes {
     this.routes.get('/', async (_req, res) => {
       try {
         const result = await this.listarDispositivoController.handle()
+        res.status(200).json(result)
+      } catch (error) {
+        res.status(400).json(error)
+      }
+    })
+
+    this.routes.patch('/:id', async (req, res) => {
+      try {
+        const result = await this.atualizarDispositivoController.handle({
+          id: req.params.id,
+          ...res,
+        })
         res.status(200).json(result)
       } catch (error) {
         res.status(400).json(error)

@@ -3,6 +3,7 @@ import type { CriarAmbienteController } from '@/interface/ambiente/criar-ambient
 import type { ListarAmbientesController } from '@/interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
 import type { RemoverAmbienteController } from '@/interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
 import type { CadastrarDispositivoController } from '@/interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
+import type { ListarDispositivosController } from '@/interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
 import type { CadastrarMedicaoController } from '@/interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
 import { Router } from 'express'
 import { AmbienteRoutes } from './ambientes.route.js'
@@ -19,6 +20,8 @@ export class Routes {
     private readonly removerAmbienteController: RemoverAmbienteController,
 
     private readonly cadastrarDispositivoController: CadastrarDispositivoController,
+    private readonly listarDispositivosController: ListarDispositivosController,
+
     private readonly cadastrarMedicaoController: CadastrarMedicaoController,
   ) {
     this.routes = Router()
@@ -32,6 +35,8 @@ export class Routes {
     removerAmbienteController: RemoverAmbienteController,
 
     cadastrarDispositivoController: CadastrarDispositivoController,
+    listarDispositivosController: ListarDispositivosController,
+
     cadastrarMedicaoController: CadastrarMedicaoController,
   ) {
     return new Routes(
@@ -41,6 +46,8 @@ export class Routes {
       removerAmbienteController,
 
       cadastrarDispositivoController,
+      listarDispositivosController,
+
       cadastrarMedicaoController,
     )
   }
@@ -58,7 +65,10 @@ export class Routes {
 
     this.routes.use(
       '/dispositivo',
-      DispositivoRoutes.create(this.cadastrarDispositivoController).routes,
+      DispositivoRoutes.create(
+        this.cadastrarDispositivoController,
+        this.listarDispositivosController,
+      ).routes,
     )
 
     this.routes.use('/medicao', MedicaoRoutes.create(this.cadastrarMedicaoController).routes)

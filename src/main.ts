@@ -4,6 +4,7 @@ import { CriarAmbienteUseCase } from './application/ambiente/use-cases/criar-amb
 import { ListarAmbientesUseCase } from './application/ambiente/use-cases/listar-ambientes.usecase.js'
 import { RemoverAmbienteUseCase } from './application/ambiente/use-cases/remover-ambiente.usecase.js'
 import { CadastrarDispositivoUseCase } from './application/dispositivo/use-cases/cadastrar-dispositivo.usecase.js'
+import { ListarDispositivosUseCase } from './application/dispositivo/use-cases/listar-dispositivos.usecase.js'
 import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastrar-medicao.usecase.js'
 import { MongooseAmbienteRepository } from './infra/database/ambiente/ambiente.repository.js'
 import { MongooseDispositivoRepository } from './infra/database/dispositivo/dispositivo.repository.js'
@@ -17,6 +18,7 @@ import { CriarAmbienteController } from './interface/ambiente/criar-ambientes/cr
 import { ListarAmbientesController } from './interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
 import { RemoverAmbienteController } from './interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
 import { CadastrarDispositivoController } from './interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
+import { ListarDispositivosController } from './interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
 import { CadastrarMedicaoController } from './interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
 
 async function main() {
@@ -36,6 +38,7 @@ async function main() {
   const removerAmbienteUseCase = RemoverAmbienteUseCase.create(ambienteRepo, dispositivoRepo)
 
   const cadastrarDispositivoUseCase = CadastrarDispositivoUseCase.create(dispositivoRepo)
+  const listarDispositivosUseCase = ListarDispositivosUseCase.create(dispositivoRepo)
 
   const cadastrarMedicaoUseCase = CadastrarMedicaoUseCase.create(medicaoRepo, dispositivoRepo)
 
@@ -48,6 +51,7 @@ async function main() {
   const cadastrarDispositivoController = CadastrarDispositivoController.create(
     cadastrarDispositivoUseCase,
   )
+  const listarDispositivoController = ListarDispositivosController.create(listarDispositivosUseCase)
 
   const cadastrarMedicaoController = CadastrarMedicaoController.create(cadastrarMedicaoUseCase)
 
@@ -63,6 +67,8 @@ async function main() {
     removerAmbienteController,
 
     cadastrarDispositivoController,
+    listarDispositivoController,
+
     cadastrarMedicaoController,
   ).routes
 

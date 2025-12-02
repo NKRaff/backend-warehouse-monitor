@@ -16,7 +16,7 @@ export class AtualizarAmbienteUseCase
   }
 
   public async execute(input: AtualizarAmbienteInputDto): Promise<AtualizarAmbienteOutputDto> {
-    if (!input.id && !input.descricao)
+    if (!input.nome && !input.descricao)
       throw new Error('Não é possivel atualizar ambiente: não existe nenhum dado a ser alterado')
     const ambiente = await this.ambienteRepo.findById(input.id)
     if (!ambiente)

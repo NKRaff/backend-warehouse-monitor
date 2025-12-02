@@ -1,10 +1,10 @@
 import type { DispositivoRepository } from '@/domain/dispositivo/despositivo.repository.js'
-import type { UseCase } from '../usecase.js'
+import type { UseCase } from '../../usecase.js'
 import type {
   AtualizarDispositivoInputDto,
   AtualizarDispositivoOutputDto,
-} from './dtos/atualizar-dispositivo.dto.js'
-import { AtualizarDispositivoMapper } from './mappers/atualizar-dispositivo.mapper.js'
+} from '../dtos/atualizar-dispositivo.dto.js'
+import { AtualizarDispositivoMapper } from '../mappers/atualizar-dispositivo.mapper.js'
 
 export class AtualizarDispositivoUseCase
   implements UseCase<AtualizarDispositivoInputDto, AtualizarDispositivoOutputDto>

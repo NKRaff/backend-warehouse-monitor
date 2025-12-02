@@ -3,6 +3,7 @@ import { AtualizarAmbienteUseCase } from './application/ambiente/use-cases/atual
 import { CriarAmbienteUseCase } from './application/ambiente/use-cases/criar-ambiente.usecase.js'
 import { ListarAmbientesUseCase } from './application/ambiente/use-cases/listar-ambientes.usecase.js'
 import { RemoverAmbienteUseCase } from './application/ambiente/use-cases/remover-ambiente.usecase.js'
+import { AtualizarDispositivoUseCase } from './application/dispositivo/use-cases/atualizar-dispositivo.usecase.js'
 import { CadastrarDispositivoUseCase } from './application/dispositivo/use-cases/cadastrar-dispositivo.usecase.js'
 import { ListarDispositivosUseCase } from './application/dispositivo/use-cases/listar-dispositivos.usecase.js'
 import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastrar-medicao.usecase.js'
@@ -17,6 +18,7 @@ import { AtualizarAmbienteController } from './interface/ambiente/atualizar-ambi
 import { CriarAmbienteController } from './interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
 import { ListarAmbientesController } from './interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
 import { RemoverAmbienteController } from './interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
+import { AtualizarDispositivoController } from './interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
 import { CadastrarDispositivoController } from './interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
 import { ListarDispositivosController } from './interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
 import { CadastrarMedicaoController } from './interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
@@ -39,6 +41,7 @@ async function main() {
 
   const cadastrarDispositivoUseCase = CadastrarDispositivoUseCase.create(dispositivoRepo)
   const listarDispositivosUseCase = ListarDispositivosUseCase.create(dispositivoRepo)
+  const atualizarDispositivoUseCase = AtualizarDispositivoUseCase.create(dispositivoRepo)
 
   const cadastrarMedicaoUseCase = CadastrarMedicaoUseCase.create(medicaoRepo, dispositivoRepo)
 
@@ -52,6 +55,9 @@ async function main() {
     cadastrarDispositivoUseCase,
   )
   const listarDispositivoController = ListarDispositivosController.create(listarDispositivosUseCase)
+  const atualizarDispositivoController = AtualizarDispositivoController.create(
+    atualizarDispositivoUseCase,
+  )
 
   const cadastrarMedicaoController = CadastrarMedicaoController.create(cadastrarMedicaoUseCase)
 
@@ -68,6 +74,7 @@ async function main() {
 
     cadastrarDispositivoController,
     listarDispositivoController,
+    atualizarDispositivoController,
 
     cadastrarMedicaoController,
   ).routes

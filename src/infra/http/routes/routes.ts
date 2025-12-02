@@ -5,6 +5,7 @@ import type { RemoverAmbienteController } from '@/interface/ambiente/remover-amb
 import type { AtualizarDispositivoController } from '@/interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
 import type { CadastrarDispositivoController } from '@/interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
 import type { ListarDispositivosController } from '@/interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
+import type { RemoverDispositivoController } from '@/interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
 import type { CadastrarMedicaoController } from '@/interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
 import { Router } from 'express'
 import { AmbienteRoutes } from './ambientes.route.js'
@@ -23,6 +24,7 @@ export class Routes {
     private readonly cadastrarDispositivoController: CadastrarDispositivoController,
     private readonly listarDispositivosController: ListarDispositivosController,
     private readonly atualizarDispositivoController: AtualizarDispositivoController,
+    private readonly removerDispositivoController: RemoverDispositivoController,
 
     private readonly cadastrarMedicaoController: CadastrarMedicaoController,
   ) {
@@ -39,6 +41,7 @@ export class Routes {
     cadastrarDispositivoController: CadastrarDispositivoController,
     listarDispositivosController: ListarDispositivosController,
     atualizarDispositivoController: AtualizarDispositivoController,
+    removerDispositivoController: RemoverDispositivoController,
 
     cadastrarMedicaoController: CadastrarMedicaoController,
   ) {
@@ -51,6 +54,7 @@ export class Routes {
       cadastrarDispositivoController,
       listarDispositivosController,
       atualizarDispositivoController,
+      removerDispositivoController,
 
       cadastrarMedicaoController,
     )
@@ -73,6 +77,7 @@ export class Routes {
         this.cadastrarDispositivoController,
         this.listarDispositivosController,
         this.atualizarDispositivoController,
+        this.removerDispositivoController,
       ).routes,
     )
 

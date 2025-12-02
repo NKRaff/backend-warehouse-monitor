@@ -1,6 +1,7 @@
 import type { AtualizarDispositivoController } from '@/interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
 import type { CadastrarDispositivoController } from '@/interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
 import type { ListarDispositivosController } from '@/interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
+import type { RemoverDispositivoController } from '@/interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
 import { Router } from 'express'
 
 export class DispositivoRoutes {
@@ -10,6 +11,7 @@ export class DispositivoRoutes {
     private readonly cadastrarDispositivoController: CadastrarDispositivoController,
     private readonly listarDispositivoController: ListarDispositivosController,
     private readonly atualizarDispositivoController: AtualizarDispositivoController,
+    private readonly removerDispositivoController: RemoverDispositivoController,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -19,11 +21,13 @@ export class DispositivoRoutes {
     cadastrarDispositivoController: CadastrarDispositivoController,
     listarDispositivoController: ListarDispositivosController,
     atualizarDispositivoController: AtualizarDispositivoController,
+    removerDispositivoController: RemoverDispositivoController,
   ) {
     return new DispositivoRoutes(
       cadastrarDispositivoController,
       listarDispositivoController,
       atualizarDispositivoController,
+      removerDispositivoController,
     )
   }
 
@@ -52,6 +56,15 @@ export class DispositivoRoutes {
           id: req.params.id,
           ...req.body,
         })
+        res.status(200).json(result)
+      } catch (error) {
+        res.status(400).json(error)
+      }
+    })
+
+    this.routes.delete('/:id', async (req, res) => {
+      try {
+        const result = await this.removerDispositivoController.handle(req.params.id)
         res.status(200).json(result)
       } catch (error) {
         res.status(400).json(error)

@@ -50,7 +50,7 @@ export class DispositivoRoutes {
       try {
         const result = await this.atualizarDispositivoController.handle({
           id: req.params.id,
-          ...res,
+          ...req.body,
         })
         res.status(200).json(result)
       } catch (error) {

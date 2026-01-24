@@ -7,10 +7,13 @@ import type { CadastrarDispositivoController } from '@/interface/dispositivo/cad
 import type { ListarDispositivosController } from '@/interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
 import type { RemoverDispositivoController } from '@/interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
 import type { CadastrarMedicaoController } from '@/interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
+import type { CriarUsuarioController } from '@/interface/usuario/criar-usuario/criar-usuario.controller.js'
+import type { RemoverUsuarioController } from '@/interface/usuario/remover-usuario/remover-usuario.controller.js'
 import { Router } from 'express'
 import { AmbienteRoutes } from './ambientes.route.js'
 import { DispositivoRoutes } from './dispositivo.route.js'
 import { MedicaoRoutes } from './medicao.route.js'
+import { UsuarioRoutes } from './usuario.route.js'
 
 export class Routes {
   public readonly routes: Router
@@ -27,6 +30,9 @@ export class Routes {
     private readonly removerDispositivoController: RemoverDispositivoController,
 
     private readonly cadastrarMedicaoController: CadastrarMedicaoController,
+
+    private readonly criarUsuarioController: CriarUsuarioController,
+    private readonly removerUsuarioController: RemoverUsuarioController,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -44,6 +50,9 @@ export class Routes {
     removerDispositivoController: RemoverDispositivoController,
 
     cadastrarMedicaoController: CadastrarMedicaoController,
+
+    criarUsuarioController: CriarUsuarioController,
+    removerUsuarioController: RemoverUsuarioController,
   ) {
     return new Routes(
       criarAmbienteController,
@@ -57,6 +66,9 @@ export class Routes {
       removerDispositivoController,
 
       cadastrarMedicaoController,
+
+      criarUsuarioController,
+      removerUsuarioController,
     )
   }
 
@@ -82,5 +94,10 @@ export class Routes {
     )
 
     this.routes.use('/medicao', MedicaoRoutes.create(this.cadastrarMedicaoController).routes)
+
+    this.routes.use(
+      '/usuario',
+      UsuarioRoutes.create(this.criarUsuarioController, this.removerUsuarioController).routes,
+    )
   }
 }

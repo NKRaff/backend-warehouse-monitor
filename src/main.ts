@@ -8,10 +8,13 @@ import { CadastrarDispositivoUseCase } from './application/dispositivo/use-cases
 import { ListarDispositivosUseCase } from './application/dispositivo/use-cases/listar-dispositivos.usecase.js'
 import { RemoverDispositivoUseCase } from './application/dispositivo/use-cases/remover-dispositivo.usecase.js'
 import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastrar-medicao.usecase.js'
+import { CriarUsuarioUseCase } from './application/usuario/use-cases/criar-usuario.usecase.js'
+import { RemoverUsuarioUseCase } from './application/usuario/use-cases/remover-usuario.usecase.js'
 import { MongooseAmbienteRepository } from './infra/database/ambiente/ambiente.repository.js'
 import { MongooseDispositivoRepository } from './infra/database/dispositivo/dispositivo.repository.js'
 import { MongooseMedicaoRepository } from './infra/database/medicao/medicao.repository.js'
 import { MongooseORM } from './infra/database/mongoose.config.js'
+import { MongooseUsuarioRepository } from './infra/database/usuario/usuario.repository.js'
 import { Routes } from './infra/http/routes/routes.js'
 import { ServerHTTP } from './infra/http/server.js'
 import { ClientMQTT } from './infra/mqtt/client.js'
@@ -24,6 +27,8 @@ import { CadastrarDispositivoController } from './interface/dispositivo/cadastra
 import { ListarDispositivosController } from './interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
 import { RemoverDispositivoController } from './interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
 import { CadastrarMedicaoController } from './interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
+import { CriarUsuarioController } from './interface/usuario/criar-usuario/criar-usuario.controller.js'
+import { RemoverUsuarioController } from './interface/usuario/remover-usuario/remover-usuario.controller.js'
 
 async function main() {
   // Conectar MongoDB
@@ -34,6 +39,7 @@ async function main() {
   const ambienteRepo = MongooseAmbienteRepository.create()
   const dispositivoRepo = MongooseDispositivoRepository.create()
   const medicaoRepo = MongooseMedicaoRepository.create()
+  const usuarioRepo = MongooseUsuarioRepository.create()
 
   // Instanciar use cases
   const criarAmbienteUseCase = CriarAmbienteUseCase.create(ambienteRepo)
@@ -47,6 +53,9 @@ async function main() {
   const removerDispositivoUseCase = RemoverDispositivoUseCase.create(dispositivoRepo)
 
   const cadastrarMedicaoUseCase = CadastrarMedicaoUseCase.create(medicaoRepo, dispositivoRepo)
+
+  const criarUsuarioUseCase = CriarUsuarioUseCase.create(usuarioRepo)
+  const removerUsuarioUseCase = RemoverUsuarioUseCase.create(usuarioRepo)
 
   // Instanciar controllers
   const criarAmbienteController = CriarAmbienteController.create(criarAmbienteUseCase)
@@ -66,6 +75,9 @@ async function main() {
 
   const cadastrarMedicaoController = CadastrarMedicaoController.create(cadastrarMedicaoUseCase)
 
+  const criarUsuarioController = CriarUsuarioController.create(criarUsuarioUseCase)
+  const removerUsuarioController = RemoverUsuarioController.create(removerUsuarioUseCase)
+
   // Conecta no Broker MQTT
   const clientMQTT = ClientMQTT.create(cadastrarMedicaoController)
   clientMQTT.subscribeTopic('+')
@@ -83,6 +95,9 @@ async function main() {
     removerDispositivoController,
 
     cadastrarMedicaoController,
+
+    criarUsuarioController,
+    removerUsuarioController,
   ).routes
 
   // Conecta no Servidor

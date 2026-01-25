@@ -3,6 +3,7 @@ import { AtualizarAmbienteUseCase } from './application/ambiente/use-cases/atual
 import { CriarAmbienteUseCase } from './application/ambiente/use-cases/criar-ambiente.usecase.js'
 import { ListarAmbientesUseCase } from './application/ambiente/use-cases/listar-ambientes.usecase.js'
 import { RemoverAmbienteUseCase } from './application/ambiente/use-cases/remover-ambiente.usecase.js'
+import { LogarUseCase } from './application/autenticacao/use-cases/logar.usecase.js'
 import { AtualizarDispositivoUseCase } from './application/dispositivo/use-cases/atualizar-dispositivo.usecase.js'
 import { CadastrarDispositivoUseCase } from './application/dispositivo/use-cases/cadastrar-dispositivo.usecase.js'
 import { ListarDispositivosUseCase } from './application/dispositivo/use-cases/listar-dispositivos.usecase.js'
@@ -11,6 +12,7 @@ import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastr
 import { CriarUsuarioUseCase } from './application/usuario/use-cases/criar-usuario.usecase.js'
 import { RemoverUsuarioUseCase } from './application/usuario/use-cases/remover-usuario.usecase.js'
 import { MongooseAmbienteRepository } from './infra/database/ambiente/ambiente.repository.js'
+import { MongooseAutenticacaoRepository } from './infra/database/autenticacao/autenticacao.repository.js'
 import { MongooseDispositivoRepository } from './infra/database/dispositivo/dispositivo.repository.js'
 import { MongooseMedicaoRepository } from './infra/database/medicao/medicao.repository.js'
 import { MongooseORM } from './infra/database/mongoose.config.js'
@@ -22,6 +24,7 @@ import { AtualizarAmbienteController } from './interface/ambiente/atualizar-ambi
 import { CriarAmbienteController } from './interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
 import { ListarAmbientesController } from './interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
 import { RemoverAmbienteController } from './interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
+import { LoginController } from './interface/autenticacao/logar/logar.controller.js'
 import { AtualizarDispositivoController } from './interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
 import { CadastrarDispositivoController } from './interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
 import { ListarDispositivosController } from './interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
@@ -40,6 +43,7 @@ async function main() {
   const dispositivoRepo = MongooseDispositivoRepository.create()
   const medicaoRepo = MongooseMedicaoRepository.create()
   const usuarioRepo = MongooseUsuarioRepository.create()
+  const autenticacaoRepo = MongooseAutenticacaoRepository.create()
 
   // Instanciar use cases
   const criarAmbienteUseCase = CriarAmbienteUseCase.create(ambienteRepo)
@@ -56,6 +60,8 @@ async function main() {
 
   const criarUsuarioUseCase = CriarUsuarioUseCase.create(usuarioRepo)
   const removerUsuarioUseCase = RemoverUsuarioUseCase.create(usuarioRepo)
+
+  const loginUseCase = LogarUseCase.create(usuarioRepo, autenticacaoRepo)
 
   // Instanciar controllers
   const criarAmbienteController = CriarAmbienteController.create(criarAmbienteUseCase)
@@ -78,6 +84,8 @@ async function main() {
   const criarUsuarioController = CriarUsuarioController.create(criarUsuarioUseCase)
   const removerUsuarioController = RemoverUsuarioController.create(removerUsuarioUseCase)
 
+  const loginController = LoginController.create(loginUseCase)
+
   // Conecta no Broker MQTT
   const clientMQTT = ClientMQTT.create(cadastrarMedicaoController)
   clientMQTT.subscribeTopic('+')
@@ -98,6 +106,8 @@ async function main() {
 
     criarUsuarioController,
     removerUsuarioController,
+
+    loginController,
   ).routes
 
   // Conecta no Servidor

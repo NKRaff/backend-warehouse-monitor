@@ -6,7 +6,6 @@ type UsuarioMongo = {
   _id: string
   nome: string
   email: string
-  senha: string
 }
 
 export class MongooseUsuarioRepository implements UsuarioRepository {
@@ -17,25 +16,23 @@ export class MongooseUsuarioRepository implements UsuarioRepository {
   }
 
   async save(usuario: Usuario): Promise<void> {
-    const u = await UsuarioModel.create({
+    await UsuarioModel.create({
       _id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
-      senha: usuario.senha,
     })
-    console.log(u)
   }
 
   async findById(id: string): Promise<Usuario> {
     const usuarioDoc = await UsuarioModel.findById(id).lean<UsuarioMongo>()
     if (!usuarioDoc) throw new Error('Nenhum usuario encontrado')
-    return Usuario.create(usuarioDoc._id, usuarioDoc.nome, usuarioDoc.email, usuarioDoc.senha)
+    return Usuario.create(usuarioDoc._id, usuarioDoc.nome, usuarioDoc.email)
   }
 
   async findByEmail(email: string): Promise<Usuario> {
-    const usuarioDoc = await UsuarioModel.find({ email }).lean<UsuarioMongo>()
+    const usuarioDoc = await UsuarioModel.findOne({ email }).lean<UsuarioMongo>()
     if (!usuarioDoc) throw new Error('Nenhum usuario encontrado')
-    return Usuario.create(usuarioDoc._id, usuarioDoc.nome, usuarioDoc.email, usuarioDoc.senha)
+    return Usuario.create(usuarioDoc._id, usuarioDoc.nome, usuarioDoc.email)
   }
 
   async delete(id: string): Promise<void> {

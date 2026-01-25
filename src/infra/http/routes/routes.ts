@@ -2,6 +2,7 @@ import type { AtualizarAmbienteController } from '@/interface/ambiente/atualizar
 import type { CriarAmbienteController } from '@/interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
 import type { ListarAmbientesController } from '@/interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
 import type { RemoverAmbienteController } from '@/interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
+import type { LoginController } from '@/interface/autenticacao/logar/logar.controller.js'
 import type { AtualizarDispositivoController } from '@/interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
 import type { CadastrarDispositivoController } from '@/interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
 import type { ListarDispositivosController } from '@/interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
@@ -12,6 +13,7 @@ import type { RemoverUsuarioController } from '@/interface/usuario/remover-usuar
 import { Router } from 'express'
 import { AmbienteRoutes } from './ambientes.route.js'
 import { DispositivoRoutes } from './dispositivo.route.js'
+import { LoginRoutes } from './login.route.js'
 import { MedicaoRoutes } from './medicao.route.js'
 import { UsuarioRoutes } from './usuario.route.js'
 
@@ -33,6 +35,8 @@ export class Routes {
 
     private readonly criarUsuarioController: CriarUsuarioController,
     private readonly removerUsuarioController: RemoverUsuarioController,
+
+    private readonly loginController: LoginController,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -53,6 +57,8 @@ export class Routes {
 
     criarUsuarioController: CriarUsuarioController,
     removerUsuarioController: RemoverUsuarioController,
+
+    loginController: LoginController,
   ) {
     return new Routes(
       criarAmbienteController,
@@ -69,6 +75,8 @@ export class Routes {
 
       criarUsuarioController,
       removerUsuarioController,
+
+      loginController,
     )
   }
 
@@ -99,5 +107,7 @@ export class Routes {
       '/usuario',
       UsuarioRoutes.create(this.criarUsuarioController, this.removerUsuarioController).routes,
     )
+
+    this.routes.use('/autenticacao', LoginRoutes.create(this.loginController).routes)
   }
 }

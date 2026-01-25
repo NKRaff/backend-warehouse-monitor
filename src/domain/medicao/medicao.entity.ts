@@ -46,11 +46,19 @@ export class Medicao {
     return this.props.ambienteId
   }
 
-  public get tipo(): string {
+  public get tipo(): TipoMedicao {
     return this.props.tipo
   }
 
   public get valor(): number {
     return this.props.valor
+  }
+
+  public get createdAt(): Date {
+    return this.props.createdAt
+  }
+
+  public get updatedAt(): Date {
+    return this.props.updatedAt
   }
 }

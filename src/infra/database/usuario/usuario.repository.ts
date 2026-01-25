@@ -30,7 +30,7 @@ export class MongooseUsuarioRepository implements UsuarioRepository {
   }
 
   async findByEmail(email: string): Promise<Usuario> {
-    const usuarioDoc = await UsuarioModel.find({ email }).lean<UsuarioMongo>()
+    const usuarioDoc = await UsuarioModel.findOne({ email }).lean<UsuarioMongo>()
     if (!usuarioDoc) throw new Error('Nenhum usuario encontrado')
     return Usuario.create(usuarioDoc._id, usuarioDoc.nome, usuarioDoc.email)
   }

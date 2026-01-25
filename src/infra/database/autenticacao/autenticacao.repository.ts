@@ -24,7 +24,7 @@ export class MongooseAutenticacaoRepository implements AutenticacaoRepository {
   }
 
   async findByUsuarioId(usuarioId: string): Promise<Autenticacao> {
-    const autenticacaoDoc = await AutenticaoModel.find({ usuarioId }).lean<AutenticacaoMongo>()
+    const autenticacaoDoc = await AutenticaoModel.findOne({ usuarioId }).lean<AutenticacaoMongo>()
     if (!autenticacaoDoc) throw new Error('Usuario não encontrado')
     return Autenticacao.create(
       autenticacaoDoc._id,
@@ -34,7 +34,7 @@ export class MongooseAutenticacaoRepository implements AutenticacaoRepository {
   }
 
   async findById(id: string): Promise<Autenticacao> {
-    const autenticacaoDoc = await AutenticaoModel.findById(id).lean<AutenticacaoMongo>()
+    const autenticacaoDoc = await AutenticaoModel.findOne({ _id: id }).lean<AutenticacaoMongo>()
     if (!autenticacaoDoc) throw new Error('Usuario não encontrado')
     return Autenticacao.create(
       autenticacaoDoc._id,
@@ -44,7 +44,8 @@ export class MongooseAutenticacaoRepository implements AutenticacaoRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const autenticacaoDoc = await AutenticaoModel.findByIdAndDelete(id)
+    const autenticacaoDoc = await AutenticaoModel.findOne({ _id: id }).lean<AutenticacaoMongo>()
     if (!autenticacaoDoc) throw new Error('Nenhum usuario encontrado')
+    await AutenticaoModel.deleteOne({ _id: id })
   }
 }

@@ -58,8 +58,8 @@ async function main() {
 
   const cadastrarMedicaoUseCase = CadastrarMedicaoUseCase.create(medicaoRepo, dispositivoRepo)
 
-  const criarUsuarioUseCase = CriarUsuarioUseCase.create(usuarioRepo)
-  const removerUsuarioUseCase = RemoverUsuarioUseCase.create(usuarioRepo)
+  const criarUsuarioUseCase = CriarUsuarioUseCase.create(usuarioRepo, autenticacaoRepo)
+  const removerUsuarioUseCase = RemoverUsuarioUseCase.create(usuarioRepo, autenticacaoRepo)
 
   const loginUseCase = LogarUseCase.create(usuarioRepo, autenticacaoRepo)
 

@@ -21,6 +21,7 @@ import { MongooseUsuarioRepository } from './infra/database/usuario/usuario.repo
 import { Routes } from './infra/http/routes/routes.js'
 import { ServerHTTP } from './infra/http/server.js'
 import { ClientMQTT } from './infra/mqtt/client.js'
+import { MqttTopicSubscriber } from './infra/mqtt/topic-subscriber.js'
 import { AtualizarAmbienteController } from './interface/ambiente/atualizar-ambientes/atualizar-ambientes.controller.js'
 import { CriarAmbienteController } from './interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
 import { ListarAmbientesController } from './interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
@@ -40,6 +41,10 @@ async function main() {
   const orm = MongooseORM.create()
   await orm.connectDatabase()
 
+  // Conecta no Broker MQTT
+  const clientMQTT = ClientMQTT.create()
+  const topicSubscriber = MqttTopicSubscriber.create(clientMQTT)
+
   // Instanciar repositorios
   const ambienteRepo = MongooseAmbienteRepository.create()
   const dispositivoRepo = MongooseDispositivoRepository.create()
@@ -53,7 +58,10 @@ async function main() {
   const atualizarAmbienteUseCase = AtualizarAmbienteUseCase.create(ambienteRepo)
   const removerAmbienteUseCase = RemoverAmbienteUseCase.create(ambienteRepo, dispositivoRepo)
 
-  const cadastrarDispositivoUseCase = CadastrarDispositivoUseCase.create(dispositivoRepo)
+  const cadastrarDispositivoUseCase = CadastrarDispositivoUseCase.create(
+    dispositivoRepo,
+    topicSubscriber,
+  )
   const listarDispositivosUseCase = ListarDispositivosUseCase.create(dispositivoRepo)
   const atualizarDispositivoUseCase = AtualizarDispositivoUseCase.create(dispositivoRepo)
   const removerDispositivoUseCase = RemoverDispositivoUseCase.create(dispositivoRepo)
@@ -90,10 +98,6 @@ async function main() {
 
   const loginController = LoginController.create(loginUseCase)
 
-  // Conecta no Broker MQTT
-  const clientMQTT = ClientMQTT.create(cadastrarMedicaoController)
-  clientMQTT.subscribeTopic('+')
-
   // Instanciar as rotas
   const routes = Routes.create(
     criarAmbienteController,
@@ -114,6 +118,13 @@ async function main() {
 
     loginController,
   ).routes
+
+  clientMQTT.onMessage((msg) => cadastrarMedicaoController.handle(msg))
+
+  const dispositivos = await dispositivoRepo.findAll()
+  for (const dispositivo of dispositivos) {
+    if (dispositivo.ambienteId) await topicSubscriber.dispositivoSubscribe(dispositivo.id)
+  }
 
   // Conecta no Servidor
   const server = ServerHTTP.create(routes)

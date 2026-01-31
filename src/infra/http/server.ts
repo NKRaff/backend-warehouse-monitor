@@ -13,10 +13,9 @@ export class ServerHTTP {
       res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
       
       if (req.method === 'OPTIONS') {
-        res.sendStatus(200)
-      } else {
-        next()
+        res.sendStatus(204)
       }
+        next()
     })
     
     this.app.use(express.json())

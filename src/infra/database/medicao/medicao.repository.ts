@@ -81,4 +81,29 @@ export class MongooseMedicaoRepository implements MedicaoRepository {
       ),
     )
   }
+
+  public async findLast(filters: {
+    dispositivoId?: string
+    ambienteId?: string
+    tipo: TipoMedicao
+  }): Promise<Medicao> {
+    const query: any = {}
+    if (filters.dispositivoId) query.dispositivoId = filters.dispositivoId
+    if (filters.ambienteId) query.ambienteId = filters.ambienteId
+    query.tipo = filters.tipo
+    const medicaoDoc = await MedicaoModel.findOne(query)
+      .sort({ createdAt: -1 })
+      .lean<MedicaoMongo>()
+    console.log(medicaoDoc)
+    if (!medicaoDoc) throw new Error('Nenhuma medição encontrada')
+    return Medicao.create(
+      medicaoDoc._id,
+      medicaoDoc.dispositivoId,
+      medicaoDoc.ambienteId,
+      medicaoDoc.tipo,
+      medicaoDoc.valor,
+      medicaoDoc.createdAt,
+      medicaoDoc.updatedAt,
+    )
+  }
 }

@@ -1,4 +1,5 @@
 import type { BuscarMedicoesController } from '@/interface/medicao/buscar-medicoes/buscar-medicoes.controller.js'
+import type { BuscarUltimaMedicaoController } from '@/interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
 import type { CadastrarMedicaoController } from '@/interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
 import { Router } from 'express'
 
@@ -8,6 +9,7 @@ export class MedicaoRoutes {
   private constructor(
     private readonly cadastrarMedicaoController: CadastrarMedicaoController,
     private readonly buscarMedicoesController: BuscarMedicoesController,
+    private readonly buscarUltimaMedicaoController: BuscarUltimaMedicaoController,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -16,8 +18,13 @@ export class MedicaoRoutes {
   public static create(
     cadastrarMedicaoController: CadastrarMedicaoController,
     buscarMedicoesController: BuscarMedicoesController,
+    buscarUltimaMedicaoController: BuscarUltimaMedicaoController,
   ) {
-    return new MedicaoRoutes(cadastrarMedicaoController, buscarMedicoesController)
+    return new MedicaoRoutes(
+      cadastrarMedicaoController,
+      buscarMedicoesController,
+      buscarUltimaMedicaoController,
+    )
   }
 
   private setupRoutes() {
@@ -33,6 +40,15 @@ export class MedicaoRoutes {
     this.routes.post('/buscar', async (req, res) => {
       try {
         const result = await this.buscarMedicoesController.handle(req.body)
+        res.status(200).json(result)
+      } catch (error) {
+        res.status(400).json(error)
+      }
+    })
+
+    this.routes.post('/buscar-ultima', async (req, res) => {
+      try {
+        const result = await this.buscarUltimaMedicaoController.handle(req.body)
         res.status(200).json(result)
       } catch (error) {
         res.status(400).json(error)

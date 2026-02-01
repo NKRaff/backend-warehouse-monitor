@@ -53,8 +53,6 @@ export class MongooseDispositivoRepository implements DispositivoRepository {
     if (Object.keys(setData).length > 0) updateQuery.$set = setData
     if (Object.keys(unsetData).length > 0) updateQuery.$unset = unsetData
 
-    console.log(updateQuery)
-
     const dispositivoDoc = await DispositivoModel.findByIdAndUpdate(dispositivo.id, updateQuery)
 
     if (!dispositivoDoc) throw new Error('Nenhum dispositivo com esse Id encontrado')

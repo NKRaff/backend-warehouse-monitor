@@ -12,4 +12,9 @@ export interface MedicaoRepository {
     startData?: Date
     endData?: Date
   }): Promise<Medicao[]>
+  findLast(filters: {
+    dispositivoId?: string
+    ambienteId?: string
+    tipo: TipoMedicao
+  }): Promise<Medicao>
 }

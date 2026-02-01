@@ -9,6 +9,7 @@ import { CadastrarDispositivoUseCase } from './application/dispositivo/use-cases
 import { ListarDispositivosUseCase } from './application/dispositivo/use-cases/listar-dispositivos.usecase.js'
 import { RemoverDispositivoUseCase } from './application/dispositivo/use-cases/remover-dispositivo.usecase.js'
 import { BuscarMedicaoUseCase } from './application/medicao/use-cases/buscar-medicoes.usecase.js'
+import { BuscarUltimaMedicaoUseCase } from './application/medicao/use-cases/buscar-ultima-medicao.usecase.js'
 import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastrar-medicao.usecase.js'
 import { CriarUsuarioUseCase } from './application/usuario/use-cases/criar-usuario.usecase.js'
 import { RemoverUsuarioUseCase } from './application/usuario/use-cases/remover-usuario.usecase.js'
@@ -32,6 +33,7 @@ import { CadastrarDispositivoController } from './interface/dispositivo/cadastra
 import { ListarDispositivosController } from './interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
 import { RemoverDispositivoController } from './interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
 import { BuscarMedicoesController } from './interface/medicao/buscar-medicoes/buscar-medicoes.controller.js'
+import { BuscarUltimaMedicaoController } from './interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
 import { CadastrarMedicaoController } from './interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
 import { CriarUsuarioController } from './interface/usuario/criar-usuario/criar-usuario.controller.js'
 import { RemoverUsuarioController } from './interface/usuario/remover-usuario/remover-usuario.controller.js'
@@ -68,6 +70,7 @@ async function main() {
 
   const cadastrarMedicaoUseCase = CadastrarMedicaoUseCase.create(medicaoRepo, dispositivoRepo)
   const buscarMedicoesUseCase = BuscarMedicaoUseCase.create(medicaoRepo)
+  const buscarUltimaMedicaoUseCase = BuscarUltimaMedicaoUseCase.create(medicaoRepo)
 
   const criarUsuarioUseCase = CriarUsuarioUseCase.create(usuarioRepo, autenticacaoRepo)
   const removerUsuarioUseCase = RemoverUsuarioUseCase.create(usuarioRepo, autenticacaoRepo)
@@ -92,6 +95,9 @@ async function main() {
 
   const cadastrarMedicaoController = CadastrarMedicaoController.create(cadastrarMedicaoUseCase)
   const buscarMedicoesController = BuscarMedicoesController.create(buscarMedicoesUseCase)
+  const buscarUltimaMedicaoController = BuscarUltimaMedicaoController.create(
+    buscarUltimaMedicaoUseCase,
+  )
 
   const criarUsuarioController = CriarUsuarioController.create(criarUsuarioUseCase)
   const removerUsuarioController = RemoverUsuarioController.create(removerUsuarioUseCase)
@@ -112,6 +118,7 @@ async function main() {
 
     cadastrarMedicaoController,
     buscarMedicoesController,
+    buscarUltimaMedicaoController,
 
     criarUsuarioController,
     removerUsuarioController,

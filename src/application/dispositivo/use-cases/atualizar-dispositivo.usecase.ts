@@ -18,8 +18,6 @@ export class AtualizarDispositivoUseCase
   public async execute(
     input: AtualizarDispositivoInputDto,
   ): Promise<AtualizarDispositivoOutputDto> {
-    if (!input.nome && !input.ambienteId)
-      throw new Error('Não é possivel atualizar dispositivo: não existe nunhum dado a ser alterado')
     const dispositivo = await this.dispositivoRepo.findById(input.id)
     if (!dispositivo)
       throw new Error(

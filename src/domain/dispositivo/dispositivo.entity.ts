@@ -14,6 +14,7 @@ export class Dispositivo {
   public update(nome?: string, ambienteId?: string) {
     if (nome) this.props.nome = nome
     if (ambienteId) this.props.ambienteId = ambienteId
+    else this.props.ambienteId = ''
   }
 
   public removerAmbiente() {

@@ -42,10 +42,20 @@ export class MongooseDispositivoRepository implements DispositivoRepository {
   }
 
   public async update(dispositivo: Dispositivo): Promise<void> {
-    const dispositivoDoc = await DispositivoModel.findByIdAndUpdate(dispositivo.id, {
-      nome: dispositivo.nome,
-      ambienteId: dispositivo.ambienteId,
-    })
+    const setData: any = {}
+    const unsetData: any = {}
+
+    if (dispositivo.nome) setData.nome = dispositivo.nome
+    if (dispositivo.ambienteId) setData.ambienteId = dispositivo.ambienteId
+    else unsetData.ambienteId = ''
+
+    const updateQuery: any = {}
+    if (Object.keys(setData).length > 0) updateQuery.$set = setData
+    if (Object.keys(unsetData).length > 0) updateQuery.$unset = unsetData
+
+    console.log(updateQuery)
+
+    const dispositivoDoc = await DispositivoModel.findByIdAndUpdate(dispositivo.id, updateQuery)
 
     if (!dispositivoDoc) throw new Error('Nenhum dispositivo com esse Id encontrado')
   }

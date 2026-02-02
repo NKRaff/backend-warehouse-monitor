@@ -4,6 +4,9 @@ import type { AmbienteRepository } from '@/domain/ambiente/ambiente.repository.j
 import type { DispositivoRepository } from '@/domain/dispositivo/despositivo.repository.js'
 import { Medicao } from '@/domain/medicao/medicao.entity.js'
 import type { MedicaoRepository } from '@/domain/medicao/medicao.repository.js'
+import { Notificacao } from '@/domain/notificacao/notificacao.entity.js'
+import type { NotificacaoRepository } from '@/domain/notificacao/notificacao.repository.js'
+import type { UsuarioRepository } from '@/domain/usuario/usuario.repository.js'
 import { v7 } from 'uuid'
 import type {
   CadastrarMedicaoInputDto,
@@ -19,6 +22,8 @@ export class CadastrarMedicaoUseCase
     private readonly dispositivoRepo: DispositivoRepository,
     private readonly ambienteRepo: AmbienteRepository,
     private readonly alertaRepo: AlertaRepository,
+    private readonly usuarioRepo: UsuarioRepository,
+    private readonly notificacaoRepo: NotificacaoRepository,
   ) {}
 
   public static create(
@@ -26,8 +31,17 @@ export class CadastrarMedicaoUseCase
     dispositivoRepo: DispositivoRepository,
     ambienteRepo: AmbienteRepository,
     alertaRepo: AlertaRepository,
+    usuarioRepo: UsuarioRepository,
+    notificacaoRepo: NotificacaoRepository,
   ) {
-    return new CadastrarMedicaoUseCase(medicaoRepo, dispositivoRepo, ambienteRepo, alertaRepo)
+    return new CadastrarMedicaoUseCase(
+      medicaoRepo,
+      dispositivoRepo,
+      ambienteRepo,
+      alertaRepo,
+      usuarioRepo,
+      notificacaoRepo,
+    )
   }
 
   public async execute(input: CadastrarMedicaoInputDto): Promise<CadastrarMedicaoOutputDto> {
@@ -60,7 +74,15 @@ export class CadastrarMedicaoUseCase
     const alertaGerado = ambiente.validarMedicao(idAlerta, dispositivo, input.tipo, input.valor)
     const alertaAtivo = await this.alertaRepo.findAtivoPorAmbienteETipo(ambiente.id, input.tipo)
 
-    if (alertaGerado && !alertaAtivo) await this.alertaRepo.save(alertaGerado)
+    if (alertaGerado && !alertaAtivo) {
+      await this.alertaRepo.save(alertaGerado)
+      const usuarios = await this.usuarioRepo.findAll()
+      usuarios.forEach(async (usuario) => {
+        const notificaoId = v7()
+        const notificao = Notificacao.create(notificaoId, alertaGerado.id, usuario.id)
+        await this.notificacaoRepo.save(notificao)
+      })
+    }
     if (!alertaGerado && alertaAtivo) {
       alertaAtivo.encerrar()
       await this.alertaRepo.updateStatus(alertaAtivo.id, alertaAtivo.ativo)

@@ -65,4 +65,22 @@ export class MongooseAlertaRepository implements AlertaRepository {
       alerta.limiteMax,
     )
   }
+
+  public async findById(id: string): Promise<Alerta> {
+    const alertaDoc = await AlertaModel.findById(id).lean<AlertaMongo>()
+    if (!alertaDoc) throw new Error('Nenhum alerta com esse id encontrado')
+    return Alerta.create(
+      alertaDoc._id,
+      alertaDoc.dispositivoId,
+      alertaDoc.ambienteId,
+      alertaDoc.tipo,
+      alertaDoc.nivel,
+      alertaDoc.mensagem,
+      alertaDoc.ativo,
+      alertaDoc.sensorTipo,
+      alertaDoc.valorAtual,
+      alertaDoc.limiteMin,
+      alertaDoc.limiteMax,
+    )
+  }
 }

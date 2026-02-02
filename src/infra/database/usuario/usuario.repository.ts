@@ -35,6 +35,11 @@ export class MongooseUsuarioRepository implements UsuarioRepository {
     return Usuario.create(usuarioDoc._id, usuarioDoc.nome, usuarioDoc.email)
   }
 
+  async findAll(): Promise<Usuario[]> {
+    const usuariosDoc = await UsuarioModel.find().lean<UsuarioMongo[]>()
+    return usuariosDoc.map((doc) => Usuario.create(doc._id, doc.nome, doc.email))
+  }
+
   async delete(id: string): Promise<void> {
     const usuarioDoc = await UsuarioModel.findByIdAndDelete(id)
     if (!usuarioDoc) throw new Error('Nenhum usuario encontrado')

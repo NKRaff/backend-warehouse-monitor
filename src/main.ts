@@ -11,6 +11,8 @@ import { RemoverDispositivoUseCase } from './application/dispositivo/use-cases/r
 import { BuscarMedicaoUseCase } from './application/medicao/use-cases/buscar-medicoes.usecase.js'
 import { BuscarUltimaMedicaoUseCase } from './application/medicao/use-cases/buscar-ultima-medicao.usecase.js'
 import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastrar-medicao.usecase.js'
+import { ListarNotificaoDoUsuarioUseCase } from './application/notificao/use-cases/listar-notificao-do-usuario.usecase.js'
+import { MarcarComoLidaUseCase } from './application/notificao/use-cases/marcar-como-lida.usecase.js'
 import { CriarUsuarioUseCase } from './application/usuario/use-cases/criar-usuario.usecase.js'
 import { RemoverUsuarioUseCase } from './application/usuario/use-cases/remover-usuario.usecase.js'
 import { MongooseAlertaRepository } from './infra/database/alerta/alerta.repository.js'
@@ -19,6 +21,7 @@ import { MongooseAutenticacaoRepository } from './infra/database/autenticacao/au
 import { MongooseDispositivoRepository } from './infra/database/dispositivo/dispositivo.repository.js'
 import { MongooseMedicaoRepository } from './infra/database/medicao/medicao.repository.js'
 import { MongooseORM } from './infra/database/mongoose.config.js'
+import { MongooseNotificacaoRepository } from './infra/database/notificacao/notificacao.repository.js'
 import { MongooseUsuarioRepository } from './infra/database/usuario/usuario.repository.js'
 import { Routes } from './infra/http/routes/routes.js'
 import { ServerHTTP } from './infra/http/server.js'
@@ -36,6 +39,8 @@ import { RemoverDispositivoController } from './interface/dispositivo/remover-di
 import { BuscarMedicoesController } from './interface/medicao/buscar-medicoes/buscar-medicoes.controller.js'
 import { BuscarUltimaMedicaoController } from './interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
 import { CadastrarMedicaoController } from './interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
+import { ListarNotificacaoDoUsuarioController } from './interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
+import { MarcarComoLidaController } from './interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import { CriarUsuarioController } from './interface/usuario/criar-usuario/criar-usuario.controller.js'
 import { RemoverUsuarioController } from './interface/usuario/remover-usuario/remover-usuario.controller.js'
 
@@ -55,6 +60,7 @@ async function main() {
   const usuarioRepo = MongooseUsuarioRepository.create()
   const autenticacaoRepo = MongooseAutenticacaoRepository.create()
   const alertaRepo = MongooseAlertaRepository.create()
+  const notificacaoRepo = MongooseNotificacaoRepository.create()
 
   // Instanciar use cases
   const criarAmbienteUseCase = CriarAmbienteUseCase.create(ambienteRepo)
@@ -75,6 +81,8 @@ async function main() {
     dispositivoRepo,
     ambienteRepo,
     alertaRepo,
+    usuarioRepo,
+    notificacaoRepo,
   )
   const buscarMedicoesUseCase = BuscarMedicaoUseCase.create(medicaoRepo)
   const buscarUltimaMedicaoUseCase = BuscarUltimaMedicaoUseCase.create(medicaoRepo)
@@ -83,6 +91,12 @@ async function main() {
   const removerUsuarioUseCase = RemoverUsuarioUseCase.create(usuarioRepo, autenticacaoRepo)
 
   const loginUseCase = LogarUseCase.create(usuarioRepo, autenticacaoRepo)
+
+  const listaNotificacaoDoUsuarioUseCase = ListarNotificaoDoUsuarioUseCase.create(
+    alertaRepo,
+    notificacaoRepo,
+  )
+  const marcarComoLidaUseCase = MarcarComoLidaUseCase.create(notificacaoRepo)
 
   // Instanciar controllers
   const criarAmbienteController = CriarAmbienteController.create(criarAmbienteUseCase)
@@ -111,6 +125,11 @@ async function main() {
 
   const loginController = LoginController.create(loginUseCase)
 
+  const listarNotificacaoDoUsuarioController = ListarNotificacaoDoUsuarioController.create(
+    listaNotificacaoDoUsuarioUseCase,
+  )
+  const marcarComoLidaController = MarcarComoLidaController.create(marcarComoLidaUseCase)
+
   // Instanciar as rotas
   const routes = Routes.create(
     criarAmbienteController,
@@ -131,6 +150,9 @@ async function main() {
     removerUsuarioController,
 
     loginController,
+
+    listarNotificacaoDoUsuarioController,
+    marcarComoLidaController,
   ).routes
 
   clientMQTT.onMessage((msg) => cadastrarMedicaoController.handle(msg))

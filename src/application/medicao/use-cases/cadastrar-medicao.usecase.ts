@@ -60,10 +60,7 @@ export class CadastrarMedicaoUseCase
     const alertaGerado = ambiente.validarMedicao(idAlerta, dispositivo, input.tipo, input.valor)
     const alertaAtivo = await this.alertaRepo.findAtivoPorAmbienteETipo(ambiente.id, input.tipo)
 
-    if (alertaGerado && !alertaAtivo) {
-      await this.alertaRepo.save(alertaGerado)
-      console.log('gerou alerta')
-    }
+    if (alertaGerado && !alertaAtivo) await this.alertaRepo.save(alertaGerado)
     if (!alertaGerado && alertaAtivo) {
       alertaAtivo.encerrar()
       await this.alertaRepo.updateStatus(alertaAtivo.id, alertaAtivo.ativo)

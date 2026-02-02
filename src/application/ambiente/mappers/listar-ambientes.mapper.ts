@@ -9,6 +9,10 @@ export namespace ListarAmbientesMapper {
           nome: ambiente.nome,
           tipo: ambiente.tipo,
           descricao: ambiente.descricao,
+          temperatura_minima: ambiente.temperaturaMinima,
+          temperatura_maxima: ambiente.temperaturaMaxima,
+          umidade_minima: ambiente.umidadeMinima,
+          umidade_maxima: ambiente.umidadeMaxima,
         }
       }),
     }

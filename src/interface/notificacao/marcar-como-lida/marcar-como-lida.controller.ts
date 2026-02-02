@@ -1,7 +1,7 @@
 import type {
   MarcarComoLidaInputDto,
   MarcarComoLidaOutputDto,
-} from '@/application/notificao/dtos/marcar-como-lida.dto.js'
+} from '@/application/notificacao/dtos/marcar-como-lida.dto.js'
 import type { UseCase } from '@/application/usecase.js'
 import { MarcarComoLidaSchema } from './marcar-como-lida.schema.js'
 

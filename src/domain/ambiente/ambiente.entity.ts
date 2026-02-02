@@ -1,3 +1,7 @@
+import { Alerta } from '../alerta/alerta.entity.js'
+import type { Dispositivo } from '../dispositivo/dispositivo.entity.js'
+import type { TipoMedicao } from '../medicao/medicao.entity.js'
+
 export type TipoAmbiente = 'frio' | 'arejado'
 
 export type AmbienteProps = {
@@ -56,7 +60,7 @@ export class Ambiente {
     const max =
       temperatura_maxima !== undefined ? temperatura_maxima : this.props.temperatura_maxima
 
-    if (min <= max)
+    if (min >= max)
       throw new Error('Temperatura mínima não pode ser maior ou igual à temperatura máxima')
 
     if (temperatura_minima !== undefined) this.props.temperatura_minima = temperatura_minima
@@ -64,13 +68,71 @@ export class Ambiente {
   }
 
   private atualizarRangeUmidade(umidade_minima?: number, umidade_maxima?: number) {
-    const min = umidade_minima !== undefined ? umidade_minima : this.props.temperatura_minima
+    const min = umidade_minima !== undefined ? umidade_minima : this.props.umidade_minima
     const max = umidade_maxima !== undefined ? umidade_maxima : this.props.umidade_maxima
 
-    if (min <= max) throw new Error('Umidade mínima não pode ser maior ou igual à umidade máxima')
+    if (min >= max) throw new Error('Umidade mínima não pode ser maior ou igual à umidade máxima')
 
     if (umidade_minima !== undefined) this.props.umidade_minima = umidade_minima
     if (umidade_maxima !== undefined) this.props.umidade_maxima = umidade_maxima
+  }
+
+  public validarMedicao(
+    id: string,
+    dispositivo: Dispositivo,
+    tipo: TipoMedicao,
+    valor: number,
+  ): Alerta | null {
+    let alerta: Alerta | null = null
+    if (tipo === 'temperatura') {
+      alerta = this.validarRange(
+        id,
+        dispositivo,
+        valor,
+        tipo,
+        this.temperaturaMinima,
+        this.temperaturaMaxima,
+        'Valor de temperatura fora do limite esperado',
+      )
+    } else {
+      alerta = this.validarRange(
+        id,
+        dispositivo,
+        valor,
+        tipo,
+        this.umidadeMinima,
+        this.umidadeMaxima,
+        'Valor de umidade fora do limite esperado',
+      )
+    }
+    return alerta
+  }
+
+  private validarRange(
+    id: string,
+    dispositivo: Dispositivo,
+    valor: number,
+    tipo: TipoMedicao,
+    min: number,
+    max: number,
+    mensagem: string,
+  ): Alerta | null {
+    if (valor < min || valor > max) {
+      return Alerta.create(
+        id,
+        dispositivo.id,
+        this.id,
+        'sensor_fora_do_range',
+        'critico',
+        mensagem,
+        true,
+        tipo,
+        valor,
+        min,
+        max,
+      )
+    }
+    return null
   }
 
   public get id(): string {

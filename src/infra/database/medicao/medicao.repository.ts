@@ -94,7 +94,6 @@ export class MongooseMedicaoRepository implements MedicaoRepository {
     const medicaoDoc = await MedicaoModel.findOne(query)
       .sort({ createdAt: -1 })
       .lean<MedicaoMongo>()
-    console.log(medicaoDoc)
     if (!medicaoDoc) throw new Error('Nenhuma medição encontrada')
     return Medicao.create(
       medicaoDoc._id,

@@ -13,6 +13,7 @@ import { BuscarUltimaMedicaoUseCase } from './application/medicao/use-cases/busc
 import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastrar-medicao.usecase.js'
 import { CriarUsuarioUseCase } from './application/usuario/use-cases/criar-usuario.usecase.js'
 import { RemoverUsuarioUseCase } from './application/usuario/use-cases/remover-usuario.usecase.js'
+import { MongooseAlertaRepository } from './infra/database/alerta/alerta.repository.js'
 import { MongooseAmbienteRepository } from './infra/database/ambiente/ambiente.repository.js'
 import { MongooseAutenticacaoRepository } from './infra/database/autenticacao/autenticacao.repository.js'
 import { MongooseDispositivoRepository } from './infra/database/dispositivo/dispositivo.repository.js'
@@ -53,6 +54,7 @@ async function main() {
   const medicaoRepo = MongooseMedicaoRepository.create()
   const usuarioRepo = MongooseUsuarioRepository.create()
   const autenticacaoRepo = MongooseAutenticacaoRepository.create()
+  const alertaRepo = MongooseAlertaRepository.create()
 
   // Instanciar use cases
   const criarAmbienteUseCase = CriarAmbienteUseCase.create(ambienteRepo)
@@ -68,7 +70,12 @@ async function main() {
   const atualizarDispositivoUseCase = AtualizarDispositivoUseCase.create(dispositivoRepo)
   const removerDispositivoUseCase = RemoverDispositivoUseCase.create(dispositivoRepo)
 
-  const cadastrarMedicaoUseCase = CadastrarMedicaoUseCase.create(medicaoRepo, dispositivoRepo)
+  const cadastrarMedicaoUseCase = CadastrarMedicaoUseCase.create(
+    medicaoRepo,
+    dispositivoRepo,
+    ambienteRepo,
+    alertaRepo,
+  )
   const buscarMedicoesUseCase = BuscarMedicaoUseCase.create(medicaoRepo)
   const buscarUltimaMedicaoUseCase = BuscarUltimaMedicaoUseCase.create(medicaoRepo)
 

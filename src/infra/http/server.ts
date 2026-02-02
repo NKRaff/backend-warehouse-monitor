@@ -1,3 +1,4 @@
+import cors from 'cors'
 import express, { type Express, type Router } from 'express'
 
 export class ServerHTTP {
@@ -6,6 +7,13 @@ export class ServerHTTP {
   private constructor(routes: Router) {
     this.app = express()
     this.app.use(express.json())
+    this.app.use(
+      cors({
+        origin: process.env.CORS_ORIGIN || '*',
+        methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+      }),
+    )
     this.app.use(routes)
   }
 

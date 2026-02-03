@@ -85,11 +85,13 @@ export class CadastrarMedicaoUseCase
         const notificaoId = v7()
         const notificao = Notificacao.create(notificaoId, alertaGerado.id, usuario.id)
         await this.notificacaoRepo.save(notificao)
-        await this.mailer.sendMail({
-          to: usuario.email,
-          subject: 'Teste de email',
-          text: 'Email de teste',
-        })
+        if (usuario.receberEmail) {
+          await this.mailer.sendMail({
+            to: usuario.email,
+            subject: 'Teste de email',
+            text: 'Email de teste',
+          })
+        }
       })
     }
     if (!alertaGerado && alertaAtivo) {

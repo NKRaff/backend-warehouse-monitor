@@ -19,7 +19,6 @@ export class CadastrarMedicaoController {
     const dispositivoId = parts[0]
     const tipo = parts[1]
     const valor = message.payload.toString()
-    console.log(`dispositivoId: ${dispositivoId}, tipo: ${tipo}, valor: ${valor}`)
     const dto = CadastrarMedicaoSchema.parse({ dispositivoId, tipo, valor })
     return await this.useCase.execute(dto)
   }

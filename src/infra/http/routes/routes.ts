@@ -10,13 +10,18 @@ import type { RemoverDispositivoController } from '@/interface/dispositivo/remov
 import type { BuscarMedicoesController } from '@/interface/medicao/buscar-medicoes/buscar-medicoes.controller.js'
 import type { BuscarUltimaMedicaoController } from '@/interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
 import type { CadastrarMedicaoController } from '@/interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
+import type { ListarNotificacaoDoUsuarioController } from '@/interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
+import type { MarcarComoLidaController } from '@/interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import type { CriarUsuarioController } from '@/interface/usuario/criar-usuario/criar-usuario.controller.js'
+import type { AtivarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
+import type { DesativarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
 import type { RemoverUsuarioController } from '@/interface/usuario/remover-usuario/remover-usuario.controller.js'
 import { Router } from 'express'
 import { AmbienteRoutes } from './ambientes.route.js'
 import { DispositivoRoutes } from './dispositivo.route.js'
 import { LoginRoutes } from './login.route.js'
 import { MedicaoRoutes } from './medicao.route.js'
+import { NotificaoRoutes } from './notificacao.route.js'
 import { UsuarioRoutes } from './usuario.route.js'
 
 export class Routes {
@@ -39,8 +44,13 @@ export class Routes {
 
     private readonly criarUsuarioController: CriarUsuarioController,
     private readonly removerUsuarioController: RemoverUsuarioController,
+    private readonly ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
+    private readonly desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
 
     private readonly loginController: LoginController,
+
+    private readonly listarNotificacaoDoUsuarioController: ListarNotificacaoDoUsuarioController,
+    private readonly marcarComoLidaController: MarcarComoLidaController,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -63,8 +73,13 @@ export class Routes {
 
     criarUsuarioController: CriarUsuarioController,
     removerUsuarioController: RemoverUsuarioController,
+    ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
+    desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
 
     loginController: LoginController,
+
+    listarNotificacaoDoUsuarioController: ListarNotificacaoDoUsuarioController,
+    marcarComoLidaController: MarcarComoLidaController,
   ) {
     return new Routes(
       criarAmbienteController,
@@ -83,8 +98,13 @@ export class Routes {
 
       criarUsuarioController,
       removerUsuarioController,
+      ativarRecebimentoEmailController,
+      desativarRecebimentoEmailController,
 
       loginController,
+
+      listarNotificacaoDoUsuarioController,
+      marcarComoLidaController,
     )
   }
 
@@ -120,9 +140,22 @@ export class Routes {
 
     this.routes.use(
       '/usuario',
-      UsuarioRoutes.create(this.criarUsuarioController, this.removerUsuarioController).routes,
+      UsuarioRoutes.create(
+        this.criarUsuarioController,
+        this.removerUsuarioController,
+        this.ativarRecebimentoEmailController,
+        this.desativarRecebimentoEmailController,
+      ).routes,
     )
 
     this.routes.use('/autenticacao', LoginRoutes.create(this.loginController).routes)
+
+    this.routes.use(
+      '/notificacao',
+      NotificaoRoutes.create(
+        this.listarNotificacaoDoUsuarioController,
+        this.marcarComoLidaController,
+      ).routes,
+    )
   }
 }

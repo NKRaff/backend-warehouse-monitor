@@ -11,18 +11,25 @@ import { RemoverDispositivoUseCase } from './application/dispositivo/use-cases/r
 import { BuscarMedicaoUseCase } from './application/medicao/use-cases/buscar-medicoes.usecase.js'
 import { BuscarUltimaMedicaoUseCase } from './application/medicao/use-cases/buscar-ultima-medicao.usecase.js'
 import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastrar-medicao.usecase.js'
+import { ListarNotificaoDoUsuarioUseCase } from './application/notificacao/use-cases/listar-notificao-do-usuario.usecase.js'
+import { MarcarComoLidaUseCase } from './application/notificacao/use-cases/marcar-como-lida.usecase.js'
+import { AtivarRecebimentoEmailUseCase } from './application/usuario/use-cases/ativar-recebimento-email.usecase.js'
 import { CriarUsuarioUseCase } from './application/usuario/use-cases/criar-usuario.usecase.js'
+import { DesativarRecebimentoEmailUseCase } from './application/usuario/use-cases/desativar-recebimento-email.usecase.js'
 import { RemoverUsuarioUseCase } from './application/usuario/use-cases/remover-usuario.usecase.js'
+import { MongooseAlertaRepository } from './infra/database/alerta/alerta.repository.js'
 import { MongooseAmbienteRepository } from './infra/database/ambiente/ambiente.repository.js'
 import { MongooseAutenticacaoRepository } from './infra/database/autenticacao/autenticacao.repository.js'
 import { MongooseDispositivoRepository } from './infra/database/dispositivo/dispositivo.repository.js'
 import { MongooseMedicaoRepository } from './infra/database/medicao/medicao.repository.js'
 import { MongooseORM } from './infra/database/mongoose.config.js'
+import { MongooseNotificacaoRepository } from './infra/database/notificacao/notificacao.repository.js'
 import { MongooseUsuarioRepository } from './infra/database/usuario/usuario.repository.js'
 import { Routes } from './infra/http/routes/routes.js'
 import { ServerHTTP } from './infra/http/server.js'
 import { ClientMQTT } from './infra/mqtt/client.js'
 import { MqttTopicSubscriber } from './infra/mqtt/topic-subscriber.js'
+import { Nodemailer } from './infra/smtp/nodemailer/client.mailer.js'
 import { AtualizarAmbienteController } from './interface/ambiente/atualizar-ambientes/atualizar-ambientes.controller.js'
 import { CriarAmbienteController } from './interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
 import { ListarAmbientesController } from './interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
@@ -35,7 +42,11 @@ import { RemoverDispositivoController } from './interface/dispositivo/remover-di
 import { BuscarMedicoesController } from './interface/medicao/buscar-medicoes/buscar-medicoes.controller.js'
 import { BuscarUltimaMedicaoController } from './interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
 import { CadastrarMedicaoController } from './interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
+import { ListarNotificacaoDoUsuarioController } from './interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
+import { MarcarComoLidaController } from './interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import { CriarUsuarioController } from './interface/usuario/criar-usuario/criar-usuario.controller.js'
+import { AtivarRecebimentoEmailController } from './interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
+import { DesativarRecebimentoEmailController } from './interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
 import { RemoverUsuarioController } from './interface/usuario/remover-usuario/remover-usuario.controller.js'
 
 async function main() {
@@ -47,12 +58,17 @@ async function main() {
   const clientMQTT = ClientMQTT.create()
   const topicSubscriber = MqttTopicSubscriber.create(clientMQTT)
 
+  // Cria Transporter Mailer SMTP
+  const mailer = Nodemailer.create()
+
   // Instanciar repositorios
   const ambienteRepo = MongooseAmbienteRepository.create()
   const dispositivoRepo = MongooseDispositivoRepository.create()
   const medicaoRepo = MongooseMedicaoRepository.create()
   const usuarioRepo = MongooseUsuarioRepository.create()
   const autenticacaoRepo = MongooseAutenticacaoRepository.create()
+  const alertaRepo = MongooseAlertaRepository.create()
+  const notificacaoRepo = MongooseNotificacaoRepository.create()
 
   // Instanciar use cases
   const criarAmbienteUseCase = CriarAmbienteUseCase.create(ambienteRepo)
@@ -68,14 +84,30 @@ async function main() {
   const atualizarDispositivoUseCase = AtualizarDispositivoUseCase.create(dispositivoRepo)
   const removerDispositivoUseCase = RemoverDispositivoUseCase.create(dispositivoRepo)
 
-  const cadastrarMedicaoUseCase = CadastrarMedicaoUseCase.create(medicaoRepo, dispositivoRepo)
+  const cadastrarMedicaoUseCase = CadastrarMedicaoUseCase.create(
+    medicaoRepo,
+    dispositivoRepo,
+    ambienteRepo,
+    alertaRepo,
+    usuarioRepo,
+    notificacaoRepo,
+    mailer,
+  )
   const buscarMedicoesUseCase = BuscarMedicaoUseCase.create(medicaoRepo)
   const buscarUltimaMedicaoUseCase = BuscarUltimaMedicaoUseCase.create(medicaoRepo)
 
   const criarUsuarioUseCase = CriarUsuarioUseCase.create(usuarioRepo, autenticacaoRepo)
   const removerUsuarioUseCase = RemoverUsuarioUseCase.create(usuarioRepo, autenticacaoRepo)
+  const ativarRecebimentoEmailUseCase = AtivarRecebimentoEmailUseCase.create(usuarioRepo)
+  const desativarRecebimentoEmailUseCase = DesativarRecebimentoEmailUseCase.create(usuarioRepo)
 
   const loginUseCase = LogarUseCase.create(usuarioRepo, autenticacaoRepo)
+
+  const listaNotificacaoDoUsuarioUseCase = ListarNotificaoDoUsuarioUseCase.create(
+    alertaRepo,
+    notificacaoRepo,
+  )
+  const marcarComoLidaUseCase = MarcarComoLidaUseCase.create(notificacaoRepo)
 
   // Instanciar controllers
   const criarAmbienteController = CriarAmbienteController.create(criarAmbienteUseCase)
@@ -101,8 +133,19 @@ async function main() {
 
   const criarUsuarioController = CriarUsuarioController.create(criarUsuarioUseCase)
   const removerUsuarioController = RemoverUsuarioController.create(removerUsuarioUseCase)
+  const ativarRecebimentoEmailController = AtivarRecebimentoEmailController.create(
+    ativarRecebimentoEmailUseCase,
+  )
+  const desativarRecebimentoEmailController = DesativarRecebimentoEmailController.create(
+    desativarRecebimentoEmailUseCase,
+  )
 
   const loginController = LoginController.create(loginUseCase)
+
+  const listarNotificacaoDoUsuarioController = ListarNotificacaoDoUsuarioController.create(
+    listaNotificacaoDoUsuarioUseCase,
+  )
+  const marcarComoLidaController = MarcarComoLidaController.create(marcarComoLidaUseCase)
 
   // Instanciar as rotas
   const routes = Routes.create(
@@ -122,8 +165,13 @@ async function main() {
 
     criarUsuarioController,
     removerUsuarioController,
+    ativarRecebimentoEmailController,
+    desativarRecebimentoEmailController,
 
     loginController,
+
+    listarNotificacaoDoUsuarioController,
+    marcarComoLidaController,
   ).routes
 
   clientMQTT.onMessage((msg) => cadastrarMedicaoController.handle(msg))

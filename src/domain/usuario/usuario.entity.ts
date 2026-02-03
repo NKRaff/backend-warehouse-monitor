@@ -2,13 +2,22 @@ export type UsuarioProps = {
   id: string
   nome: string
   email: string
+  receberEmail: boolean
 }
 
 export class Usuario {
   private constructor(private props: UsuarioProps) {}
 
-  public static create(id: string, nome: string, email: string) {
-    return new Usuario({ id, nome, email })
+  public static create(id: string, nome: string, email: string, receberEmail: boolean) {
+    return new Usuario({ id, nome, email, receberEmail })
+  }
+
+  public ativarRecebimentoDeEmail() {
+    this.props.receberEmail = true
+  }
+
+  public desativarRecebimentoDeEmail() {
+    this.props.receberEmail = false
   }
 
   public get id(): string {
@@ -21,5 +30,9 @@ export class Usuario {
 
   public get email(): string {
     return this.props.email
+  }
+
+  public get receberEmail(): boolean {
+    return this.props.receberEmail
   }
 }

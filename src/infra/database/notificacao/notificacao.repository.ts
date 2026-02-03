@@ -26,7 +26,9 @@ export class MongooseNotificacaoRepository implements NotificacaoRepository {
   }
 
   public async findByUsuario(usuarioId: string): Promise<Notificacao[]> {
-    const notificacoesDoc = await NotificacaoModel.find({ usuarioId }).lean<NotificaoMongo[]>()
+    const notificacoesDoc = await NotificacaoModel.find({ usuarioId })
+      .sort({ createdAt: -1 })
+      .lean<NotificaoMongo[]>()
     return notificacoesDoc.map((doc) =>
       Notificacao.create(doc._id, doc.alertaId, doc.usuarioId, doc.lida),
     )

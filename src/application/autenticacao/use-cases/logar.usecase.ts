@@ -18,10 +18,16 @@ export class LogarUseCase implements UseCase<LogarInputDto, LogarOutputDto> {
   public async execute(input: LogarInputDto): Promise<LogarOutputDto> {
     const usuario = await this.usuarioRepo.findByEmail(input.email)
     if (!usuario) throw new Error('Credenciais invalidas')
+
     const autenticao = await this.autenticacaoRepo.findByUsuarioId(usuario.id)
     if (!autenticao) throw new Error('O usuario não possui credenciais para autenticação')
+
     if (!(await compare(input.senha, autenticao.senha))) throw new Error('Credenciais invalidas')
-    const token = jwt.sign({ sub: usuario.id }, process.env.JWT_SECRET!, { expiresIn: '1h' })
+
+    const jwtSecret = process.env.JWT_SECRET
+    if (!jwtSecret) throw new Error('JWT_SECRET não definido')
+
+    const token = jwt.sign({ sub: usuario.id }, jwtSecret, { expiresIn: '1h' })
     return { token }
   }
 }

@@ -1,6 +1,7 @@
 import type { ListarNotificacaoDoUsuarioController } from '@/interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
 import type { MarcarComoLidaController } from '@/interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import { Router } from 'express'
+import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
 export class NotificaoRoutes {
   public readonly routes: Router
@@ -21,7 +22,7 @@ export class NotificaoRoutes {
   }
 
   private setupRoutes() {
-    this.routes.get('/:usuarioId', async (req, res) => {
+    this.routes.get('/:usuarioId', autenticarToken, async (req, res) => {
       try {
         const input = {
           usuarioId: req.params.usuarioId,
@@ -33,7 +34,7 @@ export class NotificaoRoutes {
       }
     })
 
-    this.routes.post('/', async (req, res) => {
+    this.routes.post('/', autenticarToken, async (req, res) => {
       try {
         const result = await this.marcarComoLidaController.handle(req.body)
         res.status(200).json(result)

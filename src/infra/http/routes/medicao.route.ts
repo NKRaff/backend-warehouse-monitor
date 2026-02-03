@@ -2,6 +2,7 @@ import type { BuscarMedicoesController } from '@/interface/medicao/buscar-medico
 import type { BuscarUltimaMedicaoController } from '@/interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
 import type { CadastrarMedicaoController } from '@/interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
 import { Router } from 'express'
+import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
 export class MedicaoRoutes {
   public readonly routes: Router
@@ -28,16 +29,7 @@ export class MedicaoRoutes {
   }
 
   private setupRoutes() {
-    this.routes.post('/', async (req, res) => {
-      try {
-        const result = await this.cadastrarMedicaoController.handle(req.body)
-        res.status(201).json(result)
-      } catch (error) {
-        res.status(400).json(error)
-      }
-    })
-
-    this.routes.post('/buscar', async (req, res) => {
+    this.routes.post('/buscar', autenticarToken, async (req, res) => {
       try {
         const result = await this.buscarMedicoesController.handle(req.body)
         res.status(200).json(result)
@@ -46,7 +38,7 @@ export class MedicaoRoutes {
       }
     })
 
-    this.routes.post('/buscar-ultima', async (req, res) => {
+    this.routes.post('/buscar-ultima', autenticarToken, async (req, res) => {
       try {
         const result = await this.buscarUltimaMedicaoController.handle(req.body)
         res.status(200).json(result)

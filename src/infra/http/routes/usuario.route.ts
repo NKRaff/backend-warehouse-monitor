@@ -3,6 +3,7 @@ import type { AtivarRecebimentoEmailController } from '@/interface/usuario/receb
 import type { DesativarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
 import type { RemoverUsuarioController } from '@/interface/usuario/remover-usuario/remover-usuario.controller.js'
 import { Router } from 'express'
+import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
 export class UsuarioRoutes {
   public readonly routes: Router
@@ -41,7 +42,7 @@ export class UsuarioRoutes {
       }
     })
 
-    this.routes.delete('/:id', async (req, res) => {
+    this.routes.delete('/:id', autenticarToken, async (req, res) => {
       try {
         const result = await this.removerUsuarioController.handle({ id: req.params.id })
         res.status(200).json(result)
@@ -50,7 +51,7 @@ export class UsuarioRoutes {
       }
     })
 
-    this.routes.post('/ativar-recebimento-email', async (req, res) => {
+    this.routes.post('/ativar-recebimento-email', autenticarToken, async (req, res) => {
       try {
         const result = await this.ativarRecebimentoEmailController.handle(req.body)
         res.status(200).json(result)
@@ -59,7 +60,7 @@ export class UsuarioRoutes {
       }
     })
 
-    this.routes.post('/desativar-recebimento-email', async (req, res) => {
+    this.routes.post('/desativar-recebimento-email', autenticarToken, async (req, res) => {
       try {
         const result = await this.desativarRecebimentoEmailController.handle(req.body)
         res.status(200).json(result)

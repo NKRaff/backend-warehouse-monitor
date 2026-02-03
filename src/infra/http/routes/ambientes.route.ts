@@ -3,6 +3,7 @@ import type { CriarAmbienteController } from '@/interface/ambiente/criar-ambient
 import type { ListarAmbientesController } from '@/interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
 import type { RemoverAmbienteController } from '@/interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
 import { Router } from 'express'
+import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
 export class AmbienteRoutes {
   public readonly routes: Router
@@ -32,7 +33,7 @@ export class AmbienteRoutes {
   }
 
   private setupRoutes() {
-    this.routes.post('/', async (req, res) => {
+    this.routes.post('/', autenticarToken, async (req, res) => {
       try {
         const result = await this.criarAmbienteController.handle(req.body)
         res.status(201).json(result)
@@ -41,7 +42,7 @@ export class AmbienteRoutes {
       }
     })
 
-    this.routes.get('/', async (_req, res) => {
+    this.routes.get('/', autenticarToken, async (_req, res) => {
       try {
         const result = await this.listarAmbientesController.handle()
         res.status(200).json(result)
@@ -50,7 +51,7 @@ export class AmbienteRoutes {
       }
     })
 
-    this.routes.patch('/:id', async (req, res) => {
+    this.routes.patch('/:id', autenticarToken, async (req, res) => {
       try {
         const input = {
           id: req.params.id,
@@ -63,7 +64,7 @@ export class AmbienteRoutes {
       }
     })
 
-    this.routes.delete('/:id', async (req, res) => {
+    this.routes.delete('/:id', autenticarToken, async (req, res) => {
       try {
         const result = await this.removerAmbienteController.handle({ id: req.params.id })
         res.status(200).json(result)

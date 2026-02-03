@@ -20,7 +20,7 @@ export class CriarUsuarioUseCase implements UseCase<CriarUsuarioInputDto, CriarU
 
   public async execute(input: CriarUsuarioInputDto): Promise<CriarUsuarioOutputDto> {
     const senhaHash = await hash(input.senha, Number(process.env.BCRYPT_SALT))
-    const usuario = Usuario.create(v7(), input.nome, input.email)
+    const usuario = Usuario.create(v7(), input.nome, input.email, input.receberEmail)
     const autenticacao = Autenticacao.create(v7(), usuario.id, senhaHash)
     await this.usuarioRepo.save(usuario)
     await this.autenticacaoRepo.save(autenticacao)

@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express, { type Express, type Router } from 'express'
 
@@ -7,6 +8,7 @@ export class ServerHTTP {
   private constructor(routes: Router) {
     this.app = express()
     this.app.use(express.json())
+    this.app.use(cookieParser())
     this.app.use(
       cors({
         origin: process.env.CORS_ORIGIN || '*',

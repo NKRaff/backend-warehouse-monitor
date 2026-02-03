@@ -3,6 +3,7 @@ import type { CadastrarDispositivoController } from '@/interface/dispositivo/cad
 import type { ListarDispositivosController } from '@/interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
 import type { RemoverDispositivoController } from '@/interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
 import { Router } from 'express'
+import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
 export class DispositivoRoutes {
   public readonly routes: Router
@@ -32,7 +33,7 @@ export class DispositivoRoutes {
   }
 
   private setupRoutes() {
-    this.routes.post('/', async (req, res) => {
+    this.routes.post('/', autenticarToken, async (req, res) => {
       try {
         const result = await this.cadastrarDispositivoController.handle(req.body)
         res.status(201).json(result)
@@ -41,7 +42,7 @@ export class DispositivoRoutes {
       }
     })
 
-    this.routes.get('/', async (_req, res) => {
+    this.routes.get('/', autenticarToken, async (_req, res) => {
       try {
         const result = await this.listarDispositivoController.handle()
         res.status(200).json(result)
@@ -50,7 +51,7 @@ export class DispositivoRoutes {
       }
     })
 
-    this.routes.patch('/:id', async (req, res) => {
+    this.routes.patch('/:id', autenticarToken, async (req, res) => {
       try {
         const result = await this.atualizarDispositivoController.handle({
           id: req.params.id,
@@ -62,7 +63,7 @@ export class DispositivoRoutes {
       }
     })
 
-    this.routes.delete('/:id', async (req, res) => {
+    this.routes.delete('/:id', autenticarToken, async (req, res) => {
       try {
         const result = await this.removerDispositivoController.handle({ id: req.params.id })
         res.status(200).json(result)

@@ -1,4 +1,6 @@
 import type { CriarUsuarioController } from '@/interface/usuario/criar-usuario/criar-usuario.controller.js'
+import type { AtivarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
+import type { DesativarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
 import type { RemoverUsuarioController } from '@/interface/usuario/remover-usuario/remover-usuario.controller.js'
 import { Router } from 'express'
 
@@ -8,6 +10,8 @@ export class UsuarioRoutes {
   private constructor(
     private readonly criarUsuarioController: CriarUsuarioController,
     private readonly removerUsuarioController: RemoverUsuarioController,
+    private readonly ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
+    private readonly desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -16,8 +20,15 @@ export class UsuarioRoutes {
   public static create(
     criarUsuarioController: CriarUsuarioController,
     removerUsuarioController: RemoverUsuarioController,
+    ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
+    desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
   ) {
-    return new UsuarioRoutes(criarUsuarioController, removerUsuarioController)
+    return new UsuarioRoutes(
+      criarUsuarioController,
+      removerUsuarioController,
+      ativarRecebimentoEmailController,
+      desativarRecebimentoEmailController,
+    )
   }
 
   private setupRoutes() {
@@ -33,6 +44,24 @@ export class UsuarioRoutes {
     this.routes.delete('/:id', async (req, res) => {
       try {
         const result = await this.removerUsuarioController.handle({ id: req.params.id })
+        res.status(200).json(result)
+      } catch (error) {
+        res.status(400).json(error)
+      }
+    })
+
+    this.routes.post('/ativar-recebimento-email', async (req, res) => {
+      try {
+        const result = await this.ativarRecebimentoEmailController.handle(req.body)
+        res.status(200).json(result)
+      } catch (error) {
+        res.status(400).json(error)
+      }
+    })
+
+    this.routes.post('/desativar-recebimento-email', async (req, res) => {
+      try {
+        const result = await this.desativarRecebimentoEmailController.handle(req.body)
         res.status(200).json(result)
       } catch (error) {
         res.status(400).json(error)

@@ -13,6 +13,8 @@ import type { CadastrarMedicaoController } from '@/interface/medicao/cadastrar-m
 import type { ListarNotificacaoDoUsuarioController } from '@/interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
 import type { MarcarComoLidaController } from '@/interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import type { CriarUsuarioController } from '@/interface/usuario/criar-usuario/criar-usuario.controller.js'
+import type { AtivarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
+import type { DesativarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
 import type { RemoverUsuarioController } from '@/interface/usuario/remover-usuario/remover-usuario.controller.js'
 import { Router } from 'express'
 import { AmbienteRoutes } from './ambientes.route.js'
@@ -42,6 +44,8 @@ export class Routes {
 
     private readonly criarUsuarioController: CriarUsuarioController,
     private readonly removerUsuarioController: RemoverUsuarioController,
+    private readonly ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
+    private readonly desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
 
     private readonly loginController: LoginController,
 
@@ -69,6 +73,8 @@ export class Routes {
 
     criarUsuarioController: CriarUsuarioController,
     removerUsuarioController: RemoverUsuarioController,
+    ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
+    desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
 
     loginController: LoginController,
 
@@ -92,6 +98,8 @@ export class Routes {
 
       criarUsuarioController,
       removerUsuarioController,
+      ativarRecebimentoEmailController,
+      desativarRecebimentoEmailController,
 
       loginController,
 
@@ -132,7 +140,12 @@ export class Routes {
 
     this.routes.use(
       '/usuario',
-      UsuarioRoutes.create(this.criarUsuarioController, this.removerUsuarioController).routes,
+      UsuarioRoutes.create(
+        this.criarUsuarioController,
+        this.removerUsuarioController,
+        this.ativarRecebimentoEmailController,
+        this.desativarRecebimentoEmailController,
+      ).routes,
     )
 
     this.routes.use('/autenticacao', LoginRoutes.create(this.loginController).routes)

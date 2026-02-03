@@ -13,7 +13,9 @@ import { BuscarUltimaMedicaoUseCase } from './application/medicao/use-cases/busc
 import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastrar-medicao.usecase.js'
 import { ListarNotificaoDoUsuarioUseCase } from './application/notificacao/use-cases/listar-notificao-do-usuario.usecase.js'
 import { MarcarComoLidaUseCase } from './application/notificacao/use-cases/marcar-como-lida.usecase.js'
+import { AtivarRecebimentoEmailUseCase } from './application/usuario/use-cases/ativar-recebimento-email.usecase.js'
 import { CriarUsuarioUseCase } from './application/usuario/use-cases/criar-usuario.usecase.js'
+import { DesativarRecebimentoEmailUseCase } from './application/usuario/use-cases/desativar-recebimento-email.usecase.js'
 import { RemoverUsuarioUseCase } from './application/usuario/use-cases/remover-usuario.usecase.js'
 import { MongooseAlertaRepository } from './infra/database/alerta/alerta.repository.js'
 import { MongooseAmbienteRepository } from './infra/database/ambiente/ambiente.repository.js'
@@ -43,6 +45,8 @@ import { CadastrarMedicaoController } from './interface/medicao/cadastrar-medica
 import { ListarNotificacaoDoUsuarioController } from './interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
 import { MarcarComoLidaController } from './interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import { CriarUsuarioController } from './interface/usuario/criar-usuario/criar-usuario.controller.js'
+import { AtivarRecebimentoEmailController } from './interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
+import { DesativarRecebimentoEmailController } from './interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
 import { RemoverUsuarioController } from './interface/usuario/remover-usuario/remover-usuario.controller.js'
 
 async function main() {
@@ -94,6 +98,8 @@ async function main() {
 
   const criarUsuarioUseCase = CriarUsuarioUseCase.create(usuarioRepo, autenticacaoRepo)
   const removerUsuarioUseCase = RemoverUsuarioUseCase.create(usuarioRepo, autenticacaoRepo)
+  const ativarRecebimentoEmailUseCase = AtivarRecebimentoEmailUseCase.create(usuarioRepo)
+  const desativarRecebimentoEmailUseCase = DesativarRecebimentoEmailUseCase.create(usuarioRepo)
 
   const loginUseCase = LogarUseCase.create(usuarioRepo, autenticacaoRepo)
 
@@ -127,6 +133,12 @@ async function main() {
 
   const criarUsuarioController = CriarUsuarioController.create(criarUsuarioUseCase)
   const removerUsuarioController = RemoverUsuarioController.create(removerUsuarioUseCase)
+  const ativarRecebimentoEmailController = AtivarRecebimentoEmailController.create(
+    ativarRecebimentoEmailUseCase,
+  )
+  const desativarRecebimentoEmailController = DesativarRecebimentoEmailController.create(
+    desativarRecebimentoEmailUseCase,
+  )
 
   const loginController = LoginController.create(loginUseCase)
 
@@ -153,6 +165,8 @@ async function main() {
 
     criarUsuarioController,
     removerUsuarioController,
+    ativarRecebimentoEmailController,
+    desativarRecebimentoEmailController,
 
     loginController,
 

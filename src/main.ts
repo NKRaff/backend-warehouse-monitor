@@ -27,6 +27,7 @@ import { Routes } from './infra/http/routes/routes.js'
 import { ServerHTTP } from './infra/http/server.js'
 import { ClientMQTT } from './infra/mqtt/client.js'
 import { MqttTopicSubscriber } from './infra/mqtt/topic-subscriber.js'
+import { Nodemailer } from './infra/smtp/nodemailer/client.mailer.js'
 import { AtualizarAmbienteController } from './interface/ambiente/atualizar-ambientes/atualizar-ambientes.controller.js'
 import { CriarAmbienteController } from './interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
 import { ListarAmbientesController } from './interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
@@ -52,6 +53,9 @@ async function main() {
   // Conecta no Broker MQTT
   const clientMQTT = ClientMQTT.create()
   const topicSubscriber = MqttTopicSubscriber.create(clientMQTT)
+
+  // Cria Transporter Mailer SMTP
+  const mailer = Nodemailer.create()
 
   // Instanciar repositorios
   const ambienteRepo = MongooseAmbienteRepository.create()
@@ -83,6 +87,7 @@ async function main() {
     alertaRepo,
     usuarioRepo,
     notificacaoRepo,
+    mailer,
   )
   const buscarMedicoesUseCase = BuscarMedicaoUseCase.create(medicaoRepo)
   const buscarUltimaMedicaoUseCase = BuscarUltimaMedicaoUseCase.create(medicaoRepo)

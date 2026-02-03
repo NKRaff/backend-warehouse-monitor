@@ -7,6 +7,7 @@ import type { MedicaoRepository } from '@/domain/medicao/medicao.repository.js'
 import { Notificacao } from '@/domain/notificacao/notificacao.entity.js'
 import type { NotificacaoRepository } from '@/domain/notificacao/notificacao.repository.js'
 import type { UsuarioRepository } from '@/domain/usuario/usuario.repository.js'
+import type { Mailer } from '@/infra/smtp/mailer.interface.js'
 import { v7 } from 'uuid'
 import type {
   CadastrarMedicaoInputDto,
@@ -24,6 +25,7 @@ export class CadastrarMedicaoUseCase
     private readonly alertaRepo: AlertaRepository,
     private readonly usuarioRepo: UsuarioRepository,
     private readonly notificacaoRepo: NotificacaoRepository,
+    private readonly mailer: Mailer,
   ) {}
 
   public static create(
@@ -33,6 +35,7 @@ export class CadastrarMedicaoUseCase
     alertaRepo: AlertaRepository,
     usuarioRepo: UsuarioRepository,
     notificacaoRepo: NotificacaoRepository,
+    mailer: Mailer,
   ) {
     return new CadastrarMedicaoUseCase(
       medicaoRepo,
@@ -41,6 +44,7 @@ export class CadastrarMedicaoUseCase
       alertaRepo,
       usuarioRepo,
       notificacaoRepo,
+      mailer,
     )
   }
 
@@ -81,6 +85,11 @@ export class CadastrarMedicaoUseCase
         const notificaoId = v7()
         const notificao = Notificacao.create(notificaoId, alertaGerado.id, usuario.id)
         await this.notificacaoRepo.save(notificao)
+        await this.mailer.sendMail({
+          to: usuario.email,
+          subject: 'Teste de email',
+          text: 'Email de teste',
+        })
       })
     }
     if (!alertaGerado && alertaAtivo) {

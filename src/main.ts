@@ -159,7 +159,6 @@ async function main() {
     atualizarDispositivoController,
     removerDispositivoController,
 
-    cadastrarMedicaoController,
     buscarMedicoesController,
     buscarUltimaMedicaoController,
 

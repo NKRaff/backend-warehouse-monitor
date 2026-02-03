@@ -9,7 +9,6 @@ import type { ListarDispositivosController } from '@/interface/dispositivo/lista
 import type { RemoverDispositivoController } from '@/interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
 import type { BuscarMedicoesController } from '@/interface/medicao/buscar-medicoes/buscar-medicoes.controller.js'
 import type { BuscarUltimaMedicaoController } from '@/interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
-import type { CadastrarMedicaoController } from '@/interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
 import type { ListarNotificacaoDoUsuarioController } from '@/interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
 import type { MarcarComoLidaController } from '@/interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import type { CriarUsuarioController } from '@/interface/usuario/criar-usuario/criar-usuario.controller.js'
@@ -38,7 +37,6 @@ export class Routes {
     private readonly atualizarDispositivoController: AtualizarDispositivoController,
     private readonly removerDispositivoController: RemoverDispositivoController,
 
-    private readonly cadastrarMedicaoController: CadastrarMedicaoController,
     private readonly buscarMedicoesController: BuscarMedicoesController,
     private readonly buscarUltimaMedicaoController: BuscarUltimaMedicaoController,
 
@@ -67,7 +65,6 @@ export class Routes {
     atualizarDispositivoController: AtualizarDispositivoController,
     removerDispositivoController: RemoverDispositivoController,
 
-    cadastrarMedicaoController: CadastrarMedicaoController,
     buscarMedicoesController: BuscarMedicoesController,
     buscarUltimaMedicaoController: BuscarUltimaMedicaoController,
 
@@ -92,7 +89,6 @@ export class Routes {
       atualizarDispositivoController,
       removerDispositivoController,
 
-      cadastrarMedicaoController,
       buscarMedicoesController,
       buscarUltimaMedicaoController,
 
@@ -131,11 +127,8 @@ export class Routes {
 
     this.routes.use(
       '/medicao',
-      MedicaoRoutes.create(
-        this.cadastrarMedicaoController,
-        this.buscarMedicoesController,
-        this.buscarUltimaMedicaoController,
-      ).routes,
+      MedicaoRoutes.create(this.buscarMedicoesController, this.buscarUltimaMedicaoController)
+        .routes,
     )
 
     this.routes.use(

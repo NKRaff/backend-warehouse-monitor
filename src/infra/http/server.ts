@@ -12,6 +12,7 @@ export class ServerHTTP {
     this.app.use(
       cors({
         origin: process.env.CORS_ORIGIN || '*',
+        credentials: Boolean(process.env.CORS_ORIGIN),
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
       }),

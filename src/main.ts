@@ -14,6 +14,7 @@ import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastr
 import { ListarNotificaoDoUsuarioUseCase } from './application/notificacao/use-cases/listar-notificao-do-usuario.usecase.js'
 import { MarcarComoLidaUseCase } from './application/notificacao/use-cases/marcar-como-lida.usecase.js'
 import { AtivarRecebimentoEmailUseCase } from './application/usuario/use-cases/ativar-recebimento-email.usecase.js'
+import { AtualizarUsuarioUseCase } from './application/usuario/use-cases/atualizar-usuario.usecase.js'
 import { CriarUsuarioUseCase } from './application/usuario/use-cases/criar-usuario.usecase.js'
 import { DesativarRecebimentoEmailUseCase } from './application/usuario/use-cases/desativar-recebimento-email.usecase.js'
 import { RemoverUsuarioUseCase } from './application/usuario/use-cases/remover-usuario.usecase.js'
@@ -44,6 +45,7 @@ import { BuscarUltimaMedicaoController } from './interface/medicao/buscar-ultima
 import { CadastrarMedicaoController } from './interface/medicao/cadastrar-medicao/cadastrar-medicao.controller.js'
 import { ListarNotificacaoDoUsuarioController } from './interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
 import { MarcarComoLidaController } from './interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
+import { AtualizarUsuarioController } from './interface/usuario/atualizar-usuario/atualizar-usuario.controller.js'
 import { CriarUsuarioController } from './interface/usuario/criar-usuario/criar-usuario.controller.js'
 import { AtivarRecebimentoEmailController } from './interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
 import { DesativarRecebimentoEmailController } from './interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
@@ -100,6 +102,7 @@ async function main() {
   const removerUsuarioUseCase = RemoverUsuarioUseCase.create(usuarioRepo, autenticacaoRepo)
   const ativarRecebimentoEmailUseCase = AtivarRecebimentoEmailUseCase.create(usuarioRepo)
   const desativarRecebimentoEmailUseCase = DesativarRecebimentoEmailUseCase.create(usuarioRepo)
+  const atualizarUsuarioUseCase = AtualizarUsuarioUseCase.create(usuarioRepo)
 
   const loginUseCase = LogarUseCase.create(usuarioRepo, autenticacaoRepo)
 
@@ -139,6 +142,7 @@ async function main() {
   const desativarRecebimentoEmailController = DesativarRecebimentoEmailController.create(
     desativarRecebimentoEmailUseCase,
   )
+  const atualizarUsuarioController = AtualizarUsuarioController.create(atualizarUsuarioUseCase)
 
   const loginController = LoginController.create(loginUseCase)
 
@@ -166,6 +170,7 @@ async function main() {
     removerUsuarioController,
     ativarRecebimentoEmailController,
     desativarRecebimentoEmailController,
+    atualizarUsuarioController,
 
     loginController,
 

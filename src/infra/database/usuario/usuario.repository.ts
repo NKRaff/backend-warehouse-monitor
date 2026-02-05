@@ -57,6 +57,16 @@ export class MongooseUsuarioRepository implements UsuarioRepository {
     if (!usuarioDoc) throw new Error('Nenhum usuario encontrado')
   }
 
+  async update(usuario: Usuario): Promise<void> {
+    const usuarioDoc = await UsuarioModel.findByIdAndUpdate(usuario.id, {
+      nome: usuario.nome,
+      email: usuario.email,
+      receber_email: usuario.receberEmail,
+    })
+
+    if (!usuarioDoc) throw new Error('Nenhum usuario encontrado com esse id')
+  }
+
   async updateRecebimentoEmail(id: string, usuario: Usuario): Promise<void> {
     await UsuarioModel.findByIdAndUpdate(id, {
       receber_email: usuario.receberEmail,

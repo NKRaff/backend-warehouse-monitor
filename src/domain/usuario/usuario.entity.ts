@@ -15,7 +15,7 @@ export class Usuario {
   public update(nome?: string, email?: string, receberEmail?: boolean) {
     if (nome) this.props.nome = nome
     if (email) this.props.email = email
-    if (receberEmail) this.props.receberEmail = receberEmail
+    if (receberEmail !== undefined) this.props.receberEmail = receberEmail
   }
 
   public ativarRecebimentoDeEmail() {

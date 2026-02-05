@@ -6,5 +6,6 @@ export interface UsuarioRepository {
   findByEmail(email: string): Promise<Usuario>
   findAll(): Promise<Usuario[]>
   delete(id: string): Promise<void>
+  update(usuario: Usuario): Promise<void>
   updateRecebimentoEmail(id: string, usuario: Usuario): Promise<void>
 }

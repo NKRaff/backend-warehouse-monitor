@@ -11,6 +11,7 @@ import type { BuscarMedicoesController } from '@/interface/medicao/buscar-medico
 import type { BuscarUltimaMedicaoController } from '@/interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
 import type { ListarNotificacaoDoUsuarioController } from '@/interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
 import type { MarcarComoLidaController } from '@/interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
+import type { AtualizarUsuarioController } from '@/interface/usuario/atualizar-usuario/atualizar-usuario.controller.js'
 import type { CriarUsuarioController } from '@/interface/usuario/criar-usuario/criar-usuario.controller.js'
 import type { AtivarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
 import type { DesativarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
@@ -44,6 +45,7 @@ export class Routes {
     private readonly removerUsuarioController: RemoverUsuarioController,
     private readonly ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
     private readonly desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
+    private readonly atualizarUsuarioController: AtualizarUsuarioController,
 
     private readonly loginController: LoginController,
 
@@ -72,6 +74,7 @@ export class Routes {
     removerUsuarioController: RemoverUsuarioController,
     ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
     desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
+    atualizarUsuarioController: AtualizarUsuarioController,
 
     loginController: LoginController,
 
@@ -96,6 +99,7 @@ export class Routes {
       removerUsuarioController,
       ativarRecebimentoEmailController,
       desativarRecebimentoEmailController,
+      atualizarUsuarioController,
 
       loginController,
 
@@ -138,6 +142,7 @@ export class Routes {
         this.removerUsuarioController,
         this.ativarRecebimentoEmailController,
         this.desativarRecebimentoEmailController,
+        this.atualizarUsuarioController,
       ).routes,
     )
 

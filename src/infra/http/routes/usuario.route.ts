@@ -1,3 +1,4 @@
+import type { AtualizarUsuarioController } from '@/interface/usuario/atualizar-usuario/atualizar-usuario.controller.js'
 import type { CriarUsuarioController } from '@/interface/usuario/criar-usuario/criar-usuario.controller.js'
 import type { AtivarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
 import type { DesativarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
@@ -13,6 +14,7 @@ export class UsuarioRoutes {
     private readonly removerUsuarioController: RemoverUsuarioController,
     private readonly ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
     private readonly desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
+    private readonly atualizarUsuarioController: AtualizarUsuarioController,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -23,12 +25,14 @@ export class UsuarioRoutes {
     removerUsuarioController: RemoverUsuarioController,
     ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
     desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
+    atualizarUsuarioController: AtualizarUsuarioController,
   ) {
     return new UsuarioRoutes(
       criarUsuarioController,
       removerUsuarioController,
       ativarRecebimentoEmailController,
       desativarRecebimentoEmailController,
+      atualizarUsuarioController,
     )
   }
 
@@ -45,6 +49,18 @@ export class UsuarioRoutes {
     this.routes.delete('/:id', autenticarToken, async (req, res) => {
       try {
         const result = await this.removerUsuarioController.handle({ id: req.params.id })
+        res.status(200).json(result)
+      } catch (error) {
+        res.status(400).json(error)
+      }
+    })
+
+    this.routes.patch('/:id', autenticarToken, async (req, res) => {
+      try {
+        const result = await this.atualizarUsuarioController.handle({
+          id: req.params.id,
+          ...req.body,
+        })
         res.status(200).json(result)
       } catch (error) {
         res.status(400).json(error)

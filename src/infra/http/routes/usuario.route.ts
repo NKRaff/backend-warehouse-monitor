@@ -55,10 +55,10 @@ export class UsuarioRoutes {
       }
     })
 
-    this.routes.patch('/:id', autenticarToken, async (req, res) => {
+    this.routes.patch('/', autenticarToken, async (req, res) => {
       try {
         const result = await this.atualizarUsuarioController.handle({
-          id: req.params.id,
+          id: req.usuarioId,
           ...req.body,
         })
         res.status(200).json(result)

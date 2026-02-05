@@ -4,5 +4,6 @@ export type LogarInputDto = {
 }
 
 export type LogarOutputDto = {
+  id: string
   token: string
 }

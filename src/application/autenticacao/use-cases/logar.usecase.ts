@@ -28,6 +28,6 @@ export class LogarUseCase implements UseCase<LogarInputDto, LogarOutputDto> {
     if (!jwtSecret) throw new Error('JWT_SECRET não definido')
 
     const token = jwt.sign({ sub: usuario.id }, jwtSecret, { expiresIn: '1h' })
-    return { token }
+    return { id: usuario.id, token }
   }
 }

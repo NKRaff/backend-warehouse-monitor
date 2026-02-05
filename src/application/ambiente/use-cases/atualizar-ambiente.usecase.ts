@@ -1,8 +1,8 @@
 import type { UseCase } from '@/application/usecase.js'
 import type { AmbienteRepository } from '@/domain/ambiente/ambiente.repository.js'
 import type {
-    AtualizarAmbienteInputDto,
-    AtualizarAmbienteOutputDto,
+  AtualizarAmbienteInputDto,
+  AtualizarAmbienteOutputDto,
 } from '../dtos/atualizar-ambiente.dto.js'
 import { AtualizarAmbienteMapper } from '../mappers/atualizar-ambiente.dto.js'
 
@@ -16,8 +16,8 @@ export class AtualizarAmbienteUseCase
   }
 
   public async execute(input: AtualizarAmbienteInputDto): Promise<AtualizarAmbienteOutputDto> {
-    if (
-      !input.nome &&
+    if ( 
+      !input.nome && 
       !input.descricao &&
       input.temperatura_minima === undefined &&
       input.temperatura_maxima === undefined &&
@@ -25,17 +25,20 @@ export class AtualizarAmbienteUseCase
       input.umidade_maxima === undefined
     )
       throw new Error('Não é possivel atualizar ambiente: não existe nenhum dado a ser alterado')
+
     const ambiente = await this.ambienteRepo.findById(input.id)
     if (!ambiente)
       throw new Error('Não é possível atualizar ambiente: não existe ambiente associado a esse id.')
+
     ambiente.update(
-      input.nome,
+      input.nome, 
       input.descricao,
       input.temperatura_minima,
       input.temperatura_maxima,
       input.umidade_minima,
-      input.umidade_maxima,
+      input.umidade_maxima
     )
+    
     await this.ambienteRepo.update(ambiente)
     const output = AtualizarAmbienteMapper.paraOutput(ambiente)
     return output

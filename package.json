@@ -1,0 +1,50 @@
+{
+  "name": "backend-warehouse-monitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias",
+    "format": "biome check --write src/",
+    "start:dev": "tsx watch src/main.ts",
+    "start:prod": "node dist/src/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NKRaff/backend-warehouse-monitor.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NKRaff/backend-warehouse-monitor/issues"
+  },
+  "homepage": "https://github.com/NKRaff/backend-warehouse-monitor#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.0.0",
+    "mqtt": "^5.14.1",
+    "nodemailer": "^7.0.13",
+    "uuid": "^13.0.0",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.8",
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.10.1",
+    "@types/nodemailer": "^7.0.9",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
+  }
+}

@@ -143,7 +143,7 @@ export class Ambiente {
     return this.props.nome
   }
 
-  public get tipo(): string {
+  public get tipo(): TipoAmbiente {
     return this.props.tipo
   }
 

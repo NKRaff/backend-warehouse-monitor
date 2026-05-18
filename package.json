@@ -8,7 +8,11 @@
     "build": "tsc && tsc-alias",
     "format": "biome check --write src/",
     "start:dev": "tsx watch src/main.ts",
-    "start:prod": "node dist/src/main.js"
+    "start:prod": "node dist/src/main.js",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -43,8 +47,10 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.1",
     "@types/nodemailer": "^7.0.9",
+    "@vitest/coverage-v8": "^4.1.6",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.6"
   }
 }

@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc && tsc-alias",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "format": "biome check --write src/",
     "start:dev": "tsx watch src/main.ts",
     "start:prod": "node dist/src/main.js",

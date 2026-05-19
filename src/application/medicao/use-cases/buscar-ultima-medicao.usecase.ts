@@ -4,7 +4,7 @@ import type {
   BuscarUltimaMedicaoInputDto,
   BuscarUltimaMedicaoOutputDto,
 } from '../dtos/buscar-ultima-medicao.dto.js'
-import { BuscarUltimaMedicaoMapper } from '../mappers/buscar-ultima-medicao.dto.js'
+import { BuscarUltimaMedicaoMapper } from '../mappers/buscar-ultima-medicao.mapper.js'
 
 export class BuscarUltimaMedicaoUseCase
   implements UseCase<BuscarUltimaMedicaoInputDto, BuscarUltimaMedicaoOutputDto>

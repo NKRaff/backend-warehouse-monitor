@@ -1,4 +1,4 @@
-import type { Medicao } from '@/domain/medicao/medicao.entity.js'
+import type { Medicao } from '../../../domain/medicao/medicao.entity.js'
 
 export namespace BuscarMedicoesMapper {
   export function paraOutput(medicoes: Medicao[]) {

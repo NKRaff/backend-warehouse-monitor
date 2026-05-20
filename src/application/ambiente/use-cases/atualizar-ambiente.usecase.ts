@@ -1,5 +1,5 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { AmbienteRepository } from '@/domain/ambiente/ambiente.repository.js'
+import type { AmbienteRepository } from '../../../domain/ambiente/ambiente.repository.js'
+import type { UseCase } from '../../usecase.js'
 import type {
   AtualizarAmbienteInputDto,
   AtualizarAmbienteOutputDto,

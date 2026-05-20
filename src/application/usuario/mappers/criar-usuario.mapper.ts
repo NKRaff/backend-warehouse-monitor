@@ -1,4 +1,4 @@
-import type { Usuario } from '@/domain/usuario/usuario.entity.js'
+import type { Usuario } from '../../../domain/usuario/usuario.entity.js'
 
 export namespace CriarUsuarioMapper {
   export function paraOutput(usuario: Usuario) {

@@ -1,5 +1,5 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { CriarUsuarioOutputDto } from '@/application/usuario/dtos/criar-usuario.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
+import type { CriarUsuarioOutputDto } from '../../../application/usuario/dtos/criar-usuario.dto.js'
 import { type CriarUsuarioInputDto, CriarUsuarioSchema } from './criar-usuario.schema.js'
 
 export class CriarUsuarioController {

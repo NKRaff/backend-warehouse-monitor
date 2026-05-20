@@ -1,4 +1,4 @@
-import type { Ambiente } from '@/domain/ambiente/ambiente.entity.js'
+import type { Ambiente } from '../../../domain/ambiente/ambiente.entity.js'
 
 export namespace ListarAmbientesMapper {
   export function paraOutput(ambientes: Ambiente[]) {

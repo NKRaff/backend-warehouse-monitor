@@ -1,8 +1,8 @@
 import type {
   BuscarUltimaMedicaoInputDto,
   BuscarUltimaMedicaoOutputDto,
-} from '@/application/medicao/dtos/buscar-ultima-medicao.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+} from '../../../application/medicao/dtos/buscar-ultima-medicao.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 import { BuscarUltimaMedicaoSchema } from './buscar-ultima-medicao.schema.js'
 
 export class BuscarUltimaMedicaoController {

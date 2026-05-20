@@ -1,5 +1,5 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { AtualizarUsuarioOutputDto } from '@/application/usuario/dtos/atualizar-usuario.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
+import type { AtualizarUsuarioOutputDto } from '../../../application/usuario/dtos/atualizar-usuario.dto.js'
 import {
   type AtualizarUsuarioInputDto,
   AtualizarUsuarioSchema,

@@ -1,6 +1,6 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { AlertaRepository } from '@/domain/alerta/alerta.repository.js'
-import type { NotificacaoRepository } from '@/domain/notificacao/notificacao.repository.js'
+import type { AlertaRepository } from '../../../domain/alerta/alerta.repository.js'
+import type { NotificacaoRepository } from '../../../domain/notificacao/notificacao.repository.js'
+import type { UseCase } from '../../usecase.js'
 import type {
   ListarNotificaoDoUsuarioInputDto,
   ListarNotificaoDoUsuarioOutputDto,

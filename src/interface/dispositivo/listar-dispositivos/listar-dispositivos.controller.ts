@@ -1,8 +1,8 @@
 import type {
   ListarDispositivosInputDto,
   ListarDispositivosOutputDto,
-} from '@/application/dispositivo/dtos/listar-dispositivos.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+} from '../../../application/dispositivo/dtos/listar-dispositivos.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 
 export class ListarDispositivosController {
   private constructor(

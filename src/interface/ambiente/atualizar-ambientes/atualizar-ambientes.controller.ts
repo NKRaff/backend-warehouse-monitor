@@ -1,5 +1,5 @@
-import type { AtualizarAmbienteOutputDto } from '@/application/ambiente/dtos/atualizar-ambiente.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+import type { AtualizarAmbienteOutputDto } from '../../../application/ambiente/dtos/atualizar-ambiente.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 import {
   type AtualizarAmbienteInputDto,
   AtualizarAmbienteSchema,

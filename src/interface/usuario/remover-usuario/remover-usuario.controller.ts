@@ -1,8 +1,8 @@
-import type { UseCase } from '@/application/usecase.js'
+import type { UseCase } from '../../../application/usecase.js'
 import type {
   RemoverUsuarioInputDto,
   RemoverUsuarioOutputDto,
-} from '@/application/usuario/dtos/remover-usuario.dto.js'
+} from '../../../application/usuario/dtos/remover-usuario.dto.js'
 import { RemoverUsuarioSchema } from './remover-usuario.schema.js'
 
 export class RemoverUsuarioController {

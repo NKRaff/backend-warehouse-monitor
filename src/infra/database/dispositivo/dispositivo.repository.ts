@@ -1,5 +1,5 @@
-import type { DispositivoRepository } from '@/domain/dispositivo/despositivo.repository.js'
-import { Dispositivo } from '@/domain/dispositivo/dispositivo.entity.js'
+import type { DispositivoRepository } from '../../../domain/dispositivo/despositivo.repository.js'
+import { Dispositivo } from '../../../domain/dispositivo/dispositivo.entity.js'
 import { DispositivoModel } from './dispositivo.model.js'
 
 type DispositivoMongo = {

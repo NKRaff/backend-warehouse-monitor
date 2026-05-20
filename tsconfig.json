@@ -17,10 +17,6 @@
 
     "moduleResolution": "NodeNext",
 
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-
     "types": ["vitest/globals"],
 
     "noEmit": true

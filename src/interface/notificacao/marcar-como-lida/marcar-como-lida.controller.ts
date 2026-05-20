@@ -1,9 +1,6 @@
-import type {
-  MarcarComoLidaInputDto,
-  MarcarComoLidaOutputDto,
-} from '@/application/notificacao/dtos/marcar-como-lida.dto.js'
-import type { UseCase } from '@/application/usecase.js'
-import { MarcarComoLidaSchema } from './marcar-como-lida.schema.js'
+import type { MarcarComoLidaOutputDto } from '../../../application/notificacao/dtos/marcar-como-lida.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
+import { type MarcarComoLidaInputDto, MarcarComoLidaSchema } from './marcar-como-lida.schema.js'
 
 export class MarcarComoLidaController {
   private constructor(

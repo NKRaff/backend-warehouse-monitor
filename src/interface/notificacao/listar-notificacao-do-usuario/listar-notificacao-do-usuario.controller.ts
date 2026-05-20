@@ -1,8 +1,8 @@
 import type {
   ListarNotificaoDoUsuarioInputDto,
   ListarNotificaoDoUsuarioOutputDto,
-} from '@/application/notificacao/dtos/listar-notificacao-do-usuario.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+} from '../../../application/notificacao/dtos/listar-notificacao-do-usuario.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 import { ListarNotificacaoDoUsuarioSchema } from './listar-notificao-do-usuario.schema.js'
 
 export class ListarNotificacaoDoUsuarioController {

@@ -1,5 +1,5 @@
-import type { LoginController } from '@/interface/autenticacao/logar/logar.controller.js'
 import { Router } from 'express'
+import type { LoginController } from '../../../interface/autenticacao/logar/logar.controller.js'
 
 export class LoginRoutes {
   public readonly routes: Router

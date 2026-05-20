@@ -1,8 +1,8 @@
-import type { AtualizarDispositivoController } from '@/interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
-import type { CadastrarDispositivoController } from '@/interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
-import type { ListarDispositivosController } from '@/interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
-import type { RemoverDispositivoController } from '@/interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
 import { Router } from 'express'
+import type { AtualizarDispositivoController } from '../../../interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
+import type { CadastrarDispositivoController } from '../../../interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
+import type { ListarDispositivosController } from '../../../interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
+import type { RemoverDispositivoController } from '../../../interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
 import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
 export class DispositivoRoutes {

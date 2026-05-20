@@ -3,6 +3,12 @@ import type { Notificacao } from '@/domain/notificacao/notificacao.entity.js'
 
 export namespace ListarNotificacaoDoUsuarioMapper {
   export function paraOutput(notificacoes: Notificacao[], alertas: Alerta[]) {
+    if (!notificacoes) {
+      throw new Error('Notificacoes invalidas')
+    } else if (!alertas) {
+      throw new Error('Alertas invalidos')
+    }
+
     return {
       notificoes: notificacoes
         .map((notificao, index) => {

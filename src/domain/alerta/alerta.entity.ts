@@ -87,27 +87,19 @@ export class Alerta {
     return this.props.ativo
   }
 
-  public get sensorTipo(): TipoMedicao {
-    if (this.props.sensorTipo === undefined || this.props.sensorTipo === null)
-      throw new Error('Tipo do sensor não existe')
+  public get sensorTipo(): TipoMedicao | unknown {
     return this.props.sensorTipo
   }
 
-  public get valorAtual(): number {
-    if (this.props.valorAtual === undefined || this.props.valorAtual === null)
-      throw new Error('Valor atual não existe')
+  public get valorAtual(): number | unknown {
     return this.props.valorAtual
   }
 
-  public get limiteMin(): number {
-    if (this.props.limiteMin === undefined || this.props.limiteMin === null)
-      throw new Error('Limite minimo não existe')
+  public get limiteMin(): number | unknown {
     return this.props.limiteMin
   }
 
-  public get limiteMax(): number {
-    if (this.props.limiteMax === undefined || this.props.limiteMax === null)
-      throw new Error('Limite maximo não existe')
+  public get limiteMax(): number | unknown {
     return this.props.limiteMax
   }
 }

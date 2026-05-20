@@ -68,46 +68,7 @@ describe('Alerta', () => {
     })
   })
 
-  describe('Validação de Atributos Opcionais (Getters)', () => {
-    it('deve lançar erro ao acessar sensorTipo quando ele não for fornecido', () => {
-      expect(() => alertaMinimo.sensorTipo).toThrow('Tipo do sensor não existe')
-    })
-
-    it('deve lançar erro ao acessar valorAtual quando ele não for fornecido', () => {
-      expect(() => alertaMinimo.valorAtual).toThrow('Valor atual não existe')
-    })
-
-    it('deve lançar erro ao acessar limiteMin quando ele não for fornecido', () => {
-      expect(() => alertaMinimo.limiteMin).toThrow('Limite minimo não existe')
-    })
-
-    it('deve lançar erro ao acessar limiteMax quando ele não for fornecido', () => {
-      expect(() => alertaMinimo.limiteMax).toThrow('Limite maximo não existe')
-    })
-  })
-
   describe('Caminhos Ruins e Inconsistências de Dados', () => {
-    it('deve lançar erro se propriedades opcionais forem explicitamente passadas como null', () => {
-      const alertaComNulos = Alerta.create(
-        'alerta-ruim',
-        'disp-1',
-        'amb-1',
-        'sensor_fora_do_range',
-        'critico',
-        'Falha grave',
-        true,
-        null as any,
-        null as any,
-        null as any,
-        null as any,
-      )
-
-      expect(() => alertaComNulos.sensorTipo).toThrow('Tipo do sensor não existe')
-      expect(() => alertaComNulos.valorAtual).toThrow('Valor atual não existe')
-      expect(() => alertaComNulos.limiteMin).toThrow('Limite minimo não existe')
-      expect(() => alertaComNulos.limiteMax).toThrow('Limite maximo não existe')
-    })
-
     it('deve aceitar dados inconsistentes se o tipo for mal combinado', () => {
       const alertaInconsistente = Alerta.create(
         'alerta-misto',

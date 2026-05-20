@@ -16,6 +16,6 @@ describe('CriarUsuarioMapper', () => {
 
   it('deve retornar uma exceção quando parametro for invalido', () => {
     const mapper = CriarUsuarioMapper
-    expect(() => mapper.paraOutput(null as any)).toThrow('Ambiente invalido')
+    expect(() => mapper.paraOutput(null as any)).toThrow('Usuario invalido')
   })
 })

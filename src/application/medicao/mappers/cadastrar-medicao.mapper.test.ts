@@ -16,6 +16,6 @@ describe('CadastrarMedicaoMapper', () => {
 
   it('deve retornar uma exceção quando parametro for invalido', () => {
     const mapper = CadastrarMedicaoMapper
-    expect(() => mapper.paraOutput(null as any)).toThrow('Dispositivo invalido')
+    expect(() => mapper.paraOutput(null as any)).toThrow('Medição invalida')
   })
 })

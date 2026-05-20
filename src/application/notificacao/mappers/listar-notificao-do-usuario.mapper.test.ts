@@ -32,6 +32,10 @@ describe('ListarNotificacaoDoUsuarioMapper', () => {
           nivel: alertas.nivel,
           mensagem: alertas.mensagem,
           lida: notificacoes.lida,
+          sensorTipo: undefined,
+          valorAtual: undefined,
+          limiteMin: undefined,
+          limiteMax: undefined,
         },
       ],
     })
@@ -39,7 +43,7 @@ describe('ListarNotificacaoDoUsuarioMapper', () => {
 
   it('deve retornar uma exceção quando parametro for invalido', () => {
     const mapper = ListarNotificacaoDoUsuarioMapper
-    expect(() => mapper.paraOutput(null as any, [alertas])).toThrow('Alertas invalidos')
-    expect(() => mapper.paraOutput([notificacoes], null as any)).toThrow('Notificacoes invalidas')
+    expect(() => mapper.paraOutput(null as any, [alertas])).toThrow('Notificacoes invalidas')
+    expect(() => mapper.paraOutput([notificacoes], null as any)).toThrow('Alertas invalidos')
   })
 })

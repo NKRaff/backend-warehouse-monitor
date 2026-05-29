@@ -1,0 +1,17 @@
+.vscode
+.git
+.github
+coverage
+dist
+node_modules
+
+.env
+.env.*
+
+.gitignore
+
+*.md
+
+*.test.ts
+test
+vitest.config.ts

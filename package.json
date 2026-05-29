@@ -6,12 +6,14 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
-    "format": "biome check --write src/",
+    "check": "biome check src/",
+    "check:format": "biome check --write src/",
     "start:dev": "tsx watch src/main.ts",
     "start:prod": "node dist/src/main.js",
     "test": "vitest run",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
+    "test:e2e": "vitest run --project e2e",
     "coverage": "vitest run --coverage"
   },
   "repository": {

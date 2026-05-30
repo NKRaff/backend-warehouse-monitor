@@ -1,5 +1,5 @@
-import type { NivelAlerta, TipoAlerta } from '@/domain/alerta/alerta.entity.js'
-import type { TipoMedicao } from '@/domain/medicao/medicao.entity.js'
+import type { NivelAlerta, TipoAlerta } from '../../../domain/alerta/alerta.entity.js'
+import type { TipoMedicao } from '../../../domain/medicao/medicao.entity.js'
 
 export type ListarNotificaoDoUsuarioInputDto = {
   usuarioId: string

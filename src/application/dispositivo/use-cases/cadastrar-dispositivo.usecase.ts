@@ -1,7 +1,7 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { DispositivoRepository } from '@/domain/dispositivo/despositivo.repository.js'
-import { Dispositivo } from '@/domain/dispositivo/dispositivo.entity.js'
-import type { SubscriberTopic } from '@/domain/medicao/subscriber.repository.js'
+import type { DispositivoRepository } from '../../../domain/dispositivo/despositivo.repository.js'
+import { Dispositivo } from '../../../domain/dispositivo/dispositivo.entity.js'
+import type { SubscriberTopic } from '../../../domain/medicao/subscriber.repository.js'
+import type { UseCase } from '../../usecase.js'
 import type {
   CadastrarDispositivoInputDto,
   CadastrarDispositivoOutputDto,

@@ -1,4 +1,4 @@
-import type { SubscriberTopic } from '@/domain/medicao/subscriber.repository.js'
+import type { SubscriberTopic } from '../../domain/medicao/subscriber.repository.js'
 import type { ClientMQTT } from './client.js'
 
 export class MqttTopicSubscriber implements SubscriberTopic {

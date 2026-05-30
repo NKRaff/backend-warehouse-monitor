@@ -1,9 +1,9 @@
-import type { AtualizarUsuarioController } from '@/interface/usuario/atualizar-usuario/atualizar-usuario.controller.js'
-import type { CriarUsuarioController } from '@/interface/usuario/criar-usuario/criar-usuario.controller.js'
-import type { AtivarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
-import type { DesativarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
-import type { RemoverUsuarioController } from '@/interface/usuario/remover-usuario/remover-usuario.controller.js'
 import { Router } from 'express'
+import type { AtualizarUsuarioController } from '../../../interface/usuario/atualizar-usuario/atualizar-usuario.controller.js'
+import type { CriarUsuarioController } from '../../../interface/usuario/criar-usuario/criar-usuario.controller.js'
+import type { AtivarRecebimentoEmailController } from '../../../interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
+import type { DesativarRecebimentoEmailController } from '../../../interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
+import type { RemoverUsuarioController } from '../../../interface/usuario/remover-usuario/remover-usuario.controller.js'
 import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
 export class UsuarioRoutes {

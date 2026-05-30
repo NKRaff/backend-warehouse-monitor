@@ -1,6 +1,6 @@
-import type { BuscarMedicoesController } from '@/interface/medicao/buscar-medicoes/buscar-medicoes.controller.js'
-import type { BuscarUltimaMedicaoController } from '@/interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
 import { Router } from 'express'
+import type { BuscarMedicoesController } from '../../../interface/medicao/buscar-medicoes/buscar-medicoes.controller.js'
+import type { BuscarUltimaMedicaoController } from '../../../interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
 import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
 export class MedicaoRoutes {

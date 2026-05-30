@@ -1,5 +1,5 @@
-import type { Alerta } from '@/domain/alerta/alerta.entity.js'
-import type { Notificacao } from '@/domain/notificacao/notificacao.entity.js'
+import type { Alerta } from '../../../domain/alerta/alerta.entity.js'
+import type { Notificacao } from '../../../domain/notificacao/notificacao.entity.js'
 
 export namespace ListarNotificacaoDoUsuarioMapper {
   export function paraOutput(notificacoes: Notificacao[], alertas: Alerta[]) {

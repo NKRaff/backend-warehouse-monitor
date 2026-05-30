@@ -1,8 +1,8 @@
-import type { UseCase } from '@/application/usecase.js'
+import type { UseCase } from '../../../application/usecase.js'
 import type {
   RecebimentoEmailInputDto,
   RecebimentoEmailOutputDto,
-} from '@/application/usuario/dtos/recebimento-email.dto.js'
+} from '../../../application/usuario/dtos/recebimento-email.dto.js'
 import { RecebimentoEmailSchema } from './recebimento-email.schema.js'
 
 export class AtivarRecebimentoEmailController {

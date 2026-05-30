@@ -1,6 +1,6 @@
-import type { ListarNotificacaoDoUsuarioController } from '@/interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
-import type { MarcarComoLidaController } from '@/interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import { Router } from 'express'
+import type { ListarNotificacaoDoUsuarioController } from '../../../interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
+import type { MarcarComoLidaController } from '../../../interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
 export class NotificaoRoutes {

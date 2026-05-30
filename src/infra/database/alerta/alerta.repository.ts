@@ -1,6 +1,6 @@
-import { Alerta, type NivelAlerta, type TipoAlerta } from '@/domain/alerta/alerta.entity.js'
-import type { AlertaRepository } from '@/domain/alerta/alerta.repository.js'
-import type { TipoMedicao } from '@/domain/medicao/medicao.entity.js'
+import { Alerta, type NivelAlerta, type TipoAlerta } from '../../../domain/alerta/alerta.entity.js'
+import type { AlertaRepository } from '../../../domain/alerta/alerta.repository.js'
+import type { TipoMedicao } from '../../../domain/medicao/medicao.entity.js'
 import { AlertaModel } from './alerta.model.js'
 
 type AlertaMongo = {

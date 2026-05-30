@@ -1,5 +1,5 @@
-import { Usuario } from '@/domain/usuario/usuario.entity.js'
-import type { UsuarioRepository } from '@/domain/usuario/usuario.repository.js'
+import { Usuario } from '../../../domain/usuario/usuario.entity.js'
+import type { UsuarioRepository } from '../../../domain/usuario/usuario.repository.js'
 import { UsuarioModel } from './usuario.model.js'
 
 type UsuarioMongo = {

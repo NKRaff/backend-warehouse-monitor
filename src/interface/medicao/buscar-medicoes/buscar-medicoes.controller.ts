@@ -1,8 +1,8 @@
 import type {
   BuscarMedicoesInputDto,
   BuscarMedicoesOutputDto,
-} from '@/application/medicao/dtos/buscar-medicoes.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+} from '../../../application/medicao/dtos/buscar-medicoes.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 import { BuscarMedicoesSchema } from './buscar-medicoes.schema.js'
 
 export class BuscarMedicoesController {

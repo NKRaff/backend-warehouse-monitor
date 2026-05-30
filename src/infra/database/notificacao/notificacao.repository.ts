@@ -1,5 +1,5 @@
-import { Notificacao } from '@/domain/notificacao/notificacao.entity.js'
-import type { NotificacaoRepository } from '@/domain/notificacao/notificacao.repository.js'
+import { Notificacao } from '../../../domain/notificacao/notificacao.entity.js'
+import type { NotificacaoRepository } from '../../../domain/notificacao/notificacao.repository.js'
 import { NotificacaoModel } from './notificacao.model.js'
 
 type NotificaoMongo = {

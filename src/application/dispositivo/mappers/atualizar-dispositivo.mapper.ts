@@ -1,4 +1,4 @@
-import type { Dispositivo } from '@/domain/dispositivo/dispositivo.entity.js'
+import type { Dispositivo } from '../../../domain/dispositivo/dispositivo.entity.js'
 
 export namespace AtualizarDispositivoMapper {
   export function paraOutput(dispositivo: Dispositivo) {

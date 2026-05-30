@@ -1,6 +1,9 @@
-import type { RemoverAmbienteOutputDto } from '@/application/ambiente/dtos/remover-ambiente.dto.js'
-import type { UseCase } from '@/application/usecase.js'
-import { type RemoverAmbienteInputDto, RemoverAmbienteSchema } from './remover-ambiente.schema.js'
+import type {
+  RemoverAmbienteInputDto,
+  RemoverAmbienteOutputDto,
+} from '../../../application/ambiente/dtos/remover-ambiente.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
+import { RemoverAmbienteSchema } from './remover-ambiente.schema.js'
 
 export class RemoverAmbienteController {
   private constructor(

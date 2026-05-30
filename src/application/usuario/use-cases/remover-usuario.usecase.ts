@@ -1,6 +1,6 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { AutenticacaoRepository } from '@/domain/autenticacao/autenticacao.repository.js'
-import type { UsuarioRepository } from '@/domain/usuario/usuario.repository.js'
+import type { AutenticacaoRepository } from '../../../domain/autenticacao/autenticacao.repository.js'
+import type { UsuarioRepository } from '../../../domain/usuario/usuario.repository.js'
+import type { UseCase } from '../../usecase.js'
 import type {
   RemoverUsuarioInputDto,
   RemoverUsuarioOutputDto,

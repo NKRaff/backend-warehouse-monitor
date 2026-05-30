@@ -1,4 +1,4 @@
-import type { TipoMedicao } from '@/domain/medicao/medicao.entity.js'
+import type { TipoMedicao } from '../../../domain/medicao/medicao.entity.js'
 
 export type BuscarUltimaMedicaoInputDto = {
   dispositivoId?: string

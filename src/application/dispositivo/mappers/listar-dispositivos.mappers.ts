@@ -2,6 +2,9 @@ import type { Dispositivo } from '../../../domain/dispositivo/dispositivo.entity
 
 export namespace ListarDispositivosMapper {
   export function paraOutput(dispositivos: Dispositivo[]) {
+    if (!dispositivos) {
+      throw new Error('Lista de Dispositivo invalido')
+    }
     return {
       dispositivos: dispositivos.map((dispositivo) => {
         return {

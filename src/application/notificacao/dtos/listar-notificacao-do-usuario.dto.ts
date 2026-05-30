@@ -13,10 +13,10 @@ export type ListarNotificaoDoUsuarioOutputDto = {
     tipo: TipoAlerta
     nivel: NivelAlerta
     mensagem: string
-    sensorTipo: TipoMedicao
-    valorAtual: number
-    limiteMin: number
-    limiteMax: number
+    sensorTipo?: TipoMedicao
+    valorAtual?: number
+    limiteMin?: number
+    limiteMax?: number
     lida: boolean
   }[]
 }

@@ -3,7 +3,7 @@ import type { ListarNotificacaoDoUsuarioController } from '../../../interface/no
 import type { MarcarComoLidaController } from '../../../interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
-export class NotificaoRoutes {
+export class NotificacaoRoutes {
   public readonly routes: Router
 
   private constructor(
@@ -18,7 +18,7 @@ export class NotificaoRoutes {
     listarNotificacaoDoUsuarioController: ListarNotificacaoDoUsuarioController,
     marcarComoLidaController: MarcarComoLidaController,
   ) {
-    return new NotificaoRoutes(listarNotificacaoDoUsuarioController, marcarComoLidaController)
+    return new NotificacaoRoutes(listarNotificacaoDoUsuarioController, marcarComoLidaController)
   }
 
   private setupRoutes() {

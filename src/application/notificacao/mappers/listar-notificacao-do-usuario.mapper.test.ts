@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { Alerta } from '../../../domain/alerta/alerta.entity.js'
 import { Notificacao } from '../../../domain/notificacao/notificacao.entity.js'
-import { ListarNotificacaoDoUsuarioMapper } from './listar-notificao-do-usuario.mapper.js'
+import { ListarNotificacaoDoUsuarioMapper } from './listar-notificacao-do-usuario.mapper.js'
 
 describe('ListarNotificacaoDoUsuarioMapper', () => {
   let notificacoes: Notificacao

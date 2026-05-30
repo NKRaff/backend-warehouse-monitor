@@ -82,9 +82,9 @@ export class CadastrarMedicaoUseCase
       await this.alertaRepo.save(alertaGerado)
       const usuarios = await this.usuarioRepo.findAll()
       usuarios.forEach(async (usuario) => {
-        const notificaoId = v7()
-        const notificao = Notificacao.create(notificaoId, alertaGerado.id, usuario.id)
-        await this.notificacaoRepo.save(notificao)
+        const notificacaoId = v7()
+        const notificacao = Notificacao.create(notificacaoId, alertaGerado.id, usuario.id)
+        await this.notificacaoRepo.save(notificacao)
         if (usuario.receberEmail) {
           await this.mailer.sendMail({
             to: usuario.email,

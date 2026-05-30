@@ -2,13 +2,13 @@ import type { AlertaRepository } from '../../../domain/alerta/alerta.repository.
 import type { NotificacaoRepository } from '../../../domain/notificacao/notificacao.repository.js'
 import type { UseCase } from '../../usecase.js'
 import type {
-  ListarNotificaoDoUsuarioInputDto,
-  ListarNotificaoDoUsuarioOutputDto,
+  ListarNotificacaoDoUsuarioInputDto,
+  ListarNotificacaoDoUsuarioOutputDto,
 } from '../dtos/listar-notificacao-do-usuario.dto.js'
-import { ListarNotificacaoDoUsuarioMapper } from '../mappers/listar-notificao-do-usuario.mapper.js'
+import { ListarNotificacaoDoUsuarioMapper } from '../mappers/listar-notificacao-do-usuario.mapper.js'
 
-export class ListarNotificaoDoUsuarioUseCase
-  implements UseCase<ListarNotificaoDoUsuarioInputDto, ListarNotificaoDoUsuarioOutputDto>
+export class ListarNotificacaoDoUsuarioUseCase
+  implements UseCase<ListarNotificacaoDoUsuarioInputDto, ListarNotificacaoDoUsuarioOutputDto>
 {
   private constructor(
     private readonly alertaRepo: AlertaRepository,
@@ -16,12 +16,12 @@ export class ListarNotificaoDoUsuarioUseCase
   ) {}
 
   public static create(alertaRepo: AlertaRepository, notificacaoRepo: NotificacaoRepository) {
-    return new ListarNotificaoDoUsuarioUseCase(alertaRepo, notificacaoRepo)
+    return new ListarNotificacaoDoUsuarioUseCase(alertaRepo, notificacaoRepo)
   }
 
   public async execute(
-    input: ListarNotificaoDoUsuarioInputDto,
-  ): Promise<ListarNotificaoDoUsuarioOutputDto> {
+    input: ListarNotificacaoDoUsuarioInputDto,
+  ): Promise<ListarNotificacaoDoUsuarioOutputDto> {
     const listaNotificoes = await this.notificacaoRepo.findByUsuario(input.usuarioId)
     const listaAlertas = await Promise.all(
       listaNotificoes.map((notificacao) => this.alertaRepo.findById(notificacao.alertaId)),

@@ -10,10 +10,10 @@ export namespace ListarNotificacaoDoUsuarioMapper {
     }
     return {
       notificoes: notificacoes
-        .map((notificao, index) => {
+        .map((notificacao, index) => {
           const alerta = alertas[index]
           return {
-            id: notificao.id,
+            id: notificacao.id,
             dispositivoId: alerta.dispositivoId,
             ambienteId: alerta.ambienteId,
             tipo: alerta.tipo,
@@ -23,7 +23,7 @@ export namespace ListarNotificacaoDoUsuarioMapper {
             valorAtual: alerta.valorAtual,
             limiteMin: alerta.limiteMin,
             limiteMax: alerta.limiteMax,
-            lida: notificao.lida,
+            lida: notificacao.lida,
           }
         })
         .filter(Boolean),

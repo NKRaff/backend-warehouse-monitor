@@ -1,27 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AlertaRepository } from '../../../domain/alerta/alerta.repository.js'
 import type { NotificacaoRepository } from '../../../domain/notificacao/notificacao.repository.js'
-import type { ListarNotificaoDoUsuarioInputDto } from '../dtos/listar-notificacao-do-usuario.dto.js'
+import type { ListarNotificacaoDoUsuarioInputDto } from '../dtos/listar-notificacao-do-usuario.dto.js'
+import { ListarNotificacaoDoUsuarioMapper } from '../mappers/listar-notificao-do-usuario.mapper.js'
+import { ListarNotificacaoDoUsuarioUseCase } from './listar-notificao-do-usuario.usecase.js'
 
 // 1. Mockando o Mapper para isolar completamente o Use Case
-vi.mock('../mappers/listar-notificao-do-usuario.mapper.js', () => ({
+vi.mock('../mappers/listar-notificacao-do-usuario.mapper.js', () => ({
   ListarNotificacaoDoUsuarioMapper: {
     paraOutput: vi.fn(),
   },
 }))
 
-import { ListarNotificacaoDoUsuarioMapper } from '../mappers/listar-notificao-do-usuario.mapper.js'
-import { ListarNotificaoDoUsuarioUseCase } from './listar-notificao-do-usuario.usecase.js'
-
-describe('ListarNotificaoDoUsuarioUseCase Unit Tests', () => {
+describe('ListarNotificacaoDoUsuarioUseCase Unit Tests', () => {
   let alertaRepositoryMock: AlertaRepository
   let notificacaoRepositoryMock: NotificacaoRepository
-  let useCase: ListarNotificaoDoUsuarioUseCase
+  let useCase: ListarNotificacaoDoUsuarioUseCase
 
   let notificacaoEntityMock: any
   let alertaEntityMock: any
 
-  const inputValido: ListarNotificaoDoUsuarioInputDto = {
+  const inputValido: ListarNotificacaoDoUsuarioInputDto = {
     usuarioId: 'usuario-123',
   }
 
@@ -55,7 +54,7 @@ describe('ListarNotificaoDoUsuarioUseCase Unit Tests', () => {
       findById: vi.fn().mockResolvedValue(alertaEntityMock),
     } as unknown as AlertaRepository
 
-    useCase = ListarNotificaoDoUsuarioUseCase.create(
+    useCase = ListarNotificacaoDoUsuarioUseCase.create(
       alertaRepositoryMock,
       notificacaoRepositoryMock,
     )

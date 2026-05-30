@@ -1,11 +1,11 @@
 import type { NivelAlerta, TipoAlerta } from '../../../domain/alerta/alerta.entity.js'
 import type { TipoMedicao } from '../../../domain/medicao/medicao.entity.js'
 
-export type ListarNotificaoDoUsuarioInputDto = {
+export type ListarNotificacaoDoUsuarioInputDto = {
   usuarioId: string
 }
 
-export type ListarNotificaoDoUsuarioOutputDto = {
+export type ListarNotificacaoDoUsuarioOutputDto = {
   notificoes: {
     id: string
     dispositivoId: string

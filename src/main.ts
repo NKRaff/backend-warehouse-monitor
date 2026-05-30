@@ -11,7 +11,7 @@ import { RemoverDispositivoUseCase } from './application/dispositivo/use-cases/r
 import { BuscarMedicaoUseCase } from './application/medicao/use-cases/buscar-medicoes.usecase.js'
 import { BuscarUltimaMedicaoUseCase } from './application/medicao/use-cases/buscar-ultima-medicao.usecase.js'
 import { CadastrarMedicaoUseCase } from './application/medicao/use-cases/cadastrar-medicao.usecase.js'
-import { ListarNotificaoDoUsuarioUseCase } from './application/notificacao/use-cases/listar-notificao-do-usuario.usecase.js'
+import { ListarNotificacaoDoUsuarioUseCase } from './application/notificacao/use-cases/listar-notificacao-do-usuario.usecase.js'
 import { MarcarComoLidaUseCase } from './application/notificacao/use-cases/marcar-como-lida.usecase.js'
 import { AtivarRecebimentoEmailUseCase } from './application/usuario/use-cases/ativar-recebimento-email.usecase.js'
 import { AtualizarUsuarioUseCase } from './application/usuario/use-cases/atualizar-usuario.usecase.js'
@@ -106,7 +106,7 @@ async function main() {
 
   const loginUseCase = LogarUseCase.create(usuarioRepo, autenticacaoRepo)
 
-  const listaNotificacaoDoUsuarioUseCase = ListarNotificaoDoUsuarioUseCase.create(
+  const listaNotificacaoDoUsuarioUseCase = ListarNotificacaoDoUsuarioUseCase.create(
     alertaRepo,
     notificacaoRepo,
   )

@@ -21,7 +21,7 @@ import { AmbienteRoutes } from './ambientes.route.js'
 import { DispositivoRoutes } from './dispositivo.route.js'
 import { LoginRoutes } from './login.route.js'
 import { MedicaoRoutes } from './medicao.route.js'
-import { NotificaoRoutes } from './notificacao.route.js'
+import { NotificacaoRoutes } from './notificacao.route.js'
 import { UsuarioRoutes } from './usuario.route.js'
 
 export class Routes {
@@ -150,7 +150,7 @@ export class Routes {
 
     this.routes.use(
       '/notificacao',
-      NotificaoRoutes.create(
+      NotificacaoRoutes.create(
         this.listarNotificacaoDoUsuarioController,
         this.marcarComoLidaController,
       ).routes,

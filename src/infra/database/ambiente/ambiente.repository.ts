@@ -24,7 +24,7 @@ export class MongooseAmbienteRepository implements AmbienteRepository {
     await AmbienteModel.create({
       _id: ambiente.id,
       nome: ambiente.nome,
-      tipo: ambiente.tipo,
+      tipo: ambiente.tipo as TipoAmbiente,
       descricao: ambiente.descricao,
       temperatura_minima: ambiente.temperaturaMinima,
       temperatura_maxima: ambiente.temperaturaMaxima,

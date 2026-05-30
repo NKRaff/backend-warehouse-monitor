@@ -26,6 +26,9 @@ jobs:
       - name: Instalando dependencias
         run: npm ci
 
+      - name: Criar arquivo .env
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+
       - name: Rodar testes de cobertura
         run: npm run coverage
     
@@ -44,6 +47,9 @@ jobs:
         - name: Instalando dependencias
           run: npm ci
 
+        - name: Criar arquivo .env
+          run: echo "${{ secrets.ENV_FILE }}" > .env
+
         - name: Rodar testes unitarios
           run: npm run test:integration
 
@@ -61,6 +67,9 @@ jobs:
 
       - name: Instalando dependencias
         run: npm ci
+
+      - name: Criar arquivo .env
+        run: echo "${{ secrets.ENV_FILE }}" > .env
 
       - name: Rodar testes end-to-end
         run: npm run test:e2e

@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AlertaRepository } from '../../../domain/alerta/alerta.repository.js'
 import type { NotificacaoRepository } from '../../../domain/notificacao/notificacao.repository.js'
 import type { ListarNotificacaoDoUsuarioInputDto } from '../dtos/listar-notificacao-do-usuario.dto.js'
-import { ListarNotificacaoDoUsuarioMapper } from '../mappers/listar-notificao-do-usuario.mapper.js'
-import { ListarNotificacaoDoUsuarioUseCase } from './listar-notificao-do-usuario.usecase.js'
+import { ListarNotificacaoDoUsuarioMapper } from '../mappers/listar-notificacao-do-usuario.mapper.js'
+import { ListarNotificacaoDoUsuarioUseCase } from './listar-notificacao-do-usuario.usecase.js'
 
 // 1. Mockando o Mapper para isolar completamente o Use Case
 vi.mock('../mappers/listar-notificacao-do-usuario.mapper.js', () => ({

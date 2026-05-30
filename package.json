@@ -5,10 +5,16 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc && tsc-alias",
-    "format": "biome check --write src/",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "check": "biome check src/",
+    "check:format": "biome check --write src/",
     "start:dev": "tsx watch src/main.ts",
-    "start:prod": "node dist/main.js"
+    "start:prod": "node dist/main.js",
+    "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
+    "test:e2e": "vitest run --project e2e",
+    "coverage": "vitest run --coverage"
   },
   "repository": {
     "type": "git",
@@ -22,6 +28,7 @@
   },
   "homepage": "https://github.com/NKRaff/backend-warehouse-monitor#readme",
   "dependencies": {
+    "@vitest/coverage-v8": "^4.1.7",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
@@ -32,6 +39,7 @@
     "mqtt": "^5.14.1",
     "nodemailer": "^8.0.10",
     "uuid": "^13.0.0",
+    "vitest": "^4.1.7",
     "zod": "^4.1.13"
   },
   "devDependencies": {

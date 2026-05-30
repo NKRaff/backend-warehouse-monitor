@@ -8,7 +8,7 @@
     "build": "tsc && tsc-alias",
     "format": "biome check --write src/",
     "start:dev": "tsx watch src/main.ts",
-    "start:prod": "node dist/src/main.js"
+    "start:prod": "node dist/main.js"
   },
   "repository": {
     "type": "git",

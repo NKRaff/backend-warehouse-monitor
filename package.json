@@ -30,7 +30,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.0.0",
     "mqtt": "^5.14.1",
-    "nodemailer": "^7.0.13",
+    "nodemailer": "^8.0.10",
     "uuid": "^13.0.0",
     "zod": "^4.1.13"
   },

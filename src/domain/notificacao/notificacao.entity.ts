@@ -30,7 +30,6 @@ export class Notificacao {
   }
 
   public get lida(): boolean {
-    if (this.props.lida === undefined || this.props.lida === null) return false
-    return this.props.lida
+    return this.props.lida || false
   }
 }

@@ -16,6 +16,6 @@ export class RemoverAmbienteController {
 
   public async handle(input: unknown) {
     const dto = RemoverAmbienteSchema.parse(input)
-    this.useCase.execute(dto)
+    await this.useCase.execute(dto)
   }
 }

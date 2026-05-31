@@ -29,4 +29,8 @@ export class ServerHTTP {
       console.log(`🖥️  Server rodando na porta ${process.env.PORT}`)
     })
   }
+
+  public get expressApp() {
+    return this.app
+  }
 }

@@ -72,7 +72,7 @@ describe('Ambiente E2E Tests', () => {
 
     // Limpa possíveis sujeiras de execuções anteriores
     await db.collection('usuarios').deleteMany({})
-    await db.collection('autenticacoes').deleteMany({})
+    await db.collection('autenticacaos').deleteMany({})
 
     await db.collection('usuarios').insertOne({
       id: mockUsuarioId,
@@ -83,7 +83,7 @@ describe('Ambiente E2E Tests', () => {
       updatedAt: new Date(),
     })
 
-    await db.collection('autenticacoes').insertOne({
+    await db.collection('autenticacaos').insertOne({
       id: mockAuthId,
       usuarioId: mockUsuarioId,
       senha: '$2b$10$/xnF.rBWp2ziVAd40ztXZOqPb2eosx/UXTTEu1VuWECinkrVJbIEq',

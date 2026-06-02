@@ -77,7 +77,7 @@ describe('Dispositivo E2E Tests', () => {
 
     // Limpa sujeiras de execuções anteriores específicas deste teste
     await db.collection('usuarios').deleteMany({ id: mockUsuarioId })
-    await db.collection('autenticacoes').deleteMany({ id: mockAuthId })
+    await db.collection('autenticacaos').deleteMany({ id: mockAuthId })
     await db.collection('ambientes').deleteMany({ id: mockAmbienteId })
 
     await db.collection('usuarios').insertOne({
@@ -89,7 +89,7 @@ describe('Dispositivo E2E Tests', () => {
       updatedAt: new Date(),
     })
 
-    await db.collection('autenticacoes').insertOne({
+    await db.collection('autenticacaos').insertOne({
       id: mockAuthId,
       usuarioId: mockUsuarioId,
       senha: '$2b$10$/xnF.rBWp2ziVAd40ztXZOqPb2eosx/UXTTEu1VuWECinkrVJbIEq', // Senha mock

@@ -10,6 +10,6 @@ export const BuscarMedicoesSchema = z.object({
   tipo: TipoMedicaoSchema.optional(),
   minValor: z.number().optional(),
   maxValor: z.number().optional(),
-  startData: z.date().optional(),
-  endData: z.date().optional(),
+  startData: z.coerce.date().optional(),
+  endData: z.coerce.date().optional(),
 })

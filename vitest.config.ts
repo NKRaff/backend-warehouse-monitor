@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
+    silent: true,
     coverage: {
       provider: 'v8',
       include: ['src/domain/**/*.ts', 'src/application/**/*.ts'],
@@ -28,6 +29,7 @@ export default defineConfig({
           name: 'integration',
           include: ['./test/**/*.test.ts'],
           exclude: ['./test/**/*.e2e.test.ts'],
+          fileParallelism: false,
         },
       },
       {

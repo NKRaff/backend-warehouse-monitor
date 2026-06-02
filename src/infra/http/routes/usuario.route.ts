@@ -46,9 +46,9 @@ export class UsuarioRoutes {
       }
     })
 
-    this.routes.delete('/:id', autenticarToken, async (req, res) => {
+    this.routes.delete('/', autenticarToken, async (req, res) => {
       try {
-        const result = await this.removerUsuarioController.handle({ id: req.params.id })
+        const result = await this.removerUsuarioController.handle(req.body)
         res.status(200).json(result)
       } catch (error) {
         res.status(400).json(error)

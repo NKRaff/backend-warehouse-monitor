@@ -11,10 +11,10 @@ jobs:
       - name: Clonando o repositorio e trocando para a branch correta
         uses: actions/checkout@v4
 
-      - name: Instalando o Node.js versão 22.x
-        uses: actions/setup-node@v4
+      - name: Instalando o Node.js versão 24.x
+        uses: actions/setup-node@v6
         with:
-          node-version: 22.x
+          node-version: 24.x
           cache: 'npm'
 
       - name: Instalando dependencias
@@ -29,10 +29,10 @@ jobs:
       - name: Clonando o repositorio e trocando para a branch correta
         uses: actions/checkout@v4
 
-      - name: Instalando o Node.js versão 22.x
-        uses: actions/setup-node@v4
+      - name: Instalando o Node.js versão 24.x
+        uses: actions/setup-node@v6
         with:
-          node-version: 22.x
+          node-version: 24.x
           cache: 'npm'
 
       - name: Instalando dependencias
@@ -48,10 +48,10 @@ jobs:
       - name: Clonando o repositorio e trocando para a branch correta
         uses: actions/checkout@v4
       
-      - name: Instalando o Node.js versão 22.x
-        uses: actions/setup-node@v4
+      - name: Instalando o Node.js versão 24.x
+        uses: actions/setup-node@v6
         with:
-          node-version: 22.x
+          node-version: 24.x
           cache: 'npm'
 
       - name: Instalando dependencias

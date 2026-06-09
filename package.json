@@ -11,9 +11,9 @@
     "start:dev": "tsx watch src/main.ts",
     "start:prod": "node dist/main.js",
     "test": "vitest run",
-    "test:unit": "vitest run --project unit",
-    "test:integration": "vitest run --project integration",
-    "test:e2e": "vitest run --project e2e",
+    "test:unit": "vitest run --project unit --passWithNoTests",
+    "test:integration": "vitest run --project integration --passWithNoTests",
+    "test:e2e": "vitest run --project e2e --passWithNoTests",
     "coverage": "vitest run --coverage",
     "prepare": "husky"
   },

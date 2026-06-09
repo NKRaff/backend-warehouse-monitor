@@ -1,5 +1,5 @@
-import { Ambiente, type TipoAmbiente } from '@/domain/ambiente/ambiente.entity.js'
-import type { AmbienteRepository } from '@/domain/ambiente/ambiente.repository.js'
+import { Ambiente, type TipoAmbiente } from '../../../domain/ambiente/ambiente.entity.js'
+import type { AmbienteRepository } from '../../../domain/ambiente/ambiente.repository.js'
 import { AmbienteModel } from './ambiente.model.js'
 
 type AmbienteMongo = {

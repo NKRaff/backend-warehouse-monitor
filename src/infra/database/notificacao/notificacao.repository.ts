@@ -1,8 +1,8 @@
-import { Notificacao } from '@/domain/notificacao/notificacao.entity.js'
-import type { NotificacaoRepository } from '@/domain/notificacao/notificacao.repository.js'
+import { Notificacao } from '../../../domain/notificacao/notificacao.entity.js'
+import type { NotificacaoRepository } from '../../../domain/notificacao/notificacao.repository.js'
 import { NotificacaoModel } from './notificacao.model.js'
 
-type NotificaoMongo = {
+type NotificacaoMongo = {
   _id: string
   alertaId: string
   usuarioId: string
@@ -28,14 +28,14 @@ export class MongooseNotificacaoRepository implements NotificacaoRepository {
   public async findByUsuario(usuarioId: string): Promise<Notificacao[]> {
     const notificacoesDoc = await NotificacaoModel.find({ usuarioId })
       .sort({ createdAt: -1 })
-      .lean<NotificaoMongo[]>()
+      .lean<NotificacaoMongo[]>()
     return notificacoesDoc.map((doc) =>
       Notificacao.create(doc._id, doc.alertaId, doc.usuarioId, doc.lida),
     )
   }
 
   public async findById(id: string): Promise<Notificacao> {
-    const notificacao = await NotificacaoModel.findById(id).lean<NotificaoMongo>()
+    const notificacao = await NotificacaoModel.findById(id).lean<NotificacaoMongo>()
     if (!notificacao) throw new Error('Notificação não encontrada')
     return Notificacao.create(
       notificacao._id,

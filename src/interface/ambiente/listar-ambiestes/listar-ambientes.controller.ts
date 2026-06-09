@@ -1,8 +1,8 @@
 import type {
   ListarAmbientesInputDto,
   ListarAmbientesOutputDto,
-} from '@/application/ambiente/dtos/listar-ambientes.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+} from '../../../application/ambiente/dtos/listar-ambientes.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 
 export class ListarAmbientesController {
   private constructor(

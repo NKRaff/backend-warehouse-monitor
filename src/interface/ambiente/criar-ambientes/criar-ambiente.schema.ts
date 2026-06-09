@@ -1,5 +1,5 @@
-import type { TipoAmbiente } from '@/domain/ambiente/ambiente.entity.js'
 import { z } from 'zod'
+import type { TipoAmbiente } from '../../../domain/ambiente/ambiente.entity.js'
 
 const tipos: TipoAmbiente[] = ['frio', 'arejado']
 const TipoAmbienteSchema = z.union(tipos.map((t) => z.literal(t)))

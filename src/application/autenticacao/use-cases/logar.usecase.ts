@@ -1,8 +1,8 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { AutenticacaoRepository } from '@/domain/autenticacao/autenticacao.repository.js'
-import type { UsuarioRepository } from '@/domain/usuario/usuario.repository.js'
 import { compare } from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import type { AutenticacaoRepository } from '../../../domain/autenticacao/autenticacao.repository.js'
+import type { UsuarioRepository } from '../../../domain/usuario/usuario.repository.js'
+import type { UseCase } from '../../usecase.js'
 import type { LogarInputDto, LogarOutputDto } from '../dtos/logar.dto.js'
 
 export class LogarUseCase implements UseCase<LogarInputDto, LogarOutputDto> {

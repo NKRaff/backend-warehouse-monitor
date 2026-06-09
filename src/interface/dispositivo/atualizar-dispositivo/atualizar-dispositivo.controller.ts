@@ -1,8 +1,8 @@
 import type {
   AtualizarDispositivoInputDto,
   AtualizarDispositivoOutputDto,
-} from '@/application/dispositivo/dtos/atualizar-dispositivo.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+} from '../../../application/dispositivo/dtos/atualizar-dispositivo.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 import { AtualizarDispositivoSchema } from './atualizar-dispositivo.schema.js'
 
 export class AtualizarDispositivoController {

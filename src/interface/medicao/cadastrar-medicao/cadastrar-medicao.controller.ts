@@ -1,8 +1,8 @@
 import type {
   CadastrarMedicaoInputDto,
   CadastrarMedicaoOutputDto,
-} from '@/application/medicao/dtos/cadastrar-medicao.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+} from '../../../application/medicao/dtos/cadastrar-medicao.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 import { CadastrarMedicaoSchema } from './cadastrar-medicao.schema.js'
 
 export class CadastrarMedicaoController {

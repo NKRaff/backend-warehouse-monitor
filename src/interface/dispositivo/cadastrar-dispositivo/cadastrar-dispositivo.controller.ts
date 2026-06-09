@@ -1,9 +1,9 @@
-import type { CadastrarDispositivoOutputDto } from '@/application/dispositivo/dtos/cadastrar-dispositivo.dto.js'
-import type { UseCase } from '@/application/usecase.js'
-import {
-  type CadastrarDispositivoInputDto,
-  CadastrarDispositivoSchema,
-} from './cadastrar-dispositivo.schema.js'
+import type {
+  CadastrarDispositivoInputDto,
+  CadastrarDispositivoOutputDto,
+} from '../../../application/dispositivo/dtos/cadastrar-dispositivo.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
+import { CadastrarDispositivoSchema } from './cadastrar-dispositivo.schema.js'
 
 export class CadastrarDispositivoController {
   private constructor(

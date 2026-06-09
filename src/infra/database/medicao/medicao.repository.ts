@@ -1,5 +1,5 @@
-import { Medicao, type TipoMedicao } from '@/domain/medicao/medicao.entity.js'
-import type { MedicaoRepository } from '@/domain/medicao/medicao.repository.js'
+import { Medicao, type TipoMedicao } from '../../../domain/medicao/medicao.entity.js'
+import type { MedicaoRepository } from '../../../domain/medicao/medicao.repository.js'
 import { MedicaoModel } from './medicao.model.js'
 
 type MedicaoMongo = {

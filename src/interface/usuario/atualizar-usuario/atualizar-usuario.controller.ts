@@ -1,9 +1,9 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { AtualizarUsuarioOutputDto } from '@/application/usuario/dtos/atualizar-usuario.dto.js'
-import {
-  type AtualizarUsuarioInputDto,
-  AtualizarUsuarioSchema,
-} from './atualizar-usuario.schema.js'
+import type { UseCase } from '../../../application/usecase.js'
+import type {
+  AtualizarUsuarioInputDto,
+  AtualizarUsuarioOutputDto,
+} from '../../../application/usuario/dtos/atualizar-usuario.dto.js'
+import { AtualizarUsuarioSchema } from './atualizar-usuario.schema.js'
 
 export class AtualizarUsuarioController {
   private constructor(

@@ -1,5 +1,8 @@
-import type { LogarInputDto, LogarOutputDto } from '@/application/autenticacao/dtos/logar.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+import type {
+  LogarInputDto,
+  LogarOutputDto,
+} from '../../../application/autenticacao/dtos/logar.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 import { LoginSchema } from './logar.schema.js'
 
 export class LoginController {

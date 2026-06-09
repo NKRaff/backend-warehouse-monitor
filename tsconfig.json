@@ -1,22 +1,26 @@
 {
   "$schema": "https://www.schemastore.org/tsconfig",
-  "_version": "22.0.0",
 
   "compilerOptions": {
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "lib": ["es2024", "ESNext.Array", "ESNext.Collection", "ESNext.Iterator"],
-    "module": "nodenext",
-    "target": "es2022",
-    "outDir": "./dist",
+
+    "lib": ["es2024"],
+
+    "module": "NodeNext",
+    "target": "ES2022",
 
     "strict": true,
+
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "node16",
 
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
+    "moduleResolution": "NodeNext",
+
+    "types": ["vitest/globals"],
+
+    "noEmit": true
+  },
+
+  "include": ["src", "test", "**/*.test.ts"]
 }

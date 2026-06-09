@@ -1,4 +1,4 @@
-import type { TipoAmbiente } from '@/domain/ambiente/ambiente.entity.js'
+import type { TipoAmbiente } from '../../../domain/ambiente/ambiente.entity.js'
 
 export type CriarAmbienteInputDto = {
   nome: string

@@ -1,20 +1,20 @@
 import type {
-  ListarNotificaoDoUsuarioInputDto,
-  ListarNotificaoDoUsuarioOutputDto,
-} from '@/application/notificacao/dtos/listar-notificacao-do-usuario.dto.js'
-import type { UseCase } from '@/application/usecase.js'
-import { ListarNotificacaoDoUsuarioSchema } from './listar-notificao-do-usuario.schema.js'
+  ListarNotificacaoDoUsuarioInputDto,
+  ListarNotificacaoDoUsuarioOutputDto,
+} from '../../../application/notificacao/dtos/listar-notificacao-do-usuario.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
+import { ListarNotificacaoDoUsuarioSchema } from './listar-notificacao-do-usuario.schema.js'
 
 export class ListarNotificacaoDoUsuarioController {
   private constructor(
     private readonly useCase: UseCase<
-      ListarNotificaoDoUsuarioInputDto,
-      ListarNotificaoDoUsuarioOutputDto
+      ListarNotificacaoDoUsuarioInputDto,
+      ListarNotificacaoDoUsuarioOutputDto
     >,
   ) {}
 
   public static create(
-    useCase: UseCase<ListarNotificaoDoUsuarioInputDto, ListarNotificaoDoUsuarioOutputDto>,
+    useCase: UseCase<ListarNotificacaoDoUsuarioInputDto, ListarNotificacaoDoUsuarioOutputDto>,
   ) {
     return new ListarNotificacaoDoUsuarioController(useCase)
   }

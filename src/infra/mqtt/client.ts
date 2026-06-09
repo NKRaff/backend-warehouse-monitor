@@ -45,6 +45,10 @@ export class ClientMQTT {
     return new ClientMQTT(options)
   }
 
+  public disconnect() {
+    this.clientMQTT.end()
+  }
+
   onMessage(listener: MqttMessageListener) {
     this.listeners.push(listener)
   }

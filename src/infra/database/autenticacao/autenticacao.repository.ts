@@ -1,5 +1,5 @@
-import { Autenticacao } from '@/domain/autenticacao/autenticacao.entity.js'
-import type { AutenticacaoRepository } from '@/domain/autenticacao/autenticacao.repository.js'
+import { Autenticacao } from '../../../domain/autenticacao/autenticacao.entity.js'
+import type { AutenticacaoRepository } from '../../../domain/autenticacao/autenticacao.repository.js'
 import { AutenticaoModel } from './autenticacao.model.js'
 
 type AutenticacaoMongo = {

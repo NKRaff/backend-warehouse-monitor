@@ -13,10 +13,12 @@ import type { BuscarUltimaMedicaoController } from '../../../interface/medicao/b
 import type { ListarNotificacaoDoUsuarioController } from '../../../interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
 import type { MarcarComoLidaController } from '../../../interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import type { AtualizarUsuarioController } from '../../../interface/usuario/atualizar-usuario/atualizar-usuario.controller.js'
+import type { BuscarUsuarioController } from '../../../interface/usuario/buscar-usuario/buscar-usuario.controller.js'
 import type { CriarUsuarioController } from '../../../interface/usuario/criar-usuario/criar-usuario.controller.js'
 import type { AtivarRecebimentoEmailController } from '../../../interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
 import type { DesativarRecebimentoEmailController } from '../../../interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
 import type { RemoverUsuarioController } from '../../../interface/usuario/remover-usuario/remover-usuario.controller.js'
+import type { MqttTopicSubscriber } from '../../mqtt/topic-subscriber.js'
 import { AmbienteRoutes } from './ambientes.route.js'
 import { DispositivoRoutes } from './dispositivo.route.js'
 import { LoginRoutes } from './login.route.js'
@@ -46,11 +48,14 @@ export class Routes {
     private readonly ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
     private readonly desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
     private readonly atualizarUsuarioController: AtualizarUsuarioController,
+    private readonly buscarUsuarioController: BuscarUsuarioController,
 
     private readonly loginController: LoginController,
 
     private readonly listarNotificacaoDoUsuarioController: ListarNotificacaoDoUsuarioController,
     private readonly marcarComoLidaController: MarcarComoLidaController,
+
+    private readonly topicSubscriber: MqttTopicSubscriber,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -75,11 +80,14 @@ export class Routes {
     ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
     desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
     atualizarUsuarioController: AtualizarUsuarioController,
+    buscarUsuarioController: BuscarUsuarioController,
 
     loginController: LoginController,
 
     listarNotificacaoDoUsuarioController: ListarNotificacaoDoUsuarioController,
     marcarComoLidaController: MarcarComoLidaController,
+
+    topicSubscriber: MqttTopicSubscriber,
   ) {
     return new Routes(
       criarAmbienteController,
@@ -100,11 +108,14 @@ export class Routes {
       ativarRecebimentoEmailController,
       desativarRecebimentoEmailController,
       atualizarUsuarioController,
+      buscarUsuarioController,
 
       loginController,
 
       listarNotificacaoDoUsuarioController,
       marcarComoLidaController,
+
+      topicSubscriber,
     )
   }
 
@@ -126,6 +137,7 @@ export class Routes {
         this.listarDispositivosController,
         this.atualizarDispositivoController,
         this.removerDispositivoController,
+        this.topicSubscriber,
       ).routes,
     )
 
@@ -143,6 +155,7 @@ export class Routes {
         this.ativarRecebimentoEmailController,
         this.desativarRecebimentoEmailController,
         this.atualizarUsuarioController,
+        this.buscarUsuarioController,
       ).routes,
     )
 

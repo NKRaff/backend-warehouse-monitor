@@ -7,6 +7,7 @@ export namespace AtualizarDispositivoMapper {
     }
     return {
       id: dispositivo.id,
+      ambienteId: dispositivo.ambienteId || undefined,
     }
   }
 }

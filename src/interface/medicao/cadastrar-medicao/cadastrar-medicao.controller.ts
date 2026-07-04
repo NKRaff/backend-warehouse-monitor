@@ -20,6 +20,8 @@ export class CadastrarMedicaoController {
     const tipo = parts[1]
     const valor = message.payload.toString()
     const dto = CadastrarMedicaoSchema.parse({ dispositivoId, tipo, valor })
-    return await this.useCase.execute(dto)
+    try {
+      return await this.useCase.execute(dto)
+    } catch {}
   }
 }

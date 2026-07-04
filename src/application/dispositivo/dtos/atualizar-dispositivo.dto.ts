@@ -6,4 +6,5 @@ export type AtualizarDispositivoInputDto = {
 
 export type AtualizarDispositivoOutputDto = {
   id: string
+  ambienteId?: string
 }

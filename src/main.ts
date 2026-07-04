@@ -15,6 +15,7 @@ import { ListarNotificacaoDoUsuarioUseCase } from './application/notificacao/use
 import { MarcarComoLidaUseCase } from './application/notificacao/use-cases/marcar-como-lida.usecase.js'
 import { AtivarRecebimentoEmailUseCase } from './application/usuario/use-cases/ativar-recebimento-email.usecase.js'
 import { AtualizarUsuarioUseCase } from './application/usuario/use-cases/atualizar-usuario.usecase.js'
+import { BuscarUsuarioUseCase } from './application/usuario/use-cases/buscar-usuario.usecase.js'
 import { CriarUsuarioUseCase } from './application/usuario/use-cases/criar-usuario.usecase.js'
 import { DesativarRecebimentoEmailUseCase } from './application/usuario/use-cases/desativar-recebimento-email.usecase.js'
 import { RemoverUsuarioUseCase } from './application/usuario/use-cases/remover-usuario.usecase.js'
@@ -46,6 +47,7 @@ import { CadastrarMedicaoController } from './interface/medicao/cadastrar-medica
 import { ListarNotificacaoDoUsuarioController } from './interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
 import { MarcarComoLidaController } from './interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
 import { AtualizarUsuarioController } from './interface/usuario/atualizar-usuario/atualizar-usuario.controller.js'
+import { BuscarUsuarioController } from './interface/usuario/buscar-usuario/buscar-usuario.controller.js'
 import { CriarUsuarioController } from './interface/usuario/criar-usuario/criar-usuario.controller.js'
 import { AtivarRecebimentoEmailController } from './interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
 import { DesativarRecebimentoEmailController } from './interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
@@ -103,6 +105,7 @@ async function main() {
   const ativarRecebimentoEmailUseCase = AtivarRecebimentoEmailUseCase.create(usuarioRepo)
   const desativarRecebimentoEmailUseCase = DesativarRecebimentoEmailUseCase.create(usuarioRepo)
   const atualizarUsuarioUseCase = AtualizarUsuarioUseCase.create(usuarioRepo)
+  const buscarUsuarioUseCase = BuscarUsuarioUseCase.create(usuarioRepo)
 
   const loginUseCase = LogarUseCase.create(usuarioRepo, autenticacaoRepo)
 
@@ -143,6 +146,7 @@ async function main() {
     desativarRecebimentoEmailUseCase,
   )
   const atualizarUsuarioController = AtualizarUsuarioController.create(atualizarUsuarioUseCase)
+  const buscarUsuarioController = BuscarUsuarioController.create(buscarUsuarioUseCase)
 
   const loginController = LoginController.create(loginUseCase)
 
@@ -171,11 +175,14 @@ async function main() {
     ativarRecebimentoEmailController,
     desativarRecebimentoEmailController,
     atualizarUsuarioController,
+    buscarUsuarioController,
 
     loginController,
 
     listarNotificacaoDoUsuarioController,
     marcarComoLidaController,
+
+    topicSubscriber,
   ).routes
 
   clientMQTT.onMessage((msg) => cadastrarMedicaoController.handle(msg))

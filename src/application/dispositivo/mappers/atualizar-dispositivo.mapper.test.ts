@@ -11,7 +11,7 @@ describe('AtualizarDispositivoMapper', () => {
 
   it('deve extrair informações do Dispositivo quando valido', () => {
     const mapper = AtualizarDispositivoMapper
-    expect(mapper.paraOutput(dispositivo)).toStrictEqual({ id: '1' })
+    expect(mapper.paraOutput(dispositivo)).toStrictEqual({ id: '1', ambienteId: '1' })
   })
 
   it('deve retornar uma exceção quando parametro for invalido', () => {

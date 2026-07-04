@@ -56,4 +56,8 @@ export class ClientMQTT {
   subscribe(topic: string) {
     this.clientMQTT.subscribe(topic, { qos: 1 })
   }
+
+  unsubscribe(topic: string) {
+    this.clientMQTT.unsubscribe(topic)
+  }
 }

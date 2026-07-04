@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import type { AtualizarUsuarioController } from '../../../interface/usuario/atualizar-usuario/atualizar-usuario.controller.js'
+import type { BuscarUsuarioController } from '../../../interface/usuario/buscar-usuario/buscar-usuario.controller.js'
 import type { CriarUsuarioController } from '../../../interface/usuario/criar-usuario/criar-usuario.controller.js'
 import type { AtivarRecebimentoEmailController } from '../../../interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
 import type { DesativarRecebimentoEmailController } from '../../../interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
@@ -15,6 +16,7 @@ export class UsuarioRoutes {
     private readonly ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
     private readonly desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
     private readonly atualizarUsuarioController: AtualizarUsuarioController,
+    private readonly buscarUsuarioController: BuscarUsuarioController,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -26,6 +28,7 @@ export class UsuarioRoutes {
     ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
     desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
     atualizarUsuarioController: AtualizarUsuarioController,
+    buscarUsuarioController: BuscarUsuarioController,
   ) {
     return new UsuarioRoutes(
       criarUsuarioController,
@@ -33,10 +36,20 @@ export class UsuarioRoutes {
       ativarRecebimentoEmailController,
       desativarRecebimentoEmailController,
       atualizarUsuarioController,
+      buscarUsuarioController,
     )
   }
 
   private setupRoutes() {
+    this.routes.get('/:id', async (req, res) => {
+      try {
+        const result = await this.buscarUsuarioController.handle({ id: req.params.id })
+        res.status(200).json(result)
+      } catch (error) {
+        res.status(400).json(error)
+      }
+    })
+
     this.routes.post('/', async (req, res) => {
       try {
         const result = await this.criarUsuarioController.handle(req.body)

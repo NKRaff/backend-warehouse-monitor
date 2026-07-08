@@ -19,7 +19,7 @@ export class AtualizarAmbienteUseCase
     if (
       !input.nome &&
       !input.descricao &&
-      input.tipo &&
+      !input.tipo &&
       input.temperatura_minima === undefined &&
       input.temperatura_maxima === undefined &&
       input.umidade_minima === undefined &&

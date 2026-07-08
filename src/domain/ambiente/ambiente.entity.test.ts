@@ -55,7 +55,7 @@ describe('Ambiente', () => {
     })
 
     it('deve atualizar os limites de temperatura e umidade com valores válidos', () => {
-      ambiente.update(undefined, undefined, 2, 18, 40, 90)
+      ambiente.update(undefined, undefined, 'frio', 2, 18, 40, 90)
 
       expect(ambiente.temperaturaMinima).toBe(2)
       expect(ambiente.temperaturaMaxima).toBe(18)
@@ -64,21 +64,21 @@ describe('Ambiente', () => {
     })
 
     it('deve lançar erro se a temperatura mínima for maior ou igual à máxima', () => {
-      expect(() => ambiente.update(undefined, undefined, 20, 15)).toThrow(
+      expect(() => ambiente.update(undefined, undefined, 'frio', 20, 15)).toThrow(
         'Temperatura mínima não pode ser maior ou igual à temperatura máxima',
       )
-      expect(() => ambiente.update(undefined, undefined, 15, 15)).toThrow(
+      expect(() => ambiente.update(undefined, undefined, 'frio', 15, 15)).toThrow(
         'Temperatura mínima não pode ser maior ou igual à temperatura máxima',
       )
     })
 
     it('deve lançar erro se a umidade mínima for maior ou igual à máxima', () => {
-      expect(() => ambiente.update(undefined, undefined, undefined, undefined, 85, 80)).toThrow(
-        'Umidade mínima não pode ser maior ou igual à umidade máxima',
-      )
-      expect(() => ambiente.update(undefined, undefined, undefined, undefined, 80, 80)).toThrow(
-        'Umidade mínima não pode ser maior ou igual à umidade máxima',
-      )
+      expect(() =>
+        ambiente.update(undefined, undefined, undefined, undefined, undefined, 85, 80),
+      ).toThrow('Umidade mínima não pode ser maior ou igual à umidade máxima')
+      expect(() =>
+        ambiente.update(undefined, undefined, undefined, undefined, undefined, 80, 80),
+      ).toThrow('Umidade mínima não pode ser maior ou igual à umidade máxima')
     })
   })
 
@@ -208,14 +208,14 @@ describe('Ambiente', () => {
       })
 
       it('deve quebrar a validação se o update misturar limites novos com limites antigos de forma inconsistente', () => {
-        expect(() => ambiente.update(undefined, undefined, undefined, 4)).toThrow(
+        expect(() => ambiente.update(undefined, undefined, undefined, undefined, 4)).toThrow(
           'Temperatura mínima não pode ser maior ou igual à temperatura máxima',
         )
       })
 
       it('deve lançar erro se o update tentar salvar um valor zero que quebre a regra de negócio', () => {
         expect(() =>
-          ambiente.update(undefined, undefined, undefined, undefined, undefined, 0),
+          ambiente.update(undefined, undefined, undefined, undefined, undefined, undefined, 0),
         ).toThrow('Umidade mínima não pode ser maior ou igual à umidade máxima')
       })
     })

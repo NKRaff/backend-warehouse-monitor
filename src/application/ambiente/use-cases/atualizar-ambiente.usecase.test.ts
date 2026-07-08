@@ -54,6 +54,7 @@ describe('AtualizarAmbienteUseCase Unit Tests', () => {
     expect(ambienteEntityMock.update).toHaveBeenCalledWith(
       inputValido.nome,
       inputValido.descricao, // undefined
+      inputValido.tipo, // undefined
       inputValido.temperatura_minima, // undefined
       inputValido.temperatura_maxima,
       inputValido.umidade_minima, // undefined

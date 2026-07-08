@@ -43,6 +43,7 @@ export class Ambiente {
   public update(
     nome?: string,
     descricao?: string,
+    tipo?: TipoAmbiente,
     temperatura_minima?: number,
     temperatura_maxima?: number,
     umidade_minima?: number,
@@ -50,6 +51,7 @@ export class Ambiente {
   ) {
     if (nome) this.props.nome = nome
     if (descricao) this.props.descricao = descricao
+    if (tipo) this.props.tipo = tipo
     this.atualizarRangeTemperatura(temperatura_minima, temperatura_maxima)
     this.atualizarRangeUmidade(umidade_minima, umidade_maxima)
   }

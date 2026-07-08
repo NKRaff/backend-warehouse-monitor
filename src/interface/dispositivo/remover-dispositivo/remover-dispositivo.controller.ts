@@ -1,8 +1,8 @@
 import type {
   RemoverDispositivoInputDto,
   RemoverDispositivoOutputDto,
-} from '@/application/dispositivo/dtos/remover-dispositivo.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+} from '../../../application/dispositivo/dtos/remover-dispositivo.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 import { RemoverDispositivoSchema } from './remover-dispositivo.schema.js'
 
 export class RemoverDispositivoController {

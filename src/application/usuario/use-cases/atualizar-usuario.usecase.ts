@@ -1,5 +1,5 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { UsuarioRepository } from '@/domain/usuario/usuario.repository.js'
+import type { UsuarioRepository } from '../../../domain/usuario/usuario.repository.js'
+import type { UseCase } from '../../usecase.js'
 import type {
   AtualizarUsuarioInputDto,
   AtualizarUsuarioOutputDto,

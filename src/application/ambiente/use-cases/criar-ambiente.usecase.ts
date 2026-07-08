@@ -1,7 +1,7 @@
-import type { UseCase } from '@/application/usecase.js'
-import { Ambiente } from '@/domain/ambiente/ambiente.entity.js'
-import type { AmbienteRepository } from '@/domain/ambiente/ambiente.repository.js'
 import { v7 } from 'uuid'
+import { Ambiente } from '../../../domain/ambiente/ambiente.entity.js'
+import type { AmbienteRepository } from '../../../domain/ambiente/ambiente.repository.js'
+import type { UseCase } from '../../usecase.js'
 import type { CriarAmbienteInputDto, CriarAmbienteOutputDto } from '../dtos/criar-ambiente.dto.js'
 import { CriarAmbienteMapper } from '../mappers/criar-ambiente.mapper.js'
 

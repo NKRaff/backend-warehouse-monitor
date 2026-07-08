@@ -1,4 +1,4 @@
-import type { DispositivoRepository } from '@/domain/dispositivo/despositivo.repository.js'
+import type { DispositivoRepository } from '../../../domain/dispositivo/despositivo.repository.js'
 import type { UseCase } from '../../usecase.js'
 import type {
   AtualizarDispositivoInputDto,

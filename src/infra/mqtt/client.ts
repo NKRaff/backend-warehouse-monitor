@@ -45,11 +45,19 @@ export class ClientMQTT {
     return new ClientMQTT(options)
   }
 
+  public disconnect() {
+    this.clientMQTT.end()
+  }
+
   onMessage(listener: MqttMessageListener) {
     this.listeners.push(listener)
   }
 
   subscribe(topic: string) {
     this.clientMQTT.subscribe(topic, { qos: 1 })
+  }
+
+  unsubscribe(topic: string) {
+    this.clientMQTT.unsubscribe(topic)
   }
 }

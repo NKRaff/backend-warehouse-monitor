@@ -1,9 +1,9 @@
-import type { AtualizarAmbienteOutputDto } from '@/application/ambiente/dtos/atualizar-ambiente.dto.js'
-import type { UseCase } from '@/application/usecase.js'
-import {
-  type AtualizarAmbienteInputDto,
-  AtualizarAmbienteSchema,
-} from './atualizar-ambiente.schema.js'
+import type {
+  AtualizarAmbienteInputDto,
+  AtualizarAmbienteOutputDto,
+} from '../../../application/ambiente/dtos/atualizar-ambiente.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
+import { AtualizarAmbienteSchema } from './atualizar-ambiente.schema.js'
 
 export class AtualizarAmbienteController {
   private constructor(

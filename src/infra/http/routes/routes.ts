@@ -1,27 +1,29 @@
-import type { AtualizarAmbienteController } from '@/interface/ambiente/atualizar-ambientes/atualizar-ambientes.controller.js'
-import type { CriarAmbienteController } from '@/interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
-import type { ListarAmbientesController } from '@/interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
-import type { RemoverAmbienteController } from '@/interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
-import type { LoginController } from '@/interface/autenticacao/logar/logar.controller.js'
-import type { AtualizarDispositivoController } from '@/interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
-import type { CadastrarDispositivoController } from '@/interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
-import type { ListarDispositivosController } from '@/interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
-import type { RemoverDispositivoController } from '@/interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
-import type { BuscarMedicoesController } from '@/interface/medicao/buscar-medicoes/buscar-medicoes.controller.js'
-import type { BuscarUltimaMedicaoController } from '@/interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
-import type { ListarNotificacaoDoUsuarioController } from '@/interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
-import type { MarcarComoLidaController } from '@/interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
-import type { AtualizarUsuarioController } from '@/interface/usuario/atualizar-usuario/atualizar-usuario.controller.js'
-import type { CriarUsuarioController } from '@/interface/usuario/criar-usuario/criar-usuario.controller.js'
-import type { AtivarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
-import type { DesativarRecebimentoEmailController } from '@/interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
-import type { RemoverUsuarioController } from '@/interface/usuario/remover-usuario/remover-usuario.controller.js'
 import { Router } from 'express'
+import type { AtualizarAmbienteController } from '../../../interface/ambiente/atualizar-ambientes/atualizar-ambientes.controller.js'
+import type { CriarAmbienteController } from '../../../interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
+import type { ListarAmbientesController } from '../../../interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
+import type { RemoverAmbienteController } from '../../../interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
+import type { LoginController } from '../../../interface/autenticacao/logar/logar.controller.js'
+import type { AtualizarDispositivoController } from '../../../interface/dispositivo/atualizar-dispositivo/atualizar-dispositivo.controller.js'
+import type { CadastrarDispositivoController } from '../../../interface/dispositivo/cadastrar-dispositivo/cadastrar-dispositivo.controller.js'
+import type { ListarDispositivosController } from '../../../interface/dispositivo/listar-dispositivos/listar-dispositivos.controller.js'
+import type { RemoverDispositivoController } from '../../../interface/dispositivo/remover-dispositivo/remover-dispositivo.controller.js'
+import type { BuscarMedicoesController } from '../../../interface/medicao/buscar-medicoes/buscar-medicoes.controller.js'
+import type { BuscarUltimaMedicaoController } from '../../../interface/medicao/buscar-ultima-medicao/buscar-ultima-medicao.controller.js'
+import type { ListarNotificacaoDoUsuarioController } from '../../../interface/notificacao/listar-notificacao-do-usuario/listar-notificacao-do-usuario.controller.js'
+import type { MarcarComoLidaController } from '../../../interface/notificacao/marcar-como-lida/marcar-como-lida.controller.js'
+import type { AtualizarUsuarioController } from '../../../interface/usuario/atualizar-usuario/atualizar-usuario.controller.js'
+import type { BuscarUsuarioController } from '../../../interface/usuario/buscar-usuario/buscar-usuario.controller.js'
+import type { CriarUsuarioController } from '../../../interface/usuario/criar-usuario/criar-usuario.controller.js'
+import type { AtivarRecebimentoEmailController } from '../../../interface/usuario/recebimento-email/ativar-recebimento-email.controller.js'
+import type { DesativarRecebimentoEmailController } from '../../../interface/usuario/recebimento-email/desativar-recebimento-email.controller.js'
+import type { RemoverUsuarioController } from '../../../interface/usuario/remover-usuario/remover-usuario.controller.js'
+import type { MqttTopicSubscriber } from '../../mqtt/topic-subscriber.js'
 import { AmbienteRoutes } from './ambientes.route.js'
 import { DispositivoRoutes } from './dispositivo.route.js'
 import { LoginRoutes } from './login.route.js'
 import { MedicaoRoutes } from './medicao.route.js'
-import { NotificaoRoutes } from './notificacao.route.js'
+import { NotificacaoRoutes } from './notificacao.route.js'
 import { UsuarioRoutes } from './usuario.route.js'
 
 export class Routes {
@@ -46,11 +48,14 @@ export class Routes {
     private readonly ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
     private readonly desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
     private readonly atualizarUsuarioController: AtualizarUsuarioController,
+    private readonly buscarUsuarioController: BuscarUsuarioController,
 
     private readonly loginController: LoginController,
 
     private readonly listarNotificacaoDoUsuarioController: ListarNotificacaoDoUsuarioController,
     private readonly marcarComoLidaController: MarcarComoLidaController,
+
+    private readonly topicSubscriber: MqttTopicSubscriber,
   ) {
     this.routes = Router()
     this.setupRoutes()
@@ -75,11 +80,14 @@ export class Routes {
     ativarRecebimentoEmailController: AtivarRecebimentoEmailController,
     desativarRecebimentoEmailController: DesativarRecebimentoEmailController,
     atualizarUsuarioController: AtualizarUsuarioController,
+    buscarUsuarioController: BuscarUsuarioController,
 
     loginController: LoginController,
 
     listarNotificacaoDoUsuarioController: ListarNotificacaoDoUsuarioController,
     marcarComoLidaController: MarcarComoLidaController,
+
+    topicSubscriber: MqttTopicSubscriber,
   ) {
     return new Routes(
       criarAmbienteController,
@@ -100,11 +108,14 @@ export class Routes {
       ativarRecebimentoEmailController,
       desativarRecebimentoEmailController,
       atualizarUsuarioController,
+      buscarUsuarioController,
 
       loginController,
 
       listarNotificacaoDoUsuarioController,
       marcarComoLidaController,
+
+      topicSubscriber,
     )
   }
 
@@ -126,6 +137,7 @@ export class Routes {
         this.listarDispositivosController,
         this.atualizarDispositivoController,
         this.removerDispositivoController,
+        this.topicSubscriber,
       ).routes,
     )
 
@@ -143,6 +155,7 @@ export class Routes {
         this.ativarRecebimentoEmailController,
         this.desativarRecebimentoEmailController,
         this.atualizarUsuarioController,
+        this.buscarUsuarioController,
       ).routes,
     )
 
@@ -150,7 +163,7 @@ export class Routes {
 
     this.routes.use(
       '/notificacao',
-      NotificaoRoutes.create(
+      NotificacaoRoutes.create(
         this.listarNotificacaoDoUsuarioController,
         this.marcarComoLidaController,
       ).routes,

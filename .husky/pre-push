@@ -1,0 +1,5 @@
+echo "Executando testes unitários..."
+npm run test:unit
+
+echo "Verificando o build..."
+npm run build

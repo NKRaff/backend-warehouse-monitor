@@ -1,8 +1,8 @@
-import type { AtualizarAmbienteController } from '@/interface/ambiente/atualizar-ambientes/atualizar-ambientes.controller.js'
-import type { CriarAmbienteController } from '@/interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
-import type { ListarAmbientesController } from '@/interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
-import type { RemoverAmbienteController } from '@/interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
 import { Router } from 'express'
+import type { AtualizarAmbienteController } from '../../../interface/ambiente/atualizar-ambientes/atualizar-ambientes.controller.js'
+import type { CriarAmbienteController } from '../../../interface/ambiente/criar-ambientes/criar-ambiente.controller.js'
+import type { ListarAmbientesController } from '../../../interface/ambiente/listar-ambiestes/listar-ambientes.controller.js'
+import type { RemoverAmbienteController } from '../../../interface/ambiente/remover-ambiente/remover-ambiente.controller.js'
 import { autenticarToken } from '../middlewares/autenticacao.middleware.js'
 
 export class AmbienteRoutes {

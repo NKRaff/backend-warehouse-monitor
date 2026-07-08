@@ -1,0 +1,71 @@
+name: CI
+
+on: 
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonando o repositorio e trocando para a branch correta
+        uses: actions/checkout@v4
+
+      - name: Instalando o Node.js versão 24.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: 'npm'
+
+      - name: Instalando dependencias
+        run: npm ci
+
+      - name: Rodar check do lint e do prettier
+        run: npm run check
+
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonando o repositorio e trocando para a branch correta
+        uses: actions/checkout@v4
+
+      - name: Instalando o Node.js versão 24.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: 'npm'
+
+      - name: Instalando dependencias
+        run: npm ci
+
+      - name: Rodar testes unitarios
+        run: npm run test:unit
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test-unit]
+    steps:
+      - name: Clonando o repositorio e trocando para a branch correta
+        uses: actions/checkout@v4
+      
+      - name: Instalando o Node.js versão 24.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: 'npm'
+
+      - name: Instalando dependencias
+        run: npm ci
+
+      - name: Builda o projeto
+        run: npm run build
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [lint, test-unit]
+    steps:
+      - name: Clonando o repositorio e trocando para a branch correta
+        uses: actions/checkout@v4
+
+      - name: Construindo imagem Docker
+        run: docker build -t backend-warehouse-monitor .

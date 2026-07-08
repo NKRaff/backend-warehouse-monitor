@@ -1,10 +1,10 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { MedicaoRepository } from '@/domain/medicao/medicao.repository.js'
+import type { MedicaoRepository } from '../../../domain/medicao/medicao.repository.js'
+import type { UseCase } from '../../usecase.js'
 import type {
   BuscarUltimaMedicaoInputDto,
   BuscarUltimaMedicaoOutputDto,
 } from '../dtos/buscar-ultima-medicao.dto.js'
-import { BuscarUltimaMedicaoMapper } from '../mappers/buscar-ultima-medicao.dto.js'
+import { BuscarUltimaMedicaoMapper } from '../mappers/buscar-ultima-medicao.mapper.js'
 
 export class BuscarUltimaMedicaoUseCase
   implements UseCase<BuscarUltimaMedicaoInputDto, BuscarUltimaMedicaoOutputDto>

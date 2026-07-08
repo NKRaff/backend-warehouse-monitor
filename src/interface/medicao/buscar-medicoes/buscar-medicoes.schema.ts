@@ -1,5 +1,5 @@
-import type { TipoMedicao } from '@/domain/medicao/medicao.entity.js'
 import { z } from 'zod'
+import type { TipoMedicao } from '../../../domain/medicao/medicao.entity.js'
 
 const tipos: TipoMedicao[] = ['temperatura', 'umidade']
 const TipoMedicaoSchema = z.union(tipos.map((t) => z.literal(t)))
@@ -10,6 +10,6 @@ export const BuscarMedicoesSchema = z.object({
   tipo: TipoMedicaoSchema.optional(),
   minValor: z.number().optional(),
   maxValor: z.number().optional(),
-  startData: z.date().optional(),
-  endData: z.date().optional(),
+  startData: z.coerce.date().optional(),
+  endData: z.coerce.date().optional(),
 })

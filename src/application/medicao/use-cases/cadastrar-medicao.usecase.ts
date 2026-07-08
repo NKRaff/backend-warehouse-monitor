@@ -1,14 +1,14 @@
-import type { UseCase } from '@/application/usecase.js'
-import type { AlertaRepository } from '@/domain/alerta/alerta.repository.js'
-import type { AmbienteRepository } from '@/domain/ambiente/ambiente.repository.js'
-import type { DispositivoRepository } from '@/domain/dispositivo/despositivo.repository.js'
-import { Medicao } from '@/domain/medicao/medicao.entity.js'
-import type { MedicaoRepository } from '@/domain/medicao/medicao.repository.js'
-import { Notificacao } from '@/domain/notificacao/notificacao.entity.js'
-import type { NotificacaoRepository } from '@/domain/notificacao/notificacao.repository.js'
-import type { UsuarioRepository } from '@/domain/usuario/usuario.repository.js'
-import type { Mailer } from '@/infra/smtp/mailer.interface.js'
 import { v7 } from 'uuid'
+import type { AlertaRepository } from '../../../domain/alerta/alerta.repository.js'
+import type { AmbienteRepository } from '../../../domain/ambiente/ambiente.repository.js'
+import type { DispositivoRepository } from '../../../domain/dispositivo/despositivo.repository.js'
+import { Medicao } from '../../../domain/medicao/medicao.entity.js'
+import type { MedicaoRepository } from '../../../domain/medicao/medicao.repository.js'
+import { Notificacao } from '../../../domain/notificacao/notificacao.entity.js'
+import type { NotificacaoRepository } from '../../../domain/notificacao/notificacao.repository.js'
+import type { UsuarioRepository } from '../../../domain/usuario/usuario.repository.js'
+import type { Mailer } from '../../../infra/smtp/mailer.interface.js'
+import type { UseCase } from '../../usecase.js'
 import type {
   CadastrarMedicaoInputDto,
   CadastrarMedicaoOutputDto,
@@ -82,9 +82,9 @@ export class CadastrarMedicaoUseCase
       await this.alertaRepo.save(alertaGerado)
       const usuarios = await this.usuarioRepo.findAll()
       usuarios.forEach(async (usuario) => {
-        const notificaoId = v7()
-        const notificao = Notificacao.create(notificaoId, alertaGerado.id, usuario.id)
-        await this.notificacaoRepo.save(notificao)
+        const notificacaoId = v7()
+        const notificacao = Notificacao.create(notificacaoId, alertaGerado.id, usuario.id)
+        await this.notificacaoRepo.save(notificacao)
         if (usuario.receberEmail) {
           await this.mailer.sendMail({
             to: usuario.email,

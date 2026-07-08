@@ -1,8 +1,8 @@
 import type {
   CadastrarMedicaoInputDto,
   CadastrarMedicaoOutputDto,
-} from '@/application/medicao/dtos/cadastrar-medicao.dto.js'
-import type { UseCase } from '@/application/usecase.js'
+} from '../../../application/medicao/dtos/cadastrar-medicao.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
 import { CadastrarMedicaoSchema } from './cadastrar-medicao.schema.js'
 
 export class CadastrarMedicaoController {
@@ -20,6 +20,8 @@ export class CadastrarMedicaoController {
     const tipo = parts[1]
     const valor = message.payload.toString()
     const dto = CadastrarMedicaoSchema.parse({ dispositivoId, tipo, valor })
-    return await this.useCase.execute(dto)
+    try {
+      return await this.useCase.execute(dto)
+    } catch {}
   }
 }

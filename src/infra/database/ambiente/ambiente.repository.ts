@@ -1,5 +1,5 @@
-import { Ambiente, type TipoAmbiente } from '@/domain/ambiente/ambiente.entity.js'
-import type { AmbienteRepository } from '@/domain/ambiente/ambiente.repository.js'
+import { Ambiente, type TipoAmbiente } from '../../../domain/ambiente/ambiente.entity.js'
+import type { AmbienteRepository } from '../../../domain/ambiente/ambiente.repository.js'
 import { AmbienteModel } from './ambiente.model.js'
 
 type AmbienteMongo = {
@@ -24,7 +24,7 @@ export class MongooseAmbienteRepository implements AmbienteRepository {
     await AmbienteModel.create({
       _id: ambiente.id,
       nome: ambiente.nome,
-      tipo: ambiente.tipo,
+      tipo: ambiente.tipo as TipoAmbiente,
       descricao: ambiente.descricao,
       temperatura_minima: ambiente.temperaturaMinima,
       temperatura_maxima: ambiente.temperaturaMaxima,

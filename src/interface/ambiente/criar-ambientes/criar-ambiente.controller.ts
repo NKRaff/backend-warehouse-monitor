@@ -1,6 +1,9 @@
-import type { CriarAmbienteOutputDto } from '@/application/ambiente/dtos/criar-ambiente.dto.js'
-import type { UseCase } from '@/application/usecase.js'
-import { type CriarAmbienteInputDto, CriarAmbienteSchema } from './criar-ambiente.schema.js'
+import type {
+  CriarAmbienteInputDto,
+  CriarAmbienteOutputDto,
+} from '../../../application/ambiente/dtos/criar-ambiente.dto.js'
+import type { UseCase } from '../../../application/usecase.js'
+import { CriarAmbienteSchema } from './criar-ambiente.schema.js'
 
 export class CriarAmbienteController {
   private constructor(

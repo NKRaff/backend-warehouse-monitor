@@ -1,9 +1,9 @@
-import nodemailer from 'nodemailer'
+import nodemailer, { type Transporter } from 'nodemailer'
 import type SMTPTransport from 'nodemailer/lib/smtp-transport/index.js'
 import type { Mailer } from '../mailer.interface.js'
 
 export class Nodemailer implements Mailer {
-  private transporter: nodemailer.Transporter
+  private transporter: Transporter
 
   private constructor() {
     const options: SMTPTransport.Options = {

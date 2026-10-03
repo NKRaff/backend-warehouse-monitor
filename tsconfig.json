@@ -1,26 +1,49 @@
 {
-  "$schema": "https://www.schemastore.org/tsconfig",
-
+  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    // File Layout
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "paths": {
+      "@domain/*": ["./src/domain/*"],
+      "@application/*": ["./src/application/*"],
+      "@infrastructure/*": ["./src/infra/*"],
+      "@presentation/*": ["./src/presentation/*"],
+      "@shared/*": ["./src/shared/*"]
+    },
 
-    "lib": ["es2024"],
-
-    "module": "NodeNext",
-    "target": "ES2022",
-
-    "strict": true,
-
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-
-    "moduleResolution": "NodeNext",
-
+    // Environment Settings
+    // See also https://aka.ms/tsconfig/module
+    "module": "nodenext",
+    "target": "esnext",
+    // For nodejs:
+    "lib": ["esnext"],
     "types": ["vitest/globals"],
 
-    "noEmit": true
-  },
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
 
-  "include": ["src", "test", "**/*.test.ts"]
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Style Options
+    // "noImplicitReturns": true,
+    // "noImplicitOverride": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noPropertyAccessFromIndexSignature": true,
+
+    // Recommended Options
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+  }
 }

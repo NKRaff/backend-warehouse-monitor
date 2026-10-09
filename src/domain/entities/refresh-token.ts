@@ -4,7 +4,6 @@ type RefreshTokenProps = {
 	readonly id: string;
 	readonly user: User;
 	tokenHash: string;
-	//createdAt: Date;
 	expiresAt: Date;
 };
 
@@ -28,5 +27,21 @@ export class RefreshToken {
 		this.props.expiresAt = props.expiresAt;
 
 		return this;
+	}
+
+	get id(): string {
+		return this.props.id;
+	}
+
+	get user(): User {
+		return this.props.user;
+	}
+
+	get tokenHash(): string {
+		return this.props.tokenHash;
+	}
+
+	get expiresAt(): Date {
+		return this.props.expiresAt;
 	}
 }

@@ -8,9 +8,7 @@ type UserProps = {
 	email: Email;
 	passwordHashed: string;
 	role: UserRole;
-	readonly createdAt: Date;
-	updatedAt: Date;
-	deletedAt?: Date;
+	deletedAt?: Date | undefined;
 };
 
 export class User {
@@ -22,20 +20,36 @@ export class User {
 		}
 	}
 
-	static create(
-		props: Omit<UserProps, "createdAt" | "updatedAt" | "deletedAt">,
-	): User {
+	static create(props: Omit<UserProps, "deletedAt">): User {
 		props.name = props.name.trim();
-		const now = new Date();
-
-		return new User({
-			...props,
-			createdAt: now,
-			updatedAt: now,
-		});
+		return new User(props);
 	}
 
 	static restore(props: UserProps): User {
 		return new User(props);
+	}
+
+	get id(): string {
+		return this.props.id;
+	}
+
+	get name(): string {
+		return this.props.name;
+	}
+
+	get email(): Email {
+		return this.props.email;
+	}
+
+	get passwordHasher(): string {
+		return this.props.passwordHashed;
+	}
+
+	get role(): UserRole {
+		return this.props.role;
+	}
+
+	get deletedAt(): Date | undefined {
+		return this.props.deletedAt;
 	}
 }

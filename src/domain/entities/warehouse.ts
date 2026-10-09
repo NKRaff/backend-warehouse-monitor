@@ -52,4 +52,29 @@ export class Warehouse {
 	deactivate(): void {
 		this.props.status = "inactive";
 	}
+
+	get id(): string {
+		return this.props.id;
+	}
+
+	get name(): string {
+		return this.props.name;
+	}
+
+	get condition(): StorageCondition {
+		return this.props.condition;
+	}
+
+	get category(): StorageCategory {
+		return this.props.category;
+	}
+	get status(): WarehouseStatus {
+		return this.props.status;
+	}
+	get description(): string {
+		return this.props.description;
+	}
+	get limits(): MeasurementLimits | undefined {
+		return this.props.limits;
+	}
 }

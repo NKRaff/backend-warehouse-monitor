@@ -19,4 +19,24 @@ export class Notification {
 	static restore(props: NotificationProps): Notification {
 		return new Notification(props);
 	}
+
+	get id(): string {
+		return this.props.id;
+	}
+
+	get alert(): Alert {
+		return this.props.alert;
+	}
+
+	get recipient(): User {
+		return this.props.recipient;
+	}
+
+	get createdAt(): Date {
+		return this.props.createdAt;
+	}
+
+	get readedAt(): Date | undefined {
+		return this.props.readedAt;
+	}
 }

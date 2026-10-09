@@ -45,4 +45,36 @@ export class Alert {
 		this.props.resolvedAt = resolvedAt;
 		this.props.resolvedBy = user;
 	}
+
+	get id(): string {
+		return this.props.id;
+	}
+
+	get type(): AlertType {
+		return this.props.type;
+	}
+
+	get severity(): AlertSeverity {
+		return this.props.severity;
+	}
+
+	get title(): string {
+		return this.props.title;
+	}
+
+	get description(): string {
+		return this.props.description;
+	}
+
+	get occurredAt(): Date {
+		return this.props.occurredAt;
+	}
+
+	get resolvedAt(): Date | undefined {
+		return this.props.resolvedAt;
+	}
+
+	get resolvedBy(): User | undefined {
+		return this.props.resolvedBy;
+	}
 }

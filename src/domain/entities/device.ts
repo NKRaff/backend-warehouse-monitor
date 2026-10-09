@@ -47,4 +47,28 @@ export class Device {
 
 		this.props.lastMeasurement = measurement;
 	}
+
+	get mac(): string {
+		return this.props.mac;
+	}
+
+	get name(): string {
+		return this.props.name;
+	}
+
+	get warehouse(): Warehouse {
+		return this.props.warehouse;
+	}
+
+	get lastMeasurement(): Measurement {
+		return this.props.lastMeasurement;
+	}
+
+	get deviceStatus(): DeviceStatus {
+		return this.props.deviceStatus;
+	}
+
+	get monitoringStatus(): MonitoringStatus {
+		return this.props.monitoringStatus;
+	}
 }

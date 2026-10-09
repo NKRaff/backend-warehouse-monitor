@@ -3,8 +3,9 @@ export abstract class AppError extends Error {
 		message: string,
 		public readonly statusCode: number,
 		public readonly code: string,
+		cause?: object,
 	) {
-		super(message);
+		super(message, { cause });
 		this.name = this.constructor.name;
 		this.statusCode = statusCode;
 

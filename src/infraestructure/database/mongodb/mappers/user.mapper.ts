@@ -10,8 +10,6 @@ export function userToDomain(raw: UserDocument): User {
 		email: new Email(raw.email),
 		passwordHashed: raw.password,
 		role: raw.role as UserRole,
-		createdAt: raw.createdAt,
-		updatedAt: raw.updatedAt,
 		deletedAt: raw.deletedAt ?? undefined,
 	});
 
@@ -22,7 +20,9 @@ export function userToDomain(raw: UserDocument): User {
 	return user;
 }
 
-export function userToPersistence(user: User): UserDocument {
+export function userToPersistence(
+	user: User,
+): Omit<UserDocument, "createdAt" | "updatedAt"> {
 	return {
 		_id: user.id,
 		name: user.name,
@@ -30,8 +30,6 @@ export function userToPersistence(user: User): UserDocument {
 		emailVerified: user.email.isVerified,
 		password: user.passwordHasher,
 		role: user.role,
-		createdAt: user.createdAt,
-		updatedAt: user.updatedAt,
 		...(user.deletedAt && { deletedAt: user.deletedAt }),
 	};
 }

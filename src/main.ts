@@ -8,13 +8,21 @@ import { Routes } from "./infraestructure/http/express/routes/routes.js";
 import { HttpServer } from "./infraestructure/http/server.js";
 import { UuidAdapter } from "./infraestructure/identifier/uuid.adapter.js";
 import { MqttAdapter } from "./infraestructure/messaging/mqtt/mqtt.adapter.js";
+import { NodemailerAdapter } from "./infraestructure/messaging/smtp/nodemailer.adapter.js";
 import { WarehouseHandle } from "./infraestructure/messaging/websocket/handle/warehouse.handle.js";
 import { SocketIO } from "./infraestructure/messaging/websocket/socket-io-adapter.js";
+import { EmailChannel } from "./infraestructure/notification/email-channel.js";
 
 // Database
 
 const database = Mongoose.instance();
 await database.connect();
+
+//
+const clientMqtt = MqttAdapter.instance();
+await clientMqtt.connect();
+
+const clientSmtp = NodemailerAdapter.instance();
 
 // Repositories
 
@@ -23,6 +31,10 @@ await database.connect();
 const _passwordHasher = BcryptPasswordHasherAdapter.instance();
 const _tokenProvider = JwtTokenAdapter.instance();
 const _uuidProvider = UuidAdapter.instance();
+
+// Notification
+
+const _emailChannel = EmailChannel.instance(clientSmtp);
 
 // Services
 
@@ -44,11 +56,6 @@ const app = ExpressApp.instance(routes);
 const httpServer = HttpServer.instance(app);
 
 httpServer.connect();
-
-// Messaging
-
-const clientMqtt = MqttAdapter.instance();
-await clientMqtt.connect();
 
 const socketServer = SocketIO.instance(httpServer.server());
 socketServer.connect([warehouseHandler]);

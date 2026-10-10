@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsup src/main.ts --format esm --clean",
     "check": "biome check src/",
     "check:format": "biome check --write src/",
     "start:dev": "tsx watch src/main.ts",
@@ -28,41 +28,42 @@
     "url": "https://github.com/NKRaff/backend-warehouse-monitor/issues"
   },
   "homepage": "https://github.com/NKRaff/backend-warehouse-monitor#readme",
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.6",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.0.0",
-    "mqtt": "^5.14.1",
-    "nodemailer": "^10.0.10",
-    "uuid": "^13.0.0",
-    "zod": "^4.1.13"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.3.8",
-    "@commitlint/cli": "^21.0.2",
-    "@commitlint/config-conventional": "^21.0.2",
-    "@types/bcrypt": "^6.0.0",
-    "@types/cookie-parser": "^1.4.10",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.5",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^24.10.1",
-    "@types/supertest": "^7.2.0",
-    "@vitest/coverage-v8": "^5.0.2",
-    "husky": "^9.1.7",
-    "lint-staged": "^17.0.7",
-    "supertest": "^7.2.2",
-    "tsx": "^4.20.6",
-    "typescript": "^5.9.3",
-    "vitest": "^5.0.2"
-  },
   "lint-staged": {
     "src/**/*.{ts,tsx,js,jsx}": [
       "biome check --write --no-errors-on-unmatched"
     ]
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.10.4",
+    "mqtt": "^5.16.0",
+    "nodemailer": "^10.0.14",
+    "socket.io": "^4.8.4",
+    "uuid": "^14.0.2",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^5.0.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "supertest": "^7.3.1",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
   }
 }

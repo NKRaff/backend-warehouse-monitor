@@ -1,26 +1,51 @@
 {
-  "$schema": "https://www.schemastore.org/tsconfig",
+	// Visit https://aka.ms/tsconfig to read more about this file
+	"compilerOptions": {
+		// File Layout
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"paths": {
+			"@domain/*": ["./src/domain/*"],
+			"@application/*": ["./src/application/*"],
+			"@infrastructure/*": ["./src/infra/*"],
+			"@presentation/*": ["./src/presentation/*"],
+			"@shared/*": ["./src/shared/*"]
+		},
 
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+		// Environment Settings
+		// See also https://aka.ms/tsconfig/module
+		"module": "nodenext",
+		"target": "esnext",
+		// For nodejs:
+		"lib": ["esnext"],
+		"types": ["vitest/globals"],
 
-    "lib": ["es2024"],
+		// Other Outputs
+		"sourceMap": true,
+		"declaration": true,
+		"declarationMap": true,
 
-    "module": "NodeNext",
-    "target": "ES2022",
+		// Stricter Typechecking Options
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
 
-    "strict": true,
+		// Style Options
+		// "noImplicitReturns": true,
+		// "noImplicitOverride": true,
+		// "noUnusedLocals": true,
+		// "noUnusedParameters": true,
+		// "noFallthroughCasesInSwitch": true,
+		// "noPropertyAccessFromIndexSignature": true,
 
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-
-    "moduleResolution": "NodeNext",
-
-    "types": ["vitest/globals"],
-
-    "noEmit": true
-  },
-
-  "include": ["src", "test", "**/*.test.ts"]
+		// Recommended Options
+		"strict": true,
+		"jsx": "react-jsx",
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"noUncheckedSideEffectImports": true,
+		"moduleDetection": "force",
+		"skipLibCheck": true
+	},
+	"include": ["src/**/*.ts", "src/application/types/notification-message.ts"],
+	"exclude": ["node_modules", "dist", "test"]
 }

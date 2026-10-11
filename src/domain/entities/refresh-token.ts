@@ -1,8 +1,6 @@
-import type { User } from "./user.js";
-
 type RefreshTokenProps = {
 	readonly id: string;
-	readonly user: User;
+	readonly userId: string;
 	tokenHash: string;
 	expiresAt: Date;
 };
@@ -22,7 +20,7 @@ export class RefreshToken {
 		return this.props.expiresAt.getTime() <= Date.now();
 	}
 
-	refresh(props: Omit<RefreshTokenProps, "id" | "user">): RefreshToken {
+	refresh(props: Omit<RefreshTokenProps, "id" | "userId">): RefreshToken {
 		this.props.tokenHash = props.tokenHash;
 		this.props.expiresAt = props.expiresAt;
 
@@ -33,8 +31,8 @@ export class RefreshToken {
 		return this.props.id;
 	}
 
-	get user(): User {
-		return this.props.user;
+	get userId(): string {
+		return this.props.userId;
 	}
 
 	get tokenHash(): string {

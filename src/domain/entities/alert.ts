@@ -2,7 +2,6 @@ import type { AlertSeverity } from "@domain/types/alert-severity.js";
 import type { AlertStatus } from "@domain/types/alert-status.js";
 import type { AlertType } from "@domain/types/alert-type.js";
 import { ConflictError } from "@shared/errors/conflict-error.js";
-import type { User } from "./user.js";
 
 type AlertProps = {
 	readonly id: string;
@@ -13,7 +12,7 @@ type AlertProps = {
 	readonly occurredAt: Date;
 	status: AlertStatus;
 	resolvedAt?: Date;
-	resolvedBy?: User;
+	resolvedById?: string;
 };
 
 export class Alert {
@@ -36,14 +35,14 @@ export class Alert {
 		return new Alert(props);
 	}
 
-	resolve(user: User, resolvedAt: Date) {
+	resolve(userId: string, resolvedAt: Date) {
 		if (this.props.status === "resolved") {
 			throw new ConflictError("O alerta ja foi resolvido");
 		}
 
 		this.props.status = "resolved";
 		this.props.resolvedAt = resolvedAt;
-		this.props.resolvedBy = user;
+		this.props.resolvedById = userId;
 	}
 
 	get id(): string {
@@ -74,7 +73,7 @@ export class Alert {
 		return this.props.resolvedAt;
 	}
 
-	get resolvedBy(): User | undefined {
-		return this.props.resolvedBy;
+	get resolvedById(): string | undefined {
+		return this.props.resolvedById;
 	}
 }

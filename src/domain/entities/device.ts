@@ -1,14 +1,12 @@
 import type { DeviceStatus } from "@domain/types/device-status.js";
 import type { MonitoringStatus } from "@domain/types/monitoring-status.js";
 import { UnprocessableEntityError } from "@shared/errors/unprocessable-entity-error.js";
-import type { Measurement } from "./measurement.js";
-import type { Warehouse } from "./warehouse.js";
 
 type DeviceProps = {
 	readonly mac: string;
 	name: string;
-	warehouse: Warehouse;
-	lastMeasurement: Measurement;
+	warehouseId: string;
+	lastMeasurementId: string;
 	deviceStatus: DeviceStatus;
 	monitoringStatus: MonitoringStatus;
 };
@@ -40,12 +38,12 @@ export class Device {
 		this.props.monitoringStatus = "disabled";
 	}
 
-	updateMeasurement(measurement: Measurement): void {
+	updateMeasurement(measurementId: string): void {
 		if (this.props.monitoringStatus === "disabled") {
 			return;
 		}
 
-		this.props.lastMeasurement = measurement;
+		this.props.lastMeasurementId = measurementId;
 	}
 
 	get mac(): string {
@@ -56,12 +54,12 @@ export class Device {
 		return this.props.name;
 	}
 
-	get warehouse(): Warehouse {
-		return this.props.warehouse;
+	get warehouseId(): string {
+		return this.props.warehouseId;
 	}
 
-	get lastMeasurement(): Measurement {
-		return this.props.lastMeasurement;
+	get lastMeasurementId(): string {
+		return this.props.lastMeasurementId;
 	}
 
 	get deviceStatus(): DeviceStatus {

@@ -1,10 +1,9 @@
 import type { AuditAction } from "@domain/types/audit-action.js";
 import type { AuditResource } from "@domain/types/audit-resource.js";
-import type { User } from "./user.js";
 
 type AuditLogProps = {
 	readonly id: string;
-	readonly actor: User | "system";
+	readonly actorId: string;
 	readonly action: AuditAction;
 	readonly resource: string;
 	readonly resourceType: AuditResource;
@@ -16,11 +15,11 @@ export class AuditLog {
 	private constructor(private props: AuditLogProps) {}
 
 	static create(
-		props: AuditLogProps & Partial<Pick<AuditLogProps, "actor">>,
+		props: AuditLogProps & Partial<Pick<AuditLogProps, "actorId">>,
 	): AuditLog {
 		return new AuditLog({
 			...props,
-			actor: props.actor ?? "system",
+			actorId: props.actorId ?? "system",
 		});
 	}
 
@@ -32,8 +31,8 @@ export class AuditLog {
 		return this.props.id;
 	}
 
-	get actor(): User | string {
-		return this.props.actor;
+	get actorId(): string {
+		return this.props.actorId;
 	}
 
 	get action(): AuditAction {

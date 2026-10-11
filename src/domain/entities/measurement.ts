@@ -1,11 +1,9 @@
 import type { MeasurementType } from "@domain/types/measurement-type.js";
-import type { Device } from "./device.js";
-import type { Warehouse } from "./warehouse.js";
 
 type MeasurementProps = {
 	readonly id: string;
-	readonly device: Device;
-	readonly warehouse: Warehouse;
+	readonly deviceId: string;
+	readonly warehouseId: string;
 	readonly type: MeasurementType;
 	readonly value: number;
 	readonly createdAt: Date;
@@ -26,12 +24,12 @@ export class Measurement {
 		return this.props.id;
 	}
 
-	get device(): Device {
-		return this.props.device;
+	get deviceId(): string {
+		return this.props.deviceId;
 	}
 
-	get warehouse(): Warehouse {
-		return this.props.warehouse;
+	get warehouseId(): string {
+		return this.props.warehouseId;
 	}
 
 	get type(): MeasurementType {

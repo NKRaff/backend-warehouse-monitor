@@ -3,6 +3,7 @@ import type { SmtpClient } from "@application/ports/smtp-client.interface.js";
 import type { NotificationMessage } from "@application/types/notification-message.js";
 import type { NotificationChannel } from "@domain/types/notification-channel.js";
 import { renderAlertEmailHtml } from "./templates/alert-email.template.js";
+import { renderWelcomeEmailHtml } from "./templates/welcome-email.template.js";
 
 export class EmailChannel implements INotificationSender {
 	private static _instance: EmailChannel;
@@ -18,10 +19,17 @@ export class EmailChannel implements INotificationSender {
 	}
 
 	async send(message: NotificationMessage): Promise<void> {
+		let htmlContent: string;
+		if (message.type === "register_user") {
+			htmlContent = renderWelcomeEmailHtml(message);
+		} else {
+			htmlContent = renderAlertEmailHtml(message);
+		}
+
 		await this.mailer.sendMail({
 			to: message.recipient.email.value,
 			subject: message.title,
-			html: renderAlertEmailHtml(message),
+			html: htmlContent,
 			text: message.message,
 		});
 	}

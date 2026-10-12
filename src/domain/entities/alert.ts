@@ -11,8 +11,8 @@ type AlertProps = {
 	readonly description: string;
 	readonly occurredAt: Date;
 	status: AlertStatus;
-	resolvedAt?: Date;
-	resolvedById?: string;
+	resolvedAt?: Date | undefined;
+	resolvedById?: string | undefined;
 };
 
 export class Alert {

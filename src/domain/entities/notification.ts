@@ -6,7 +6,7 @@ type NotificationProps = {
 	readonly recipientId: string;
 	readonly channels: NotificationChannel[];
 	readonly createdAt: Date;
-	readedAt?: Date;
+	readedAt?: Date | undefined;
 };
 
 export class Notification {

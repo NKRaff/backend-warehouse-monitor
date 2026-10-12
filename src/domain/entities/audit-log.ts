@@ -7,7 +7,7 @@ type AuditLogProps = {
 	readonly action: AuditAction;
 	readonly resourceId: string;
 	readonly resourceType: AuditResource;
-	readonly metadata?: Record<string, unknown>;
+	readonly metadata?: Record<string, unknown> | undefined;
 	readonly createdAt: Date;
 };
 

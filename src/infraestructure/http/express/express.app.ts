@@ -11,7 +11,7 @@ export class ExpressApp {
 
 		this.app.use(express.json());
 		this.app.use(cookieParser(env.cookie.secret));
-		this.app.use("api", routes);
+		this.app.use("/api", routes);
 		this.app.use(errorHandle);
 	}
 

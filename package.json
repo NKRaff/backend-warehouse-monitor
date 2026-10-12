@@ -1,69 +1,69 @@
 {
-  "name": "backend-warehouse-monitor",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "build": "tsup src/main.ts --format esm --clean",
-    "check": "biome check src/",
-    "check:format": "biome check --write src/",
-    "start:dev": "tsx watch src/main.ts",
-    "start:prod": "node dist/main.js",
-    "test": "vitest run",
-    "test:unit": "vitest run --project unit --passWithNoTests",
-    "test:integration": "vitest run --project integration --passWithNoTests",
-    "test:e2e": "vitest run --project e2e --passWithNoTests",
-    "coverage": "vitest run --coverage",
-    "prepare": "husky"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/NKRaff/backend-warehouse-monitor.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/NKRaff/backend-warehouse-monitor/issues"
-  },
-  "homepage": "https://github.com/NKRaff/backend-warehouse-monitor#readme",
-  "lint-staged": {
-    "src/**/*.{ts,tsx,js,jsx}": [
-      "biome check --write --no-errors-on-unmatched"
-    ]
-  },
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.6",
-    "dotenv": "^18.0.5",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.10.4",
-    "mqtt": "^5.16.0",
-    "nodemailer": "^10.0.14",
-    "socket.io": "^4.8.4",
-    "uuid": "^14.0.2",
-    "zod": "^4.6.5"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.5.15",
-    "@commitlint/cli": "^21.2.3",
-    "@commitlint/config-conventional": "^21.2.3",
-    "@types/bcrypt": "^6.0.0",
-    "@types/cookie-parser": "^1.4.10",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/supertest": "^7.2.1",
-    "@vitest/coverage-v8": "^5.0.3",
-    "husky": "^9.1.7",
-    "lint-staged": "^17.6.0",
-    "supertest": "^7.3.1",
-    "tsup": "^8.5.1",
-    "tsx": "^4.23.15",
-    "typescript": "^7.0.2",
-    "vitest": "^5.0.3"
-  }
+	"name": "backend-warehouse-monitor",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"type": "module",
+	"scripts": {
+		"build": "tsup src/main.ts --format esm --clean --tsconfig tsconfig.build.json",
+		"check": "biome check src/",
+		"check:format": "biome check --write src/",
+		"start:dev": "tsx watch src/main.ts",
+		"start:prod": "node dist/main.js",
+		"test": "vitest run",
+		"test:unit": "vitest run --project unit --passWithNoTests",
+		"test:integration": "vitest run --project integration --passWithNoTests",
+		"test:e2e": "vitest run --project e2e --passWithNoTests",
+		"coverage": "vitest run --coverage",
+		"prepare": "husky"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/NKRaff/backend-warehouse-monitor.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/NKRaff/backend-warehouse-monitor/issues"
+	},
+	"homepage": "https://github.com/NKRaff/backend-warehouse-monitor#readme",
+	"lint-staged": {
+		"src/**/*.{ts,tsx,js,jsx}": [
+			"biome check --write --no-errors-on-unmatched"
+		]
+	},
+	"dependencies": {
+		"bcrypt": "^6.0.0",
+		"cookie-parser": "^1.4.7",
+		"cors": "^2.8.6",
+		"dotenv": "^18.0.5",
+		"express": "^5.2.1",
+		"jsonwebtoken": "^9.0.3",
+		"mongoose": "^9.10.4",
+		"mqtt": "^5.16.0",
+		"nodemailer": "^10.0.14",
+		"socket.io": "^4.8.4",
+		"uuid": "^14.0.2",
+		"zod": "^4.6.5"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.15",
+		"@commitlint/cli": "^21.2.3",
+		"@commitlint/config-conventional": "^21.2.3",
+		"@types/bcrypt": "^6.0.0",
+		"@types/cookie-parser": "^1.4.10",
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.6",
+		"@types/jsonwebtoken": "^9.0.10",
+		"@types/supertest": "^7.2.1",
+		"@vitest/coverage-v8": "^5.0.3",
+		"husky": "^9.1.7",
+		"lint-staged": "^17.6.0",
+		"supertest": "^7.3.1",
+		"tsup": "^8.5.1",
+		"tsx": "^4.23.15",
+		"typescript": "^7.0.2",
+		"vitest": "^5.0.3"
+	}
 }

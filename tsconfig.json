@@ -2,7 +2,7 @@
 	// Visit https://aka.ms/tsconfig to read more about this file
 	"compilerOptions": {
 		// File Layout
-		"rootDir": "./src",
+		"rootDir": ".",
 		"outDir": "./dist",
 		"paths": {
 			"@domain/*": ["./src/domain/*"],
@@ -24,6 +24,7 @@
 		"sourceMap": true,
 		"declaration": true,
 		"declarationMap": true,
+		"noEmit": true,
 
 		// Stricter Typechecking Options
 		"noUncheckedIndexedAccess": true,
@@ -46,6 +47,6 @@
 		"moduleDetection": "force",
 		"skipLibCheck": true
 	},
-	"include": ["src/**/*.ts", "src/application/types/notification-message.ts"],
-	"exclude": ["node_modules", "dist", "test"]
+	"include": ["src/**/*.ts", "test/**/*.ts"],
+	"exclude": ["node_modules", "dist"]
 }

@@ -61,7 +61,7 @@ export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
 
 		const auditLog = AuditLog.create({
 			id: this.uuidProvider.generate(),
-			actorId: input.actorId,
+			actorId: user.id,
 			action: "login",
 			resourceId: user.id,
 			resourceType: "user",

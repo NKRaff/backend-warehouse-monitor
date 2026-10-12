@@ -25,9 +25,9 @@ export class LoginController implements IController<LoginOutputDto> {
 
 	async handle(
 		input: unknown,
-		context: RequestContext,
+		_context: RequestContext,
 	): Promise<LoginOutputDto> {
 		const data = LoginSchema.parse(input);
-		return await this.useCase.execute({ ...data, actorId: context.actorId });
+		return await this.useCase.execute(data);
 	}
 }

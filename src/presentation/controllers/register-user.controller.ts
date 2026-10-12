@@ -4,6 +4,7 @@ import type {
 } from "@application/dtos/register-user.dto.js";
 import type { IUseCase } from "@application/use-cases/use-case.interface.js";
 import type { RequestContext } from "@presentation/types/request-context.js";
+import { UnauthorizedError } from "@shared/errors/unauthorized-error.js";
 import { RegisterUserSchema } from "../validators/schemas/register-user.schema.js";
 import type { IController } from "./controller.interface.js";
 
@@ -32,7 +33,12 @@ export class RegisterUserController
 		input: unknown,
 		context: RequestContext,
 	): Promise<RegisterUserOutputDto> {
+		if (!context.actorId) {
+			throw new UnauthorizedError("Id do usuario não encontrado");
+		}
+
 		const data = RegisterUserSchema.parse(input);
+
 		return await this.useCase.execute({
 			...data,
 			actorId: context.actorId,

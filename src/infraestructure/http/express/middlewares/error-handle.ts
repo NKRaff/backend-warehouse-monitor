@@ -48,6 +48,6 @@ function isJsonParseError(
 		typeof error === "object" &&
 		error !== null &&
 		"type" in error &&
-		(error as { type: unknown }).type === "entity parse.failed"
+		(error as { type: unknown }).type === "entity.parse.failed"
 	);
 }

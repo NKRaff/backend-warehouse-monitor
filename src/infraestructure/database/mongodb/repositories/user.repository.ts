@@ -1,6 +1,6 @@
 import type { IUserRepository } from "@application/repositories/user.interface.js";
 import type { User } from "@domain/entities/user.js";
-import { userToDomain } from "../mappers/user.mapper.js";
+import { userToDomain, userToPersistence } from "../mappers/user.mapper.js";
 import { UserModel } from "../models/user.model.js";
 
 export class UserRepository implements IUserRepository {
@@ -13,6 +13,11 @@ export class UserRepository implements IUserRepository {
 			UserRepository._instance = new UserRepository();
 		}
 		return UserRepository._instance;
+	}
+
+	async save(user: User): Promise<void> {
+		const model = userToPersistence(user);
+		await UserModel.create(model);
 	}
 
 	async findById(id: string): Promise<User | null> {

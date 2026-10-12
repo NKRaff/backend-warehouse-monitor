@@ -1,12 +1,12 @@
-import type { Alert } from "./alert.js";
-import type { User } from "./user.js";
+import type { NotificationChannel } from "@domain/types/notification-channel.js";
 
 type NotificationProps = {
 	readonly id: string;
-	readonly alert: Alert;
-	readonly recipient: User;
+	readonly alertId: string;
+	readonly recipientId: string;
+	readonly channels: NotificationChannel[];
 	readonly createdAt: Date;
-	readedAt?: Date;
+	readedAt?: Date | undefined;
 };
 
 export class Notification {
@@ -24,12 +24,16 @@ export class Notification {
 		return this.props.id;
 	}
 
-	get alert(): Alert {
-		return this.props.alert;
+	get alertId(): string {
+		return this.props.alertId;
 	}
 
-	get recipient(): User {
-		return this.props.recipient;
+	get recipientId(): string {
+		return this.props.recipientId;
+	}
+
+	get channels(): NotificationChannel[] {
+		return this.props.channels;
 	}
 
 	get createdAt(): Date {

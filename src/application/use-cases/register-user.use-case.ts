@@ -88,15 +88,25 @@ export class RegisterUserUseCase
 		await this.alertRepo.save(alert);
 		await this.notificationRepo.save(notification);
 
-		await this.notificationService.notify({
-			recipient: user,
-			title: alert.title,
-			message: alert.description,
-			type: alert.type,
-			severity: alert.severity,
-			status: alert.status,
-			channels: notification.channels,
-		});
+		this.notificationService
+			.notify({
+				recipient: user,
+				title: alert.title,
+				message: alert.description,
+				type: alert.type,
+				severity: alert.severity,
+				status: alert.status,
+				channels: notification.channels,
+			})
+			.catch((error) => {
+				console.error(
+					`Falha no envio de e-mail para o usuário ID: ${user.id}`,
+					{
+						notificationId: notification.id,
+						error: error.message,
+					},
+				);
+			});
 
 		const log = AuditLog.create({
 			id: this.uuidProvider.generate(),

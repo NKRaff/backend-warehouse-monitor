@@ -5,7 +5,7 @@ type AuditLogProps = {
 	readonly id: string;
 	readonly actorId: string;
 	readonly action: AuditAction;
-	readonly resource: string;
+	readonly resourceId: string;
 	readonly resourceType: AuditResource;
 	readonly metadata?: Record<string, unknown>;
 	readonly createdAt: Date;
@@ -39,8 +39,8 @@ export class AuditLog {
 		return this.props.action;
 	}
 
-	get resource(): string {
-		return this.props.resource;
+	get resourceId(): string {
+		return this.props.resourceId;
 	}
 
 	get resourceType(): AuditResource {

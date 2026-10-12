@@ -69,6 +69,10 @@ export class Alert {
 		return this.props.occurredAt;
 	}
 
+	get status(): AlertStatus {
+		return this.props.status;
+	}
+
 	get resolvedAt(): Date | undefined {
 		return this.props.resolvedAt;
 	}

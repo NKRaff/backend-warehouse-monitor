@@ -1,7 +1,10 @@
+import type { NotificationChannel } from "@domain/types/notification-channel.js";
+
 type NotificationProps = {
 	readonly id: string;
 	readonly alertId: string;
 	readonly recipientId: string;
+	readonly channels: NotificationChannel[];
 	readonly createdAt: Date;
 	readedAt?: Date;
 };
@@ -27,6 +30,10 @@ export class Notification {
 
 	get recipientId(): string {
 		return this.props.recipientId;
+	}
+
+	get channels(): NotificationChannel[] {
+		return this.props.channels;
 	}
 
 	get createdAt(): Date {

@@ -34,6 +34,21 @@ function getBoolean(name: string, defaultValue?: string): boolean {
 	return value === "true";
 }
 
+function getSameSite(
+	name: string,
+	defaultValue: "strict" | "lax" | "none" = "lax",
+): "strict" | "lax" | "none" {
+	const value = getEnv(name, defaultValue).toLowerCase();
+
+	if (value !== "strict" && value !== "lax" && value !== "none") {
+		throw new InternalServerError(
+			`Variável de ambiente ${name} deve ser strict, lax ou none`,
+		);
+	}
+
+	return value;
+}
+
 export const env = {
 	app: {
 		nodeEnv: getEnv("NODE_ENV", "development"),
@@ -71,7 +86,7 @@ export const env = {
 		expiresIn: getNumber("COOKIE_EXPIRES_IN_MIN") * 60 * 1000,
 		httpOnly: getBoolean("COOKIE_HTTP_ONLY", "true"),
 		secure: getBoolean("COOKIE_SECURE", "false"),
-		sameSite: getEnv("COOKIE_SAME_SITE", "lax"),
+		sameSite: getSameSite("COOKIE_SAME_SITE", "lax"),
 	},
 
 	cors: {

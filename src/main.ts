@@ -1,7 +1,9 @@
 import { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
+import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
+import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
 import "dotenv/config";
 import { Router } from "express";
@@ -68,11 +70,19 @@ const registerUserUseCase = RegisterUserUseCase.instance(
 	auditLogRepo,
 	notificationService,
 );
+const loginUseCase = LoginUseCase.instance(
+	passwordHasher,
+	tokenProvider,
+	uuidProvider,
+	userRepo,
+	auditLogRepo,
+);
 
 // Controllers
 
 const registerUserController =
 	RegisterUserController.instance(registerUserUseCase);
+const loginController = LoginController.instance(loginUseCase);
 
 // Routes
 const routes = Router();
@@ -80,6 +90,7 @@ const userRoutes = createUserRoutes(
 	tokenProvider,
 	authorizationPolicyService,
 	registerUserController,
+	loginController,
 );
 
 routes.use("/user", userRoutes);

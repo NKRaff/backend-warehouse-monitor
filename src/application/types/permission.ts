@@ -1,1 +1,1 @@
-export type Permission = "register_user";
+export type Permission = "register_user" | "login";

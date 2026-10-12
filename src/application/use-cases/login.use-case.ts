@@ -11,8 +11,8 @@ import { AuditLog } from "@domain/entities/audit-log.js";
 import { UnprocessableEntityError } from "@shared/errors/unprocessable-entity-error.js";
 import type { IUseCase } from "./use-case.interface.js";
 
-export class Login implements IUseCase<LoginInputDto, LoginOutputDto> {
-	private static _instance: Login;
+export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
+	private static _instance: LoginUseCase;
 
 	private constructor(
 		private readonly passwordHasher: IPasswordHasher,
@@ -28,9 +28,9 @@ export class Login implements IUseCase<LoginInputDto, LoginOutputDto> {
 		uuidProvider: IUuidProvider,
 		userRepo: IUserRepository,
 		auditLogRepo: IAuditLogRepository,
-	): Login {
-		if (!Login._instance) {
-			Login._instance = new Login(
+	): LoginUseCase {
+		if (!LoginUseCase._instance) {
+			LoginUseCase._instance = new LoginUseCase(
 				passwordHasher,
 				tokenProvider,
 				uuidProvider,
@@ -38,7 +38,7 @@ export class Login implements IUseCase<LoginInputDto, LoginOutputDto> {
 				auditLogRepo,
 			);
 		}
-		return Login._instance;
+		return LoginUseCase._instance;
 	}
 
 	async execute(input: LoginInputDto): Promise<LoginOutputDto> {

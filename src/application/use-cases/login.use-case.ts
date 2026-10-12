@@ -4,7 +4,10 @@ import type {
 } from "@application/dtos/login.dto.js";
 import type { IPasswordHasher } from "@application/ports/password-hasher.interface.js";
 import type { ITokenProvider } from "@application/ports/token-provider.interface.js";
+import type { IUuidProvider } from "@application/ports/uuid-provider.interface.js";
+import type { IAuditLogRepository } from "@application/repositories/audit-log.interface.js";
 import type { IUserRepository } from "@application/repositories/user.interface.js";
+import { AuditLog } from "@domain/entities/audit-log.js";
 import { UnprocessableEntityError } from "@shared/errors/unprocessable-entity-error.js";
 import type { IUseCase } from "./use-case.interface.js";
 
@@ -14,16 +17,26 @@ export class Login implements IUseCase<LoginInputDto, LoginOutputDto> {
 	private constructor(
 		private readonly passwordHasher: IPasswordHasher,
 		private readonly tokenProvider: ITokenProvider,
+		private readonly uuidProvider: IUuidProvider,
 		private readonly userRepo: IUserRepository,
+		private readonly auditLogRepo: IAuditLogRepository,
 	) {}
 
 	static instance(
 		passwordHasher: IPasswordHasher,
 		tokenProvider: ITokenProvider,
+		uuidProvider: IUuidProvider,
 		userRepo: IUserRepository,
+		auditLogRepo: IAuditLogRepository,
 	): Login {
 		if (!Login._instance) {
-			Login._instance = new Login(passwordHasher, tokenProvider, userRepo);
+			Login._instance = new Login(
+				passwordHasher,
+				tokenProvider,
+				uuidProvider,
+				userRepo,
+				auditLogRepo,
+			);
 		}
 		return Login._instance;
 	}
@@ -45,6 +58,17 @@ export class Login implements IUseCase<LoginInputDto, LoginOutputDto> {
 		}
 
 		const accessToken = this.tokenProvider.sign({ sub: user.id });
+
+		const auditLog = AuditLog.create({
+			id: this.uuidProvider.generate(),
+			actorId: input.actorId,
+			action: "login",
+			resourceId: user.id,
+			resourceType: "user",
+			createdAt: new Date(),
+		});
+
+		await this.auditLogRepo.save(auditLog);
 
 		return {
 			message: "Usuario autenticado com sucesso",

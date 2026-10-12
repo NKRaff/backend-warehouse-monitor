@@ -31,7 +31,9 @@ export class Warehouse {
 
 		return new Warehouse({
 			...props,
-			description: props.description.trim() ?? "No description",
+			description: props.description
+				? props.description.trim()
+				: "No description",
 			status: "inactive",
 		});
 	}

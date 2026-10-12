@@ -1,5 +1,6 @@
 import type { NotificationMessage } from "@application/types/notification-message.js";
 import type { AlertSeverity } from "@domain/types/alert-severity.js";
+import type { AlertType } from "@domain/types/alert-type.js";
 
 export function renderAlertEmailHtml(message: NotificationMessage): string {
 	const style = getSeverityStyles(message.severity);
@@ -129,9 +130,7 @@ function getSeverityStyles(severity: AlertSeverity) {
 	}
 }
 
-function formatAlertType(
-	type: "device_offline" | "device_error" | "measurement_out_of_limits",
-): string {
+function formatAlertType(type: AlertType): string {
 	switch (type) {
 		case "device_offline":
 			return "Dispositivo Offline";
@@ -139,5 +138,7 @@ function formatAlertType(
 			return "Erro no Dispositivo IoT";
 		case "measurement_out_of_limits":
 			return "Medição Fora dos Limites (Temp/Umidade)";
+		default:
+			return "Erro do sistema";
 	}
 }

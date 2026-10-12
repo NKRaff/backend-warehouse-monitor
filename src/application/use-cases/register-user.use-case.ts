@@ -66,7 +66,7 @@ export class RegisterUserUseCase
 			role: input.role,
 		});
 
-		this.userRepo.save(user);
+		await this.userRepo.save(user);
 
 		const alert = Alert.create({
 			id: this.uuidProvider.generate(),

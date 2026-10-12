@@ -1,3 +1,4 @@
+import { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
@@ -43,7 +44,7 @@ const auditLogRepo = AuditLogRepository.instance();
 // Adapters
 
 const passwordHasher = BcryptPasswordHasherAdapter.instance();
-const _tokenProvider = JwtTokenAdapter.instance();
+const tokenProvider = JwtTokenAdapter.instance();
 const uuidProvider = UuidAdapter.instance();
 
 // Notification
@@ -54,6 +55,7 @@ const emailChannel = EmailChannel.instance(clientSmtp);
 
 const _passwordPolicyService = PasswordPolicyService.instance();
 const notificationService = NotificationService.instance([emailChannel]);
+const authorizationPolicyService = AuthorizationPolicy.instance(userRepo);
 
 // Use Cases
 
@@ -74,7 +76,11 @@ const registerUserController =
 
 // Routes
 const routes = Router();
-const userRoutes = createUserRoutes(registerUserController);
+const userRoutes = createUserRoutes(
+	tokenProvider,
+	authorizationPolicyService,
+	registerUserController,
+);
 
 routes.use("/user", userRoutes);
 

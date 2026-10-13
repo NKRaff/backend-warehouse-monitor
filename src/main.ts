@@ -1,8 +1,10 @@
 import { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
+import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
+import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
 import "dotenv/config";
@@ -55,7 +57,7 @@ const emailChannel = EmailChannel.instance(clientSmtp);
 
 // Services
 
-const _passwordPolicyService = PasswordPolicyService.instance();
+const passwordPolicyService = PasswordPolicyService.instance();
 const notificationService = NotificationService.instance([emailChannel]);
 const authorizationPolicyService = AuthorizationPolicy.instance(userRepo);
 
@@ -77,13 +79,22 @@ const loginUseCase = LoginUseCase.instance(
 	userRepo,
 	auditLogRepo,
 );
+const changePasswordUseCase = ChangePasswordUseCase.instance(
+	passwordHasher,
+	uuidProvider,
+	userRepo,
+	auditLogRepo,
+	passwordPolicyService,
+);
 
 // Controllers
 
 const registerUserController =
 	RegisterUserController.instance(registerUserUseCase);
 const loginController = LoginController.instance(loginUseCase);
-
+const changePasswordController = ChangePasswordController.instance(
+	changePasswordUseCase,
+);
 // Routes
 const routes = Router();
 const userRoutes = createUserRoutes(
@@ -91,6 +102,8 @@ const userRoutes = createUserRoutes(
 	authorizationPolicyService,
 	registerUserController,
 	loginController,
+	changePasswordController,
+	userRepo,
 );
 
 routes.use("/user", userRoutes);

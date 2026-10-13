@@ -82,6 +82,7 @@ export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
 				role: user.role,
 			},
 			accessToken,
+			requiresPasswordChange: user.isDefaultPassword,
 		};
 	}
 }

@@ -17,4 +17,5 @@ export type LoginOutputDto = {
 		role: UserRole;
 	};
 	accessToken: string;
+	requiresPasswordChange: boolean;
 };

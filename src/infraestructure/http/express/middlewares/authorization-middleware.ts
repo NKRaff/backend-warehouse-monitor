@@ -10,7 +10,7 @@ export function authorizationMiddleware(
 	permission: Permission,
 ) {
 	return async (req: Request, _res: Response, next: NextFunction) => {
-		const token = req.cookies?.token;
+		const token = req.cookies?.access_token;
 
 		if (!token) {
 			throw new UnauthorizedError("Token de acesso não encontrato");

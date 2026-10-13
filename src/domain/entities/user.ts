@@ -8,6 +8,7 @@ type UserProps = {
 	email: Email;
 	passwordHashed: string;
 	role: UserRole;
+	isDefaultPassword: boolean;
 	deletedAt?: Date | undefined;
 };
 
@@ -20,9 +21,9 @@ export class User {
 		}
 	}
 
-	static create(props: Omit<UserProps, "deletedAt">): User {
+	static create(props: Omit<UserProps, "defaultPassword" | "deletedAt">): User {
 		props.name = props.name.trim();
-		return new User(props);
+		return new User({ ...props, isDefaultPassword: true });
 	}
 
 	static restore(props: UserProps): User {
@@ -49,7 +50,15 @@ export class User {
 		return this.props.role;
 	}
 
+	get isDefaultPassword(): boolean {
+		return this.props.isDefaultPassword;
+	}
+
 	get deletedAt(): Date | undefined {
 		return this.props.deletedAt;
+	}
+
+	set passwordHasher(password) {
+		this.props.passwordHashed = password;
 	}
 }

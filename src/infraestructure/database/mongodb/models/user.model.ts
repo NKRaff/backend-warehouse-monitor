@@ -8,6 +8,7 @@ const userSchema = new Schema(
 		password: { type: String, required: true },
 		role: { type: String, required: true },
 		emailVerified: { type: Boolean, required: true, default: false },
+		isDefaultPassword: { type: Boolean, required: true, default: true },
 		deletedAt: { type: Date, require: false },
 	},
 	{

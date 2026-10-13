@@ -39,4 +39,11 @@ export class UserRepository implements IUserRepository {
 
 		return userToDomain(userModel);
 	}
+
+	async updatePassword(userId: string, password: string): Promise<void> {
+		await UserModel.findByIdAndUpdate(userId, {
+			password,
+			isDefaultPassword: false,
+		});
+	}
 }

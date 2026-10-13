@@ -8,4 +8,5 @@ export type AuditAction =
 	| "activate"
 	| "deactivate"
 	| "login"
-	| "logout";
+	| "logout"
+	| "change_password";

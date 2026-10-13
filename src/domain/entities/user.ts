@@ -57,4 +57,8 @@ export class User {
 	get deletedAt(): Date | undefined {
 		return this.props.deletedAt;
 	}
+
+	set passwordHasher(password) {
+		this.props.passwordHashed = password;
+	}
 }

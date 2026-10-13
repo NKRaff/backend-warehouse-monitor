@@ -12,8 +12,12 @@ export class PasswordPolicyService {
 		return PasswordPolicyService._instance;
 	}
 
-	isValid(password: string): boolean {
+	isValid(password: string, confirmPassword: string): boolean {
 		const errors = [];
+
+		if (password !== confirmPassword) {
+			errors.push("As senhas não coincidem ");
+		}
 
 		if (password.length < 8) {
 			errors.push("A senha deve ter no minimo 8 caracteres");

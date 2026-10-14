@@ -1,13 +1,14 @@
+import type { IUserRepository } from "@application/repositories/user.interface.js";
 import type { Permission } from "@application/types/permission.js";
 import { PermissionMatrix } from "@application/types/permission-matrix.js";
 import { ForbiddenError } from "@shared/errors/forbidden-error.js";
 import { UnauthorizedError } from "@shared/errors/unauthorized-error.js";
-import type { UserRepository } from "../../infraestructure/database/mongodb/repositories/user.repository.js";
+import type { UserRepository } from "../../infrastructure/database/mongodb/repositories/user.repository.js";
 
 export class AuthorizationPolicy {
 	private static _instance: AuthorizationPolicy;
 
-	private constructor(private userRepo: UserRepository) {}
+	private constructor(private userRepo: IUserRepository) {}
 
 	static instance(userRepo: UserRepository): AuthorizationPolicy {
 		if (!AuthorizationPolicy._instance) {

@@ -7,7 +7,7 @@
 		"paths": {
 			"@domain/*": ["./src/domain/*"],
 			"@application/*": ["./src/application/*"],
-			"@infrastructure/*": ["./src/infra/*"],
+			"@infrastructure/*": ["./src/infrastructure/*"],
 			"@presentation/*": ["./src/presentation/*"],
 			"@shared/*": ["./src/shared/*"]
 		},

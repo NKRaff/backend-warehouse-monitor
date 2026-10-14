@@ -21,7 +21,9 @@ export class User {
 		}
 	}
 
-	static create(props: Omit<UserProps, "defaultPassword" | "deletedAt">): User {
+	static create(
+		props: Omit<UserProps, "isDefaultPassword" | "deletedAt">,
+	): User {
 		props.name = props.name.trim();
 		return new User({ ...props, isDefaultPassword: true });
 	}

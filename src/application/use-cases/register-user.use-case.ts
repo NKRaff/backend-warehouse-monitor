@@ -15,6 +15,7 @@ import { AuditLog } from "@domain/entities/audit-log.js";
 import { Notification } from "@domain/entities/notification.js";
 import { User } from "@domain/entities/user.js";
 import { Email } from "@domain/object-values/email.js";
+import { ConflictError } from "@shared/errors/conflict-error.js";
 
 export class RegisterUserUseCase
 	implements IUseCase<RegisterUserInputDto, RegisterUserOutputDto>
@@ -55,8 +56,15 @@ export class RegisterUserUseCase
 	}
 
 	async execute(input: RegisterUserInputDto): Promise<RegisterUserOutputDto> {
+		input.email = input.email.toLowerCase().trim();
 		const randomPassword = Math.random().toString(36).slice(-8);
 		const dateNow = new Date();
+
+		const userExists = await this.userRepo.findByEmail(input.email);
+
+		if (userExists !== null) {
+			throw new ConflictError("Email já cadastrado");
+		}
 
 		const user = User.create({
 			id: this.uuidProvider.generate(),

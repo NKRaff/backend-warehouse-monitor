@@ -43,7 +43,9 @@ export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
 	}
 
 	async execute(input: LoginInputDto): Promise<LoginOutputDto> {
-		const user = await this.userRepo.findByEmail(input.email);
+		const user = await this.userRepo.findByEmail(
+			input.email.toLowerCase().trim(),
+		);
 
 		if (user === null) {
 			throw new UnprocessableEntityError("Credenciais invalidas");

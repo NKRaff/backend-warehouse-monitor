@@ -29,7 +29,7 @@ export class MeasurementLimits {
 	private isValidHumidityLimits(): void {
 		if (this._humidity.min >= this._humidity.max) {
 			throw new UnprocessableEntityError(
-				"Limite mínimo de temperatura não pode ser maior que o máximo",
+				"Limite mínimo de umidade não pode ser maior que o máximo",
 			);
 		}
 

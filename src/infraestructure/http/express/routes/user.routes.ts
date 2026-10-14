@@ -68,7 +68,7 @@ export function createUserRoutes(
 		authorizationMiddleware(
 			tokenProvider,
 			authorizationPolicy,
-			"register_user",
+			"change_password",
 		),
 		async (req, res, next) => {
 			try {

@@ -15,7 +15,7 @@ export class AuditLog {
 	private constructor(private props: AuditLogProps) {}
 
 	static create(
-		props: AuditLogProps & Partial<Pick<AuditLogProps, "actorId">>,
+		props: Omit<AuditLogProps, "actorId"> & { actorId?: string },
 	): AuditLog {
 		return new AuditLog({
 			...props,

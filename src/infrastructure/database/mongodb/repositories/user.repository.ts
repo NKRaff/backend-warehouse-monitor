@@ -1,5 +1,6 @@
 import type { IUserRepository } from "@application/repositories/user.interface.js";
 import type { User } from "@domain/entities/user.js";
+import type { UserRole } from "@domain/types/user-role.js";
 import { userToDomain, userToPersistence } from "../mappers/user.mapper.js";
 import { UserModel } from "../models/user.model.js";
 
@@ -38,6 +39,13 @@ export class UserRepository implements IUserRepository {
 		}
 
 		return userToDomain(userModel);
+	}
+
+	async findByRole(role: UserRole): Promise<User[]> {
+		const usersModel = await UserModel.find({ role });
+		return usersModel.map((userModel) => {
+			return userToDomain(userModel);
+		});
 	}
 
 	async updatePassword(userId: string, password: string): Promise<void> {

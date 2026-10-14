@@ -1,6 +1,7 @@
 import { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
+import { BootstrapAdminUseCase } from "@application/use-cases/bootstrap-admin.use-case.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
@@ -72,6 +73,15 @@ const registerUserUseCase = RegisterUserUseCase.instance(
 	auditLogRepo,
 	notificationService,
 );
+const bootstrapAdmin = BootstrapAdminUseCase.instance(
+	uuidProvider,
+	passwordHasher,
+	userRepo,
+	alertRepo,
+	notificationRepo,
+	auditLogRepo,
+	notificationService,
+);
 const loginUseCase = LoginUseCase.instance(
 	passwordHasher,
 	tokenProvider,
@@ -120,3 +130,8 @@ httpServer.connect();
 
 const socketServer = SocketIO.instance(httpServer.server());
 socketServer.connect([warehouseHandler]);
+
+// Bootstrap
+try {
+	bootstrapAdmin.execute({ name: "teste", email: "teste@email.com" });
+} catch {}

@@ -14,9 +14,16 @@ type UserProps = {
 
 export class User {
 	private constructor(private props: UserProps) {
+		const regexNomeValido = /^[a-zA-Z0-9À-ÿ\s]+$/;
 		if (this.props.name.length < 4) {
 			throw new UnprocessableEntityError(
 				"Nome do usuario deve ter no minimo 4 caracteres",
+			);
+		}
+
+		if (!regexNomeValido.test(this.props.name)) {
+			throw new UnprocessableEntityError(
+				"O nome do usuário contém caracteres especiais inválidos",
 			);
 		}
 	}

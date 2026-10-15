@@ -66,7 +66,7 @@ export class BootstrapAdminUseCase
 		}
 
 		input.email = input.email.toLowerCase().trim();
-		const randomPassword = crypto.randomBytes(8).toString();
+		const randomPassword = crypto.randomBytes(12).toString("base64url");
 		const dateNow = new Date();
 
 		const userExists = await this.userRepo.findByEmail(input.email);

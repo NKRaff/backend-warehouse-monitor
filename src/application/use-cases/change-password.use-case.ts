@@ -8,6 +8,8 @@ import type { IAuditLogRepository } from "@application/repositories/audit-log.in
 import type { IUserRepository } from "@application/repositories/user.interface.js";
 import type { PasswordPolicyService } from "@application/services/password-policy.service.js";
 import { AuditLog } from "@domain/entities/audit-log.js";
+import { ConflictError } from "@shared/errors/conflict-error.js";
+import { NotFoundError } from "@shared/errors/not-found-error.js";
 import type { IUseCase } from "./use-case.interface.js";
 
 export class ChangePasswordUseCase
@@ -46,6 +48,21 @@ export class ChangePasswordUseCase
 		input: ChangePasswordInputDto,
 	): Promise<ChangePasswordOutputDto> {
 		this.passwordPolicyService.isValid(input.password, input.confirmPassword);
+
+		const user = await this.userRepo.findById(input.actorId);
+
+		if (!user) {
+			throw new NotFoundError("Usuario não encontrado");
+		}
+
+		const isSame = await this.passwordHasher.compare(
+			input.password,
+			user.passwordHasher,
+		);
+
+		if (isSame) {
+			throw new ConflictError("Senha não pode ser igual a senha ja cadastrada");
+		}
 
 		const passwordHasher = await this.passwordHasher.hash(input.password);
 

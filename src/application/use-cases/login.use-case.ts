@@ -8,6 +8,7 @@ import type { IUuidProvider } from "@application/ports/uuid-provider.interface.j
 import type { IAuditLogRepository } from "@application/repositories/audit-log.interface.js";
 import type { IUserRepository } from "@application/repositories/user.interface.js";
 import { AuditLog } from "@domain/entities/audit-log.js";
+import { ForbiddenError } from "@shared/errors/forbidden-error.js";
 import { UnprocessableEntityError } from "@shared/errors/unprocessable-entity-error.js";
 import type { IUseCase } from "./use-case.interface.js";
 
@@ -46,8 +47,10 @@ export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
 			input.email.toLowerCase().trim(),
 		);
 
-		if (user === null || user.deletedAt) {
+		if (user === null) {
 			throw new UnprocessableEntityError("Credenciais invalidas");
+		} else if (user.deletedAt) {
+			throw new ForbiddenError("Usuario está desativado");
 		}
 
 		const passwordIsMatch = await this.passwordHasher.compare(

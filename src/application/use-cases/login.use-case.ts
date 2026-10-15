@@ -50,7 +50,7 @@ export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
 		if (user === null) {
 			throw new UnprocessableEntityError("Credenciais invalidas");
 		} else if (user.deletedAt) {
-			throw new ForbiddenError("Usuario desativado");
+			throw new ForbiddenError("Usuario está desativado");
 		}
 
 		const passwordIsMatch = await this.passwordHasher.compare(

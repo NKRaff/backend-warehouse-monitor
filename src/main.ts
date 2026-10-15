@@ -1,6 +1,7 @@
 import { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
+import { BootstrapAdminUseCase } from "@application/use-cases/bootstrap-admin.use-case.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
@@ -9,22 +10,22 @@ import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
 import "dotenv/config";
 import { Router } from "express";
-import { BcryptPasswordHasherAdapter } from "./infraestructure/cryptography/bcrypt-password-hasher.adapter.js";
-import { JwtTokenAdapter } from "./infraestructure/cryptography/jwt-token.adapter.js";
-import { Mongoose } from "./infraestructure/database/mongodb/mongoose.js";
-import { AlertRepository } from "./infraestructure/database/mongodb/repositories/alert.repository.js";
-import { AuditLogRepository } from "./infraestructure/database/mongodb/repositories/audit-log.repository.js";
-import { NotificationRepository } from "./infraestructure/database/mongodb/repositories/notification.repository.js";
-import { UserRepository } from "./infraestructure/database/mongodb/repositories/user.repository.js";
-import { ExpressApp } from "./infraestructure/http/express/express.app.js";
-import { createUserRoutes } from "./infraestructure/http/express/routes/user.routes.js";
-import { HttpServer } from "./infraestructure/http/server.js";
-import { UuidAdapter } from "./infraestructure/identifier/uuid.adapter.js";
-import { MqttAdapter } from "./infraestructure/messaging/mqtt/mqtt.adapter.js";
-import { NodemailerAdapter } from "./infraestructure/messaging/smtp/nodemailer.adapter.js";
-import { WarehouseHandle } from "./infraestructure/messaging/websocket/handle/warehouse.handle.js";
-import { SocketIO } from "./infraestructure/messaging/websocket/socket-io-adapter.js";
-import { EmailChannel } from "./infraestructure/notification/email-channel.js";
+import { BcryptPasswordHasherAdapter } from "./infrastructure/cryptography/bcrypt-password-hasher.adapter.js";
+import { JwtTokenAdapter } from "./infrastructure/cryptography/jwt-token.adapter.js";
+import { Mongoose } from "./infrastructure/database/mongodb/mongoose.js";
+import { AlertRepository } from "./infrastructure/database/mongodb/repositories/alert.repository.js";
+import { AuditLogRepository } from "./infrastructure/database/mongodb/repositories/audit-log.repository.js";
+import { NotificationRepository } from "./infrastructure/database/mongodb/repositories/notification.repository.js";
+import { UserRepository } from "./infrastructure/database/mongodb/repositories/user.repository.js";
+import { ExpressApp } from "./infrastructure/http/express/express.app.js";
+import { createUserRoutes } from "./infrastructure/http/express/routes/user.routes.js";
+import { HttpServer } from "./infrastructure/http/server.js";
+import { UuidAdapter } from "./infrastructure/identifier/uuid.adapter.js";
+import { MqttAdapter } from "./infrastructure/messaging/mqtt/mqtt.adapter.js";
+import { NodemailerAdapter } from "./infrastructure/messaging/smtp/nodemailer.adapter.js";
+import { WarehouseHandle } from "./infrastructure/messaging/websocket/handle/warehouse.handle.js";
+import { SocketIO } from "./infrastructure/messaging/websocket/socket-io-adapter.js";
+import { EmailChannel } from "./infrastructure/notification/email-channel.js";
 
 // Database
 
@@ -64,6 +65,15 @@ const authorizationPolicyService = AuthorizationPolicy.instance(userRepo);
 // Use Cases
 
 const registerUserUseCase = RegisterUserUseCase.instance(
+	uuidProvider,
+	passwordHasher,
+	userRepo,
+	alertRepo,
+	notificationRepo,
+	auditLogRepo,
+	notificationService,
+);
+const bootstrapAdmin = BootstrapAdminUseCase.instance(
 	uuidProvider,
 	passwordHasher,
 	userRepo,
@@ -120,3 +130,8 @@ httpServer.connect();
 
 const socketServer = SocketIO.instance(httpServer.server());
 socketServer.connect([warehouseHandler]);
+
+// Bootstrap
+try {
+	bootstrapAdmin.execute({ name: "teste", email: "teste@email.com" });
+} catch {}

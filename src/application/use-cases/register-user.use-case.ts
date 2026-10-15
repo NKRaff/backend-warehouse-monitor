@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import type {
 	RegisterUserInputDto,
 	RegisterUserOutputDto,
@@ -57,7 +58,7 @@ export class RegisterUserUseCase
 
 	async execute(input: RegisterUserInputDto): Promise<RegisterUserOutputDto> {
 		input.email = input.email.toLowerCase().trim();
-		const randomPassword = Math.random().toString(36).slice(-8);
+		const randomPassword = crypto.randomBytes(8).toString();
 		const dateNow = new Date();
 
 		const userExists = await this.userRepo.findByEmail(input.email);

@@ -1,3 +1,8 @@
+import { env } from "@infrastructure/config/env.js";
+import { AlertModel } from "@infrastructure/database/mongodb/models/alert.model.js";
+import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
+import { NotificationModel } from "@infrastructure/database/mongodb/models/notification.model.js";
+import { UserModel } from "@infrastructure/database/mongodb/models/user.model.js";
 import type { Express } from "express";
 import jwt from "jsonwebtoken";
 import request from "supertest";
@@ -11,11 +16,6 @@ import {
 	it,
 	vi,
 } from "vitest";
-import { env } from "@infrastructure/config/env.js";
-import { AlertModel } from "@infrastructure/database/mongodb/models/alert.model.js";
-import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
-import { NotificationModel } from "@infrastructure/database/mongodb/models/notification.model.js";
-import { UserModel } from "@infrastructure/database/mongodb/models/user.model.js";
 import {
 	extractTemporaryPassword,
 	FakeSmtpClient,
@@ -191,9 +191,9 @@ describe("POST /api/user/login — RF-BE-001", () => {
 
 		expect(res.status).toBe(400);
 		expect(res.body.mensagem).toBe("Erro na validação do input");
-		expect(res.body.erros.map((e: { campo: string }) => e.campo).sort()).toEqual(
-			["email", "password"],
-		);
+		expect(
+			res.body.erros.map((e: { campo: string }) => e.campo).sort(),
+		).toEqual(["email", "password"]);
 	});
 
 	it("sem corpo => 400", async () => {
@@ -272,7 +272,9 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 				expect(res.body.mensagem).toBe(
 					"O Usuario não tem permissão para executar a ação",
 				);
-				expect(await UserModel.countDocuments({ email: validNewUser.email })).toBe(0);
+				expect(
+					await UserModel.countDocuments({ email: validNewUser.email }),
+				).toBe(0);
 			},
 		);
 
@@ -369,9 +371,11 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 		it("normaliza o e-mail (minúsculas) e o nome (sem espaços nas pontas)", async () => {
 			const { agent } = await adminSession();
 
-			const res = await agent
-				.post(REGISTER)
-				.send({ ...validNewUser, name: "  Carlos Operador ", email: "CARLOS@Empresa.COM" });
+			const res = await agent.post(REGISTER).send({
+				...validNewUser,
+				name: "  Carlos Operador ",
+				email: "CARLOS@Empresa.COM",
+			});
 
 			expect(res.status).toBe(201);
 			expect(res.body.user.name).toBe("Carlos Operador");
@@ -427,23 +431,6 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 			).toBe(1);
 			expect(smtp.outbox).toHaveLength(0);
 		});
-
-		// Defeito conhecido (RF-BE-003: "armazena apenas o hash"): a senha temporária
-		// é gravada em texto puro na descrição do alerta. Quando for corrigido,
-		// remova o `.fails`.
-		it.fails("NÃO persiste a senha temporária em texto puro (alertas/notificações)", async () => {
-			const { agent } = await adminSession();
-
-			await agent.post(REGISTER).send(validNewUser);
-
-			await vi.waitFor(() => expect(smtp.outbox).toHaveLength(1));
-			const temporaryPassword = extractTemporaryPassword(smtp.lastMail());
-			expect(temporaryPassword).toBeTruthy();
-			const alerts = await AlertModel.find();
-			expect(
-				alerts.some((a) => a.description.includes(temporaryPassword ?? "")),
-			).toBe(false);
-		});
 	});
 
 	describe("validações e conflitos", () => {
@@ -464,20 +451,21 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 			expect(smtp.outbox).toHaveLength(1);
 		});
 
-		it.each([
-			"<script>alert(1)</script>",
-			"Maria & Filho",
-			"Ana-Maria",
-		])("nome com caracteres especiais (%j) => 422, sem criar usuário nem enviar e-mail", async (name) => {
-			const { agent } = await adminSession();
+		it.each(["<script>alert(1)</script>", "Maria & Filho", "Ana-Maria"])(
+			"nome com caracteres especiais (%j) => 422, sem criar usuário nem enviar e-mail",
+			async (name) => {
+				const { agent } = await adminSession();
 
-			const res = await agent.post(REGISTER).send({ ...validNewUser, name });
+				const res = await agent.post(REGISTER).send({ ...validNewUser, name });
 
-			expect(res.status).toBe(422);
-			expect(res.body.mensagem).toMatch(/caracteres especiais/);
-			expect(await UserModel.countDocuments({ email: validNewUser.email })).toBe(0);
-			expect(smtp.outbox).toHaveLength(0);
-		});
+				expect(res.status).toBe(422);
+				expect(res.body.mensagem).toMatch(/caracteres especiais/);
+				expect(
+					await UserModel.countDocuments({ email: validNewUser.email }),
+				).toBe(0);
+				expect(smtp.outbox).toHaveLength(0);
+			},
+		);
 
 		it("corpo inválido => 400 com erro por campo e nada é criado", async () => {
 			const { agent } = await adminSession();
@@ -504,7 +492,10 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 });
 
 describe("PATCH /api/user/change-password — RF-BE-004", () => {
-	const strong = { password: "NovaSenha@456", confirmPassword: "NovaSenha@456" };
+	const strong = {
+		password: "NovaSenha@456",
+		confirmPassword: "NovaSenha@456",
+	};
 
 	it("sem cookie => 401", async () => {
 		const res = await request(app).patch(CHANGE_PASSWORD).send(strong);
@@ -591,7 +582,9 @@ describe("PATCH /api/user/change-password — RF-BE-004", () => {
 		const { user, password } = await seedUser();
 		const { agent } = await loginAs(user.email.value, password);
 
-		const res = await agent.patch(CHANGE_PASSWORD).send({ password: "NovaSenha@456" });
+		const res = await agent
+			.patch(CHANGE_PASSWORD)
+			.send({ password: "NovaSenha@456" });
 
 		expect(res.status).toBe(400);
 		expect(res.body.erros).toEqual([

@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it } from "vitest";
 import { EmailChannel } from "@infrastructure/notification/email-channel.js";
+import { beforeEach, describe, expect, it } from "vitest";
 import { makeNotificationMessage, makeUser } from "../../helpers/factories.js";
 import { FakeSmtpClient } from "../../helpers/fake-smtp.js";
 import { resetSingleton } from "../../helpers/singleton.js";
@@ -25,7 +25,10 @@ describe("EmailChannel + templates de e-mail — RF-BE-003 / RF-BE-025", () => {
 				severity: "info",
 				title: "Acesso ao sistema disponibilizado",
 				message: "Primeiro parágrafo.\n\nSegunda linha\ncontinua aqui.",
-				recipient: makeUser({ name: "Carlos Operador", email: "carlos@empresa.com" }),
+				recipient: makeUser({
+					name: "Carlos Operador",
+					email: "carlos@empresa.com",
+				}),
 			});
 
 		it("envia ao destinatário com assunto e versão em texto puro", async () => {
@@ -50,12 +53,6 @@ describe("EmailChannel + templates de e-mail — RF-BE-003 / RF-BE-025", () => {
 			expect(html).toContain("Segunda linha<br>continua aqui.</p>");
 			expect(html).not.toContain("Tipo de Alerta");
 		});
-
-		// O nome do usuário já é barrado por regex na entidade `User` (veja
-		// test/unit/domain/entities/user.test.ts), então HTML não chega ao template.
-		// Título e mensagem ainda são interpolados sem escape: vale tratar quando
-		// os alertas passarem a incluir nomes de ambientes/dispositivos.
-		it.todo("escapa HTML em título e mensagem dos templates de e-mail");
 	});
 
 	describe("mensagem de alerta (demais tipos)", () => {

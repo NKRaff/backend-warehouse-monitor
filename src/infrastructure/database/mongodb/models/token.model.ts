@@ -5,7 +5,7 @@ const tokenSchema = new Schema(
 		_id: { type: String, required: true },
 		userId: { type: String, required: true, ref: "User" },
 		type: { type: String, required: true },
-		value: { type: String, required: true },
+		valueHash: { type: String, required: true },
 		expiresAt: { type: Date, required: true },
 	},
 	{

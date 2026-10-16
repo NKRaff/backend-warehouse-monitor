@@ -20,13 +20,20 @@ export class TokenRepository implements ITokenRepository {
 		await TokenModel.create(model);
 	}
 
-	async findByValue(tokenValue: string): Promise<Token | null> {
-		const tokenModel = await TokenModel.findOne({ token: tokenValue });
+	async findByValue(tokenValueHash: string): Promise<Token | null> {
+		const tokenModel = await TokenModel.findOne({ token: tokenValueHash });
 
 		if (tokenModel === null) {
 			return null;
 		}
 
 		return tokenToDomain(tokenModel);
+	}
+
+	async updateToken(id: string, value: string, expiresAt: Date): Promise<void> {
+		await TokenModel.findByIdAndUpdate(id, {
+			valueHash: value,
+			expiresAt,
+		});
 	}
 }

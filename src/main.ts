@@ -1,12 +1,14 @@
 import { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
-import { BootstrapAdminUseCase } from "@application/use-cases/bootstrap-admin.use-case.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
+import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
+import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
+import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
 import "dotenv/config";
 import { Router } from "express";
@@ -25,7 +27,6 @@ import { MqttAdapter } from "./infrastructure/messaging/mqtt/mqtt.adapter.js";
 import { NodemailerAdapter } from "./infrastructure/messaging/smtp/nodemailer.adapter.js";
 import { WarehouseHandle } from "./infrastructure/messaging/websocket/handle/warehouse.handle.js";
 import { SocketIO } from "./infrastructure/messaging/websocket/socket-io-adapter.js";
-import { EmailChannel } from "./infrastructure/notification/email-channel.js";
 
 // Database
 
@@ -45,6 +46,7 @@ const userRepo = UserRepository.instance();
 const alertRepo = AlertRepository.instance();
 const notificationRepo = NotificationRepository.instance();
 const auditLogRepo = AuditLogRepository.instance();
+const tokenRepo = TokenRepository.instance();
 
 // Adapters
 
@@ -71,15 +73,7 @@ const registerUserUseCase = RegisterUserUseCase.instance(
 	alertRepo,
 	notificationRepo,
 	auditLogRepo,
-	notificationService,
-);
-const bootstrapAdmin = BootstrapAdminUseCase.instance(
-	uuidProvider,
-	passwordHasher,
-	userRepo,
-	alertRepo,
-	notificationRepo,
-	auditLogRepo,
+	tokenRepo,
 	notificationService,
 );
 const loginUseCase = LoginUseCase.instance(
@@ -88,6 +82,7 @@ const loginUseCase = LoginUseCase.instance(
 	uuidProvider,
 	userRepo,
 	auditLogRepo,
+	tokenRepo,
 );
 const changePasswordUseCase = ChangePasswordUseCase.instance(
 	passwordHasher,
@@ -95,6 +90,10 @@ const changePasswordUseCase = ChangePasswordUseCase.instance(
 	userRepo,
 	auditLogRepo,
 	passwordPolicyService,
+);
+const refreshTokenUseCase = RefreshTokenUseCase.instance(
+	tokenProvider,
+	tokenRepo,
 );
 
 // Controllers
@@ -105,6 +104,8 @@ const loginController = LoginController.instance(loginUseCase);
 const changePasswordController = ChangePasswordController.instance(
 	changePasswordUseCase,
 );
+const refreshTokenController =
+	RefreshTokenController.instance(refreshTokenUseCase);
 // Routes
 const routes = Router();
 const userRoutes = createUserRoutes(
@@ -113,6 +114,7 @@ const userRoutes = createUserRoutes(
 	registerUserController,
 	loginController,
 	changePasswordController,
+	refreshTokenController,
 	userRepo,
 );
 
@@ -130,8 +132,3 @@ httpServer.connect();
 
 const socketServer = SocketIO.instance(httpServer.server());
 socketServer.connect([warehouseHandler]);
-
-// Bootstrap
-try {
-	bootstrapAdmin.execute({ name: "teste", email: "teste@email.com" });
-} catch {}

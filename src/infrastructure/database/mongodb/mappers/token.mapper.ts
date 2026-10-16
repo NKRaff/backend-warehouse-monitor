@@ -7,7 +7,7 @@ export function tokenToDomain(raw: TokenDocument): Token {
 		id: raw._id,
 		userId: raw.userId,
 		type: raw.type as TokenType,
-		value: raw.value,
+		value: raw.valueHash,
 		expiresAt: raw.expiresAt,
 	});
 }
@@ -19,7 +19,7 @@ export function tokenToPersistence(
 		_id: token.id,
 		userId: token.userId,
 		type: token.type,
-		value: token.value,
+		valueHash: token.value,
 		expiresAt: token.expiresAt,
 	};
 }

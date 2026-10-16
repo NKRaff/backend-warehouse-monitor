@@ -51,7 +51,6 @@ export function renderPasswordResetEmail(
 	`;
 
 	return renderBaseEmailLayout({
-		appName: "Warehouse Monitor",
 		title: notification.title,
 		subtitle: "Segurança da conta",
 		content,

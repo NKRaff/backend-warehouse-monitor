@@ -55,6 +55,7 @@ export const env = {
 		name: getEnv("APP_NAME"),
 		host: getEnv("APP_HOST", "0.0.0.0"),
 		port: getNumber("APP_PORT", "3000"),
+		url: getEnv("APP_URL", "http://localhost:3000/"),
 	},
 
 	database: {

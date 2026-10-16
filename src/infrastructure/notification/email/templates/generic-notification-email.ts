@@ -39,7 +39,6 @@ export function renderGenericNotificationEmail(
 	`;
 
 	return renderBaseEmailLayout({
-		appName: "Warehouse Monitor",
 		title: notification.title,
 		subtitle: "Notificação",
 		content,

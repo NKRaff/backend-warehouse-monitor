@@ -109,7 +109,6 @@ export function renderAlertEmail(notification: NotificationMessage): string {
 	`;
 
 	return renderBaseEmailLayout({
-		appName: "Warehouse Monitor",
 		title: notification.title,
 		subtitle: "Alerta do sistema",
 		content,

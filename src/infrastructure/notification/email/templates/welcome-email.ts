@@ -1,4 +1,5 @@
 import type { NotificationMessage } from "@application/types/notification-message.js";
+import { env } from "@infrastructure/config/env.js";
 import { renderBaseEmailLayout } from "../layouts/base-email-layout.js";
 import { renderActionButton } from "../layouts/components/action-button.js";
 import {
@@ -7,7 +8,6 @@ import {
 } from "../layouts/components/html-utils.js";
 
 export function renderWelcomeEmail(notification: NotificationMessage): string {
-	const appName = "Warehouse Monitor";
 	const name = escapeHtml(notification.recipient.name);
 	const url = notification.metadata?.actionUrl;
 
@@ -18,7 +18,7 @@ export function renderWelcomeEmail(notification: NotificationMessage): string {
 			font-size: 24px;
 			line-height: 1.3;
 		">
-			Bem-vindo ao ${escapeHtml(appName)}!
+			Bem-vindo ao ${escapeHtml(env.app.name)}!
 		</h1>
 
 		<p>Olá, <strong>${name}</strong>.</p>
@@ -49,7 +49,6 @@ export function renderWelcomeEmail(notification: NotificationMessage): string {
 	`;
 
 	return renderBaseEmailLayout({
-		appName,
 		title: notification.title,
 		subtitle: "Sua conta está pronta para configuração",
 		content,

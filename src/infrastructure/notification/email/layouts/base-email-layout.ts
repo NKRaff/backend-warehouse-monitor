@@ -1,8 +1,9 @@
+import { env } from "@infrastructure/config/env.js";
 import { renderEmailFooter } from "./components/email-footer.js";
 import { renderEmailHeader } from "./components/email-header.js";
+import { escapeHtml } from "./components/html-utils.js";
 
 type BaseEmailLayoutProps = {
-	appName: string;
 	title: string;
 	content: string;
 	subtitle?: string | undefined;
@@ -11,13 +12,13 @@ type BaseEmailLayoutProps = {
 };
 
 export function renderBaseEmailLayout({
-	appName,
 	title,
 	content,
 	subtitle,
 	footerNote,
 	issuedAt,
 }: BaseEmailLayoutProps): string {
+	const appName = env.app.name;
 	return `
 		<!DOCTYPE html>
 		<html lang="pt-BR">
@@ -28,7 +29,7 @@ export function renderBaseEmailLayout({
 				content="width=device-width, initial-scale=1.0"
 			>
 			<meta name="color-scheme" content="light">
-			<title>${title}</title>
+			<title>${escapeHtml(title)}</title>
 		</head>
 
 		<body style="

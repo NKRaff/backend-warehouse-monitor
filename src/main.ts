@@ -6,6 +6,7 @@ import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
+import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
@@ -56,7 +57,7 @@ const uuidProvider = UuidAdapter.instance();
 
 // Notification
 
-const emailChannel = EmailChannel.instance(clientSmtp);
+const emailChannel = EmailNotificationChannel.instance(clientSmtp);
 
 // Services
 

@@ -2,12 +2,14 @@ import { AuthorizationPolicy } from "@application/services/authorization-policy.
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
+import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
+import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
@@ -97,6 +99,15 @@ const refreshTokenUseCase = RefreshTokenUseCase.instance(
 	tokenProvider,
 	tokenRepo,
 );
+const generatePasswordResetTokenUseCase =
+	GeneratePasswordResetTokenUseCase.instance(
+		uuidProvider,
+		userRepo,
+		alertRepo,
+		notificationRepo,
+		tokenRepo,
+		notificationService,
+	);
 
 // Controllers
 
@@ -108,7 +119,13 @@ const changePasswordController = ChangePasswordController.instance(
 );
 const refreshTokenController =
 	RefreshTokenController.instance(refreshTokenUseCase);
+const generatePasswordResetTokenController =
+	GeneratePasswordResetTokenController.instance(
+		generatePasswordResetTokenUseCase,
+	);
+
 // Routes
+
 const routes = Router();
 const userRoutes = createUserRoutes(
 	tokenProvider,
@@ -117,6 +134,7 @@ const userRoutes = createUserRoutes(
 	loginController,
 	changePasswordController,
 	refreshTokenController,
+	generatePasswordResetTokenController,
 	userRepo,
 );
 

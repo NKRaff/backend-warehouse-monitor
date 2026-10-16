@@ -1,5 +1,6 @@
 import type { ITokenRepository } from "@application/repositories/token.interface.js";
 import type { Token } from "@domain/entities/token.js";
+import type { TokenType } from "@domain/types/token-type.js";
 import { tokenToDomain, tokenToPersistence } from "../mappers/token.mapper.js";
 import { TokenModel } from "../models/token.model.js";
 
@@ -22,6 +23,19 @@ export class TokenRepository implements ITokenRepository {
 
 	async findByValue(tokenValueHash: string): Promise<Token | null> {
 		const tokenModel = await TokenModel.findOne({ token: tokenValueHash });
+
+		if (tokenModel === null) {
+			return null;
+		}
+
+		return tokenToDomain(tokenModel);
+	}
+
+	async findByUserAndType(
+		userId: string,
+		type: TokenType,
+	): Promise<Token | null> {
+		const tokenModel = await TokenModel.findOne({ userId, type });
 
 		if (tokenModel === null) {
 			return null;

@@ -1,4 +1,5 @@
 import type { ChangePasswordOutputDto } from "@application/dtos/change-password.dto.js";
+import type { GeneratePasswordResetTokenOutputDto } from "@application/dtos/generate-password-reset-token.dto.js";
 import type { LoginOutputDto } from "@application/dtos/login.dto.js";
 import type { RefreshTokenOutputDto } from "@application/dtos/refresh-token.dto.js";
 import type { RegisterUserOutputDto } from "@application/dtos/register-user.dto.js";
@@ -19,6 +20,7 @@ export function createUserRoutes(
 	loginController: IController<LoginOutputDto>,
 	changePasswordController: IController<ChangePasswordOutputDto>,
 	refreshTokenController: IController<RefreshTokenOutputDto>,
+	generatePasswordResetTokenController: IController<GeneratePasswordResetTokenOutputDto>,
 	userRepo: IUserRepository,
 ): Router {
 	const routes = Router();
@@ -67,6 +69,18 @@ export function createUserRoutes(
 					sameSite: env.cookie.sameSite,
 				})
 				.json({ ...result, accessToken: undefined, refreshToken: undefined });
+		} catch (error) {
+			next(error);
+		}
+	});
+
+	routes.post("/generate-password-reset-token", async (req, res, next) => {
+		try {
+			const result = await generatePasswordResetTokenController.handle(
+				req.body,
+				{},
+			);
+			return res.status(200).json(result);
 		} catch (error) {
 			next(error);
 		}

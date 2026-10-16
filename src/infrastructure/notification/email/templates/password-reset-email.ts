@@ -1,4 +1,5 @@
 import type { NotificationMessage } from "@application/types/notification-message.js";
+import { env } from "@infrastructure/config/env.js";
 import { renderBaseEmailLayout } from "../layouts/base-email-layout.js";
 import { renderActionButton } from "../layouts/components/action-button.js";
 import {
@@ -10,7 +11,7 @@ export function renderPasswordResetEmail(
 	notification: NotificationMessage,
 ): string {
 	const name = escapeHtml(notification.recipient.name);
-	const url = notification.metadata?.actionUrl;
+	const url = `${env.app.url}?token=${notification.metadata?.token}`;
 
 	const content = `
 		<h1 style="

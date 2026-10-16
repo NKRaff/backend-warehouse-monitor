@@ -12,4 +12,5 @@ export type NotificationMessage = {
 	severity: AlertSeverity;
 	status: AlertStatus;
 	channels: NotificationChannel[];
+	metadata?: Record<string, unknown> | undefined;
 };

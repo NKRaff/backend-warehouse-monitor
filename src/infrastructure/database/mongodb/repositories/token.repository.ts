@@ -36,4 +36,8 @@ export class TokenRepository implements ITokenRepository {
 			expiresAt,
 		});
 	}
+
+	async deleteById(id: string): Promise<void> {
+		await TokenModel.findByIdAndDelete(id);
+	}
 }

@@ -39,6 +39,6 @@ export class ChangePasswordController
 			throw new UnauthorizedError("Id do usuario não encontrado");
 		}
 		const data = ChangePasswordSchema.parse(input);
-		return await this.useCase.execute({ ...data, actorId: context.actorId });
+		return await this.useCase.execute(data);
 	}
 }

@@ -73,7 +73,7 @@ export function createUserRoutes(
 	});
 
 	routes.patch(
-		"/change-password",
+		"/change-password:token",
 		authorizationMiddleware(
 			tokenProvider,
 			authorizationPolicy,
@@ -81,10 +81,14 @@ export function createUserRoutes(
 		),
 		async (req, res, next) => {
 			try {
-				const actorId = req.user?.id;
-				const result = await changePasswordController.handle(req.body, {
-					actorId,
-				});
+				const token = req.params.token;
+				const result = await changePasswordController.handle(
+					{
+						...req.body,
+						resetToken: token,
+					},
+					{},
+				);
 				return res.status(200).json(result);
 			} catch (error) {
 				next(error);

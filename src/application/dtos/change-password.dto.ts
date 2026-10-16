@@ -1,5 +1,5 @@
 export type ChangePasswordInputDto = {
-	actorId: string;
+	resetToken: string;
 	password: string;
 	confirmPassword: string;
 };

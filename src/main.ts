@@ -90,6 +90,7 @@ const changePasswordUseCase = ChangePasswordUseCase.instance(
 	uuidProvider,
 	userRepo,
 	auditLogRepo,
+	tokenRepo,
 	passwordPolicyService,
 );
 const refreshTokenUseCase = RefreshTokenUseCase.instance(

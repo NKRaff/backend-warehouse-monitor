@@ -123,7 +123,7 @@ export class RegisterUserUseCase
 				status: alert.status,
 				channels: notification.channels,
 				metadata: {
-					token: tokenResetPassword,
+					token: tokenResetPassword.value,
 				},
 			})
 			.catch((error) => {

@@ -4,4 +4,5 @@ export type AlertType =
 	| "measurement_out_of_limits"
 	| "register_user"
 	| "password_setup"
-	| "password_reset";
+	| "password_reset"
+	| "email_verification";

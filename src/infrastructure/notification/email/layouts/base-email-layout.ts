@@ -9,6 +9,7 @@ type BaseEmailLayoutProps = {
 	subtitle?: string | undefined;
 	footerNote?: string | undefined;
 	issuedAt?: Date | undefined;
+	preheader?: string | undefined;
 };
 
 export function renderBaseEmailLayout({
@@ -17,6 +18,7 @@ export function renderBaseEmailLayout({
 	subtitle,
 	footerNote,
 	issuedAt,
+	preheader,
 }: BaseEmailLayoutProps): string {
 	const appName = env.app.name;
 	return `
@@ -38,6 +40,11 @@ export function renderBaseEmailLayout({
 			background-color: #f1f5f9;
 			font-family: Arial, Helvetica, sans-serif;
 		">
+		${
+			preheader
+				? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(preheader)}</div>`
+				: ""
+		}
 			<table
 				role="presentation"
 				width="100%"

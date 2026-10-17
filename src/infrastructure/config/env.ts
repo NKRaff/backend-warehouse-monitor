@@ -58,6 +58,10 @@ export const env = {
 		url: getEnv("APP_URL", "http://localhost:3000/"),
 	},
 
+	frontend: {
+		url: getEnv("FRONTEND_URL", "http://localhost:5173/"),
+	},
+
 	database: {
 		URI: getEnv("DB_URI"),
 	},

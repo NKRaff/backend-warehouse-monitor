@@ -1,60 +1,42 @@
 import type { NotificationMessage } from "@application/types/notification-message.js";
-import { env } from "@infrastructure/config/env.js";
 import { renderBaseEmailLayout } from "../layouts/base-email-layout.js";
 import { renderActionButton } from "../layouts/components/action-button.js";
+import { renderCallout } from "../layouts/components/callout.js";
+import { APP_ROUTES, buildAppUrl } from "../layouts/components/email-links.js";
 import {
-	escapeHtml,
+	renderGreeting,
+	renderHeading,
 	renderParagraphs,
 } from "../layouts/components/html-utils.js";
 
 export function renderPasswordSetupEmail(
 	notification: NotificationMessage,
 ): string {
-	const name = escapeHtml(notification.recipient.name);
-	const url = `${env.app.url}?token=${notification.metadata?.token}`;
+	const token = notification.metadata?.token;
+	const url =
+		typeof token === "string"
+			? buildAppUrl(APP_ROUTES.passwordSetup, { token })
+			: undefined;
 
 	const content = `
-		<h1 style="
-			margin: 0 0 20px;
-			color: #0f172a;
-			font-size: 24px;
-		">
-			Defina sua senha
-		</h1>
-
-		<p>Olá, <strong>${name}</strong>.</p>
-
-		${renderParagraphs(
-			notification.message ||
-				"Use o botão abaixo para definir a senha da sua conta. " +
-					"Este link é válido por 15 minutos.",
-		)}
-
-		${
-			typeof url === "string"
-				? renderActionButton({
-						url,
-						label: "Criar minha senha",
-					})
-				: ""
-		}
-
-		<p style="
-			margin-top: 24px;
-			color: #64748b;
-			font-size: 13px;
-			line-height: 1.6;
-		">
-			Por segurança, não compartilhe este link. Se ele expirar,
-			solicite um novo.
-		</p>
+		${renderHeading("Defina sua senha")}
+		${renderGreeting(notification.recipient.name)}
+		${renderParagraphs(notification.message)}
+		${url ? renderActionButton({ url, label: "Definir minha senha" }) : ""}
+		${renderCallout({
+			tone: "info",
+			content:
+				"Por segurança, o link expira em 15 minutos e não deve ser compartilhado. " +
+				"Se ele expirar, solicite um novo pela opção de recuperação de senha.",
+		})}
 	`;
 
 	return renderBaseEmailLayout({
 		title: notification.title,
-		subtitle: "Configuração de acesso",
+		subtitle: "Ativação de conta",
+		preheader: "Defina sua senha para acessar o Warehouse Monitor.",
 		content,
 		footerNote:
-			"Se você não esperava este convite, entre em contato com o administrador.",
+			"Não esperava este convite? Ignore este e-mail ou fale com o administrador.",
 	});
 }

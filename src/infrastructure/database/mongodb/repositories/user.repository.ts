@@ -53,6 +53,21 @@ export class UserRepository implements IUserRepository {
 		});
 	}
 
+	async updateUser(user: User): Promise<void> {
+		const model = userToPersistence(user);
+		await UserModel.findByIdAndUpdate(user.id, {
+			name: model.name,
+			email: model.email,
+			emailVerified: model.emailVerified,
+		});
+	}
+
+	async updateRole(id: string, role: UserRole): Promise<void> {
+		await UserModel.findByIdAndUpdate(id, {
+			role,
+		});
+	}
+
 	async updatePassword(userId: string, password: string): Promise<void> {
 		await UserModel.findByIdAndUpdate(userId, {
 			password,

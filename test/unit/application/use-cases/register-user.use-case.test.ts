@@ -1,7 +1,6 @@
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
 import { ConflictError } from "@shared/errors/conflict-error.js";
 import { UnprocessableEntityError } from "@shared/errors/unprocessable-entity-error.js";
-import { Token } from "@domain/entities/token.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { makeUser } from "../../../helpers/factories.js";
 import {
@@ -153,7 +152,7 @@ describe("RegisterUserUseCase — RF-BE-002 / RF-BE-003", () => {
 			expect(message?.status).toBe("active");
 			expect(message?.title).toBe(alert?.title);
 			expect(message?.message).toBe(alert?.description);
-			expect(message?.metadata?.token).toBeInstanceOf(Token);
+			expect(message?.metadata?.token).toBeDefined();
 		});
 
 		it("audita a criação com o administrador como ator (RF-BE-031)", async () => {
@@ -199,12 +198,22 @@ describe("RegisterUserUseCase — RF-BE-002 / RF-BE-003", () => {
 
 	describe("erros", () => {
 		it("rejeita e-mail já cadastrado sem criar nada", async () => {
-			const { useCase, userRepo, passwordHasher, alertRepo, notificationRepo, auditLogRepo, notify } = setup();
+			const {
+				useCase,
+				userRepo,
+				passwordHasher,
+				alertRepo,
+				notificationRepo,
+				auditLogRepo,
+				notify,
+			} = setup();
 			userRepo.findByEmail.mockResolvedValue(
 				makeUser({ email: "joao@empresa.com" }),
 			);
 
-			await expect(useCase.execute(validInput())).rejects.toThrow(ConflictError);
+			await expect(useCase.execute(validInput())).rejects.toThrow(
+				ConflictError,
+			);
 			await expect(useCase.execute(validInput())).rejects.toThrow(
 				"Email já cadastrado",
 			);

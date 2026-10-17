@@ -51,3 +51,26 @@ export function getSafeHttpUrl(value: unknown): string | undefined {
 		return undefined;
 	}
 }
+
+export function renderHeading(text: string): string {
+	return `
+		<h1 style="margin: 0 0 20px; color: #0f172a; font-size: 24px; line-height: 1.3;">
+			${escapeHtml(text)}
+		</h1>
+	`;
+}
+
+export function renderGreeting(name: string): string {
+	return `
+		<p style="margin: 0 0 16px; color: #475569; font-size: 15px;">
+			Olá, <strong>${escapeHtml(name)}</strong>.
+		</p>
+	`;
+}
+
+export function formatDateTime(date: Date): string {
+	return new Intl.DateTimeFormat("pt-BR", {
+		dateStyle: "short",
+		timeStyle: "short",
+	}).format(date);
+}

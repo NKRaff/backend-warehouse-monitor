@@ -13,10 +13,10 @@ const baseProps = () => ({
 
 describe("User (Entity)", () => {
 	describe("create()", () => {
-		it("cria o usuário exigindo troca de senha no primeiro acesso (RF-BE-003/004)", () => {
+		it("cria usuário ativo sem estado de senha temporária na entidade", () => {
 			const user = User.create(baseProps());
 
-			expect(user.isDefaultPassword).toBe(true);
+			expect(user).not.toHaveProperty("isDefaultPassword");
 			expect(user.deletedAt).toBeUndefined();
 		});
 
@@ -84,7 +84,6 @@ describe("User (Entity)", () => {
 				User.restore({
 					...baseProps(),
 					name: "<b>Maria</b>",
-					isDefaultPassword: false,
 				}),
 			).toThrow(UnprocessableEntityError);
 		});
@@ -96,17 +95,16 @@ describe("User (Entity)", () => {
 
 			const user = User.restore({
 				...baseProps(),
-				isDefaultPassword: false,
 				deletedAt,
 			});
 
-			expect(user.isDefaultPassword).toBe(false);
+			expect(user).not.toHaveProperty("isDefaultPassword");
 			expect(user.deletedAt).toBe(deletedAt);
 		});
 
 		it("continua validando o tamanho do nome", () => {
 			expect(() =>
-				User.restore({ ...baseProps(), name: "Al", isDefaultPassword: false }),
+				User.restore({ ...baseProps(), name: "Al" }),
 			).toThrow(UnprocessableEntityError);
 		});
 	});

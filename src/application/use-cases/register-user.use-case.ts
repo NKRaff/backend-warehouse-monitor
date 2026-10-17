@@ -8,12 +8,14 @@ import type { IUuidProvider } from "@application/ports/uuid-provider.interface.j
 import type { IAlertRepository } from "@application/repositories/alert.interface.js";
 import type { IAuditLogRepository } from "@application/repositories/audit-log.interface.js";
 import type { INotificationRepository } from "@application/repositories/notification.interface.js";
+import type { ITokenRepository } from "@application/repositories/token.interface.js";
 import type { IUserRepository } from "@application/repositories/user.interface.js";
 import type { NotificationService } from "@application/services/notification.service.js";
 import type { IUseCase } from "@application/use-cases/use-case.interface.js";
 import { Alert } from "@domain/entities/alert.js";
 import { AuditLog } from "@domain/entities/audit-log.js";
 import { Notification } from "@domain/entities/notification.js";
+import { Token } from "@domain/entities/token.js";
 import { User } from "@domain/entities/user.js";
 import { Email } from "@domain/object-values/email.js";
 import { ConflictError } from "@shared/errors/conflict-error.js";
@@ -30,6 +32,7 @@ export class RegisterUserUseCase
 		private alertRepo: IAlertRepository,
 		private notificationRepo: INotificationRepository,
 		private auditLogRepo: IAuditLogRepository,
+		private tokenRepo: ITokenRepository,
 		private notificationService: NotificationService,
 	) {}
 
@@ -40,6 +43,7 @@ export class RegisterUserUseCase
 		alertRepo: IAlertRepository,
 		notificationRepo: INotificationRepository,
 		auditLogRepo: IAuditLogRepository,
+		tokenRepo: ITokenRepository,
 		notificationService: NotificationService,
 	) {
 		if (!RegisterUserUseCase._instance) {
@@ -50,6 +54,7 @@ export class RegisterUserUseCase
 				alertRepo,
 				notificationRepo,
 				auditLogRepo,
+				tokenRepo,
 				notificationService,
 			);
 		}
@@ -82,8 +87,11 @@ export class RegisterUserUseCase
 			id: this.uuidProvider.generate(),
 			type: "register_user",
 			severity: "info",
-			title: "Acesso ao sistema disponibilizado",
-			description: `Sua conta foi criada por um administrador. Você já pode acessar o sistema utilizando as seguintes credenciais:\n\nUsuário: ${user.email.value}\nSenha temporária: ${randomPassword}\n\nPor segurança, altere sua senha no primeiro acesso. Em caso de dúvidas, entre em contato com o administrador do sistema.`,
+			title: "Novo link para definir sua senha",
+			description:
+				"Foi solicitado um novo link para definir a senha da sua conta. " +
+				"Utilize o link enviado para o seu e-mail em até 15 minutos. " +
+				"Os links anteriores deixam de ser válidos.",
 			occurredAt: dateNow,
 		});
 
@@ -98,6 +106,13 @@ export class RegisterUserUseCase
 		await this.alertRepo.save(alert);
 		await this.notificationRepo.save(notification);
 
+		const tokenResetPassword = Token.createPasswordReset(
+			this.uuidProvider.generate(),
+			user.id,
+		);
+
+		await this.tokenRepo.save(tokenResetPassword);
+
 		this.notificationService
 			.notify({
 				recipient: user,
@@ -107,6 +122,9 @@ export class RegisterUserUseCase
 				severity: alert.severity,
 				status: alert.status,
 				channels: notification.channels,
+				metadata: {
+					token: tokenResetPassword,
+				},
 			})
 			.catch((error) => {
 				console.error(

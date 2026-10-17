@@ -2,32 +2,33 @@ import type { SmtpClient } from "@application/ports/smtp-client.interface.js";
 import { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
-import { BootstrapAdminUseCase } from "@application/use-cases/bootstrap-admin.use-case.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
+import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
+import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
-import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
-import { LoginController } from "@presentation/controllers/login.controller.js";
-import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
-import { Router } from "express";
 import { BcryptPasswordHasherAdapter } from "@infrastructure/cryptography/bcrypt-password-hasher.adapter.js";
 import { JwtTokenAdapter } from "@infrastructure/cryptography/jwt-token.adapter.js";
 import { AlertRepository } from "@infrastructure/database/mongodb/repositories/alert.repository.js";
 import { AuditLogRepository } from "@infrastructure/database/mongodb/repositories/audit-log.repository.js";
 import { NotificationRepository } from "@infrastructure/database/mongodb/repositories/notification.repository.js";
+import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { UserRepository } from "@infrastructure/database/mongodb/repositories/user.repository.js";
 import { ExpressApp } from "@infrastructure/http/express/express.app.js";
 import { createUserRoutes } from "@infrastructure/http/express/routes/user.routes.js";
 import { UuidAdapter } from "@infrastructure/identifier/uuid.adapter.js";
-import { EmailChannel } from "@infrastructure/notification/email-channel.js";
+import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
+import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
+import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
+import { LoginController } from "@presentation/controllers/login.controller.js";
+import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
+import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
+import { Router } from "express";
 import { resetSingleton } from "./singleton.js";
 
 /**
- * Composition root de teste: espelha `src/main.ts` (mesma ordem de
- * dependências), mas sem MQTT, Socket.IO, `listen()` ou SMTP real. O SMTP é
- * injetado para os testes poderem inspecionar os e-mails enviados.
- *
- * Mantenha este arquivo em sincronia com `main.ts` ao registrar novas rotas.
+ * Composition root de teste que espelha `src/main.ts`, sem MQTT, Socket.IO,
+ * `listen()` ou SMTP real. O SMTP é injetado para inspecionar os e-mails.
  */
 export function createTestApp(smtp: SmtpClient) {
 	resetSingleton(
@@ -35,42 +36,41 @@ export function createTestApp(smtp: SmtpClient) {
 		AlertRepository,
 		NotificationRepository,
 		AuditLogRepository,
+		TokenRepository,
 		BcryptPasswordHasherAdapter,
 		JwtTokenAdapter,
 		UuidAdapter,
-		EmailChannel,
+		EmailNotificationChannel,
 		PasswordPolicyService,
 		NotificationService,
 		AuthorizationPolicy,
 		RegisterUserUseCase,
-		BootstrapAdminUseCase,
 		LoginUseCase,
 		ChangePasswordUseCase,
+		RefreshTokenUseCase,
+		GeneratePasswordResetTokenUseCase,
 		RegisterUserController,
 		LoginController,
 		ChangePasswordController,
+		RefreshTokenController,
+		GeneratePasswordResetTokenController,
 	);
 
-	// Repositories
 	const userRepo = UserRepository.instance();
 	const alertRepo = AlertRepository.instance();
 	const notificationRepo = NotificationRepository.instance();
 	const auditLogRepo = AuditLogRepository.instance();
+	const tokenRepo = TokenRepository.instance();
 
-	// Adapters
 	const passwordHasher = BcryptPasswordHasherAdapter.instance();
 	const tokenProvider = JwtTokenAdapter.instance();
 	const uuidProvider = UuidAdapter.instance();
 
-	// Notification
-	const emailChannel = EmailChannel.instance(smtp);
-
-	// Services
+	const emailChannel = EmailNotificationChannel.instance(smtp);
 	const passwordPolicyService = PasswordPolicyService.instance();
 	const notificationService = NotificationService.instance([emailChannel]);
 	const authorizationPolicy = AuthorizationPolicy.instance(userRepo);
 
-	// Use cases
 	const registerUserUseCase = RegisterUserUseCase.instance(
 		uuidProvider,
 		passwordHasher,
@@ -78,15 +78,7 @@ export function createTestApp(smtp: SmtpClient) {
 		alertRepo,
 		notificationRepo,
 		auditLogRepo,
-		notificationService,
-	);
-	const bootstrapAdminUseCase = BootstrapAdminUseCase.instance(
-		uuidProvider,
-		passwordHasher,
-		userRepo,
-		alertRepo,
-		notificationRepo,
-		auditLogRepo,
+		tokenRepo,
 		notificationService,
 	);
 	const loginUseCase = LoginUseCase.instance(
@@ -95,24 +87,45 @@ export function createTestApp(smtp: SmtpClient) {
 		uuidProvider,
 		userRepo,
 		auditLogRepo,
+		tokenRepo,
 	);
 	const changePasswordUseCase = ChangePasswordUseCase.instance(
 		passwordHasher,
 		uuidProvider,
 		userRepo,
 		auditLogRepo,
+		tokenRepo,
 		passwordPolicyService,
 	);
+	const refreshTokenUseCase = RefreshTokenUseCase.instance(
+		tokenProvider,
+		tokenRepo,
+	);
+	const generatePasswordResetTokenUseCase =
+		GeneratePasswordResetTokenUseCase.instance(
+			uuidProvider,
+			userRepo,
+			alertRepo,
+			notificationRepo,
+			tokenRepo,
+			notificationService,
+		);
 
-	// Controllers
-	const registerUserController =
-		RegisterUserController.instance(registerUserUseCase);
+	const registerUserController = RegisterUserController.instance(
+		registerUserUseCase,
+	);
 	const loginController = LoginController.instance(loginUseCase);
 	const changePasswordController = ChangePasswordController.instance(
 		changePasswordUseCase,
 	);
+	const refreshTokenController = RefreshTokenController.instance(
+		refreshTokenUseCase,
+	);
+	const generatePasswordResetTokenController =
+		GeneratePasswordResetTokenController.instance(
+			generatePasswordResetTokenUseCase,
+		);
 
-	// Routes
 	const routes = Router();
 	routes.use(
 		"/user",
@@ -122,6 +135,8 @@ export function createTestApp(smtp: SmtpClient) {
 			registerUserController,
 			loginController,
 			changePasswordController,
+			refreshTokenController,
+			generatePasswordResetTokenController,
 			userRepo,
 		),
 	);
@@ -130,7 +145,5 @@ export function createTestApp(smtp: SmtpClient) {
 		app: ExpressApp.instance(routes),
 		passwordHasher,
 		tokenProvider,
-		/** Mesmo caso de uso que o `main.ts` executa na inicialização. */
-		bootstrapAdmin: bootstrapAdminUseCase,
 	};
 }

@@ -6,8 +6,10 @@ import type { IPasswordHasher } from "@application/ports/password-hasher.interfa
 import type { ITokenProvider } from "@application/ports/token-provider.interface.js";
 import type { IUuidProvider } from "@application/ports/uuid-provider.interface.js";
 import type { IAuditLogRepository } from "@application/repositories/audit-log.interface.js";
+import type { ITokenRepository } from "@application/repositories/token.interface.js";
 import type { IUserRepository } from "@application/repositories/user.interface.js";
 import { AuditLog } from "@domain/entities/audit-log.js";
+import { Token } from "@domain/entities/token.js";
 import { ForbiddenError } from "@shared/errors/forbidden-error.js";
 import { UnprocessableEntityError } from "@shared/errors/unprocessable-entity-error.js";
 import type { IUseCase } from "./use-case.interface.js";
@@ -21,6 +23,7 @@ export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
 		private readonly uuidProvider: IUuidProvider,
 		private readonly userRepo: IUserRepository,
 		private readonly auditLogRepo: IAuditLogRepository,
+		private readonly tokenRepo: ITokenRepository,
 	) {}
 
 	static instance(
@@ -29,6 +32,7 @@ export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
 		uuidProvider: IUuidProvider,
 		userRepo: IUserRepository,
 		auditLogRepo: IAuditLogRepository,
+		tokenRepo: ITokenRepository,
 	): LoginUseCase {
 		if (!LoginUseCase._instance) {
 			LoginUseCase._instance = new LoginUseCase(
@@ -37,6 +41,7 @@ export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
 				uuidProvider,
 				userRepo,
 				auditLogRepo,
+				tokenRepo,
 			);
 		}
 		return LoginUseCase._instance;
@@ -63,6 +68,15 @@ export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
 		}
 
 		const accessToken = this.tokenProvider.sign({ sub: user.id });
+		const refreshTokenHash = Token.createRefreshToken(
+			this.uuidProvider.generate(),
+			user.id,
+		);
+
+		const refreshToken = refreshTokenHash.value;
+		refreshTokenHash.value = refreshTokenHash.hash();
+
+		await this.tokenRepo.save(refreshTokenHash);
 
 		const auditLog = AuditLog.create({
 			id: this.uuidProvider.generate(),
@@ -87,7 +101,7 @@ export class LoginUseCase implements IUseCase<LoginInputDto, LoginOutputDto> {
 				role: user.role,
 			},
 			accessToken,
-			requiresPasswordChange: user.isDefaultPassword,
+			refreshToken,
 		};
 	}
 }

@@ -2,6 +2,7 @@ import { env } from "@infrastructure/config/env.js";
 import { AlertModel } from "@infrastructure/database/mongodb/models/alert.model.js";
 import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
 import { NotificationModel } from "@infrastructure/database/mongodb/models/notification.model.js";
+import { TokenModel } from "@infrastructure/database/mongodb/models/token.model.js";
 import { UserModel } from "@infrastructure/database/mongodb/models/user.model.js";
 import type { Express } from "express";
 import jwt from "jsonwebtoken";
@@ -17,7 +18,6 @@ import {
 	vi,
 } from "vitest";
 import {
-	extractTemporaryPassword,
 	FakeSmtpClient,
 } from "../../helpers/fake-smtp.js";
 import {
@@ -31,7 +31,8 @@ import { createTestApp } from "../../helpers/test-app.js";
 
 const LOGIN = "/api/user/login";
 const REGISTER = "/api/user/register";
-const CHANGE_PASSWORD = "/api/user/change-password";
+const RESET_PASSWORD = "/api/user/change-password";
+const GENERATE_RESET_TOKEN = "/api/user/generate-password-reset-token";
 
 const smtp = new FakeSmtpClient();
 let app: Express;
@@ -93,7 +94,6 @@ describe("POST /api/user/login — RF-BE-001", () => {
 				role: "manager",
 				email: { value: user.email.value, isVerified: false },
 			},
-			requiresPasswordChange: false,
 		});
 		expect(res.body.accessToken).toBeUndefined();
 		expect(res.body.user).not.toHaveProperty("password");
@@ -117,7 +117,7 @@ describe("POST /api/user/login — RF-BE-001", () => {
 		expect(payload.exp).toBeDefined();
 	});
 
-	it("informa requiresPasswordChange quando o usuário ainda usa a senha temporária", async () => {
+	it("não informa estado de senha temporária, que não faz parte da resposta atual", async () => {
 		const { user, password } = await seedUser({ isDefaultPassword: true });
 
 		const res = await request(app)
@@ -125,7 +125,7 @@ describe("POST /api/user/login — RF-BE-001", () => {
 			.send({ email: user.email.value, password });
 
 		expect(res.status).toBe(200);
-		expect(res.body.requiresPasswordChange).toBe(true);
+		expect(res.body).not.toHaveProperty("requiresPasswordChange");
 	});
 
 	it("não diferencia maiúsculas/minúsculas no e-mail", async () => {
@@ -278,7 +278,7 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 			},
 		);
 
-		it("administrador ainda com senha temporária precisa trocá-la antes => 403", async () => {
+		it("não bloqueia administrador pelo estado de senha armazenado fora da entidade", async () => {
 			const { user, password } = await seedUser({
 				role: "administrator",
 				isDefaultPassword: true,
@@ -287,8 +287,10 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 
 			const res = await agent.post(REGISTER).send(validNewUser);
 
-			expect(res.status).toBe(403);
-			expect(res.body.mensagem).toMatch(/alterar sua senha/);
+			expect(res.status).toBe(201);
+			expect(
+				await UserModel.countDocuments({ email: validNewUser.email }),
+			).toBe(1);
 		});
 
 		it("administrador removido (soft delete) com token ainda válido => 403", async () => {
@@ -333,22 +335,19 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 			expect(stored?.password).toMatch(/^\$2[aby]\$/);
 		});
 
-		it("envia por e-mail a senha temporária que corresponde ao hash armazenado", async () => {
+		it("envia aviso de definição de senha sem incluir a senha em texto puro", async () => {
 			const { agent } = await adminSession();
 
 			await agent.post(REGISTER).send(validNewUser);
 
 			await vi.waitFor(() => expect(smtp.outbox).toHaveLength(1));
 			const mail = smtp.lastMail();
-			const temporaryPassword = extractTemporaryPassword(mail);
 			const stored = await UserModel.findOne({ email: "carlos@empresa.com" });
 			expect(mail?.to).toBe("carlos@empresa.com");
-			expect(mail?.subject).toBe("Acesso ao sistema disponibilizado");
-			expect(mail?.html).toContain("Bem-vindo ao Sistema");
-			expect(temporaryPassword).toBeTruthy();
-			await expect(
-				passwordHasher.compare(temporaryPassword ?? "", stored?.password ?? ""),
-			).resolves.toBe(true);
+			expect(mail?.subject).toBe("Novo link para definir sua senha");
+			expect(mail?.html).toContain("Foi solicitado um novo link");
+			expect(mail?.html).not.toContain("Senha temporária:");
+			expect(stored?.password).toMatch(/^\$2[aby]\$/);
 		});
 
 		it("registra alerta, notificação e auditoria da criação", async () => {
@@ -382,18 +381,17 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 			expect(res.body.user.email.value).toBe("carlos@empresa.com");
 		});
 
-		it("a senha temporária enviada por e-mail é digitável e autentica o novo usuário", async () => {
+		it("não devolve flag de senha temporária no login após cadastro", async () => {
 			const { agent } = await adminSession();
 			await agent.post(REGISTER).send(validNewUser).expect(201);
 			await vi.waitFor(() => expect(smtp.outbox).toHaveLength(1));
-			const temporaryPassword = extractTemporaryPassword(smtp.lastMail());
-
-			expect(temporaryPassword).toMatch(/^[\x21-\x7e]{8,}$/);
-			const res = await request(app)
-				.post(LOGIN)
-				.send({ email: validNewUser.email, password: temporaryPassword });
-			expect(res.status).toBe(200);
-			expect(res.body.requiresPasswordChange).toBe(true);
+			expect(smtp.lastMail()?.html).not.toContain("Senha temporária:");
+			const res = await request(app).post(LOGIN).send({
+				email: validNewUser.email,
+				password: "senha-desconhecida",
+			});
+			expect(res.status).toBe(422);
+			expect(res.body).not.toHaveProperty("requiresPasswordChange");
 		});
 
 		it("aceita nomes com acentos", async () => {
@@ -491,105 +489,132 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 	});
 });
 
-describe("PATCH /api/user/change-password — RF-BE-004", () => {
+describe("RF-BE-005 — redefinição de senha por token", () => {
 	const strong = {
 		password: "NovaSenha@456",
 		confirmPassword: "NovaSenha@456",
 	};
 
-	it("sem cookie => 401", async () => {
-		const res = await request(app).patch(CHANGE_PASSWORD).send(strong);
+	function requestReset(email: string) {
+		return request(app).post(GENERATE_RESET_TOKEN).send({ email });
+	}
 
-		expect(res.status).toBe(401);
-	});
+	async function latestResetToken() {
+		await vi.waitFor(() => expect(smtp.outbox).toHaveLength(1));
+		const html = smtp.lastMail()?.html ?? "";
+		const token = /[?&amp;]token=([a-f0-9]{64})/.exec(html)?.[1];
+		expect(token).toBeDefined();
+		return token as string;
+	}
 
-	it("usuário com senha temporária define a definitiva (rota liberada para ele)", async () => {
-		const { user, password } = await seedUser({
-			role: "operator",
-			isDefaultPassword: true,
-		});
-		const { agent } = await loginAs(user.email.value, password);
+	it("solicita redefinição sem sessão, envia o link e consome o token ao trocar a senha", async () => {
+		const { user } = await seedUser({ role: "operator" });
 
-		const res = await agent.patch(CHANGE_PASSWORD).send(strong);
+		const requestResponse = await requestReset(user.email.value.toUpperCase());
 
-		expect(res.status).toBe(200);
-		expect(res.body).toEqual({ message: "Nova senha definida com sucesso" });
-		const stored = await UserModel.findById(user.id);
-		expect(stored?.isDefaultPassword).toBe(false);
+		expect(requestResponse.status).toBe(200);
+		expect(requestResponse.body.message).toBe(
+			"Token de redefinição de senha enviado por email",
+		);
+		const plainToken = await latestResetToken();
+		const storedToken = await TokenModel.findOne({ userId: user.id });
+		expect(storedToken?.valueHash).not.toBe(plainToken);
+		expect(storedToken?.type).toBe("password_reset");
+
+		const result = await request(app)
+			.patch(`${RESET_PASSWORD}/${plainToken}`)
+			.send(strong);
+
+		expect(result.status).toBe(200);
+		expect(result.body).toEqual({ message: "Nova senha definida com sucesso" });
+		const updatedUser = await UserModel.findById(user.id);
 		await expect(
-			passwordHasher.compare(strong.password, stored?.password ?? ""),
+			passwordHasher.compare(strong.password, updatedUser?.password ?? ""),
 		).resolves.toBe(true);
-	});
-
-	it("depois da troca, só a nova senha autentica", async () => {
-		const { user, password } = await seedUser({ isDefaultPassword: true });
-		const { agent } = await loginAs(user.email.value, password);
-		await agent.patch(CHANGE_PASSWORD).send(strong).expect(200);
-
-		const withOld = await request(app)
-			.post(LOGIN)
-			.send({ email: user.email.value, password });
-		const withNew = await request(app)
-			.post(LOGIN)
-			.send({ email: user.email.value, password: strong.password });
-
-		expect(withOld.status).toBe(422);
-		expect(withNew.status).toBe(200);
-		expect(withNew.body.requiresPasswordChange).toBe(false);
-	});
-
-	it("registra a troca na auditoria", async () => {
-		const { user, password } = await seedUser();
-		const { agent } = await loginAs(user.email.value, password);
-
-		await agent.patch(CHANGE_PASSWORD).send(strong);
-
+		expect(await TokenModel.countDocuments({ userId: user.id })).toBe(0);
 		const log = await AuditLogModel.findOne({ action: "change_password" });
 		expect(log?.actorId).toBe(user.id);
 	});
 
-	it("senha que não atende à política => 422 listando os critérios, sem alterar nada", async () => {
-		const { user, password } = await seedUser({ isDefaultPassword: true });
-		const { agent } = await loginAs(user.email.value, password);
+	it("uma nova solicitação invalida o link anterior e mantém apenas o mais recente", async () => {
+		const { user } = await seedUser();
+		expect((await requestReset(user.email.value)).status).toBe(200);
+		const firstToken = await latestResetToken();
+		smtp.reset();
 
-		const res = await agent
-			.patch(CHANGE_PASSWORD)
-			.send({ password: "abc", confirmPassword: "abc" });
+		expect((await requestReset(user.email.value)).status).toBe(200);
+		const newestToken = await latestResetToken();
+		expect(newestToken).not.toBe(firstToken);
+		expect(await TokenModel.countDocuments({ userId: user.id })).toBe(1);
 
-		expect(res.status).toBe(422);
-		expect(res.body.mensagem).toMatch(/Senha invalida/);
-		expect(res.body.mensagem).toMatch(/8 caracteres/);
-		const stored = await UserModel.findById(user.id);
-		expect(stored?.isDefaultPassword).toBe(true);
+		const oldLink = await request(app)
+			.patch(`${RESET_PASSWORD}/${firstToken}`)
+			.send(strong);
+		expect(oldLink.status).toBe(404);
+
+		const latestLink = await request(app)
+			.patch(`${RESET_PASSWORD}/${newestToken}`)
+			.send(strong);
+		expect(latestLink.status).toBe(200);
+	});
+
+	it("rejeita token expirado sem trocar a senha nem consumir o token", async () => {
+		const { user, password } = await seedUser();
+		expect((await requestReset(user.email.value)).status).toBe(200);
+		const plainToken = await latestResetToken();
+		await TokenModel.updateOne(
+			{ userId: user.id },
+			{ expiresAt: new Date(Date.now() - 1) },
+		);
+
+		const response = await request(app)
+			.patch(`${RESET_PASSWORD}/${plainToken}`)
+			.send(strong);
+
+		expect(response.status).toBe(401);
+		expect(await TokenModel.countDocuments({ userId: user.id })).toBe(1);
+		const unchanged = await UserModel.findById(user.id);
 		await expect(
-			passwordHasher.compare(password, stored?.password ?? ""),
+			passwordHasher.compare(password, unchanged?.password ?? ""),
 		).resolves.toBe(true);
 	});
 
-	it("confirmação diferente da senha => 422", async () => {
+	it("senha fraca não altera a senha nem consome o token", async () => {
 		const { user, password } = await seedUser();
-		const { agent } = await loginAs(user.email.value, password);
+		expect((await requestReset(user.email.value)).status).toBe(200);
+		const plainToken = await latestResetToken();
 
-		const res = await agent
-			.patch(CHANGE_PASSWORD)
-			.send({ password: "NovaSenha@456", confirmPassword: "Outra@4567" });
+		const response = await request(app)
+			.patch(`${RESET_PASSWORD}/${plainToken}`)
+			.send({ password: "abc", confirmPassword: "abc" });
 
-		expect(res.status).toBe(422);
-		expect(res.body.mensagem).toMatch(/não coincidem/);
+		expect(response.status).toBe(422);
+		expect(response.body.mensagem).toMatch(/Senha invalida/);
+		expect(await TokenModel.countDocuments({ userId: user.id })).toBe(1);
+		const unchanged = await UserModel.findById(user.id);
+		await expect(
+			passwordHasher.compare(password, unchanged?.password ?? ""),
+		).resolves.toBe(true);
 	});
 
-	it("corpo incompleto => 400", async () => {
-		const { user, password } = await seedUser();
-		const { agent } = await loginAs(user.email.value, password);
+	it("e-mail não cadastrado retorna o 404 atual sem criar token", async () => {
+		const response = await requestReset("inexistente@empresa.com");
 
-		const res = await agent
-			.patch(CHANGE_PASSWORD)
-			.send({ password: "NovaSenha@456" });
+		expect(response.status).toBe(404);
+		expect(await TokenModel.countDocuments()).toBe(0);
+		expect(smtp.outbox).toHaveLength(0);
+	});
 
-		expect(res.status).toBe(400);
-		expect(res.body.erros).toEqual([
-			expect.objectContaining({ campo: "confirmPassword" }),
+	it("corpo inválido para solicitação retorna 400 sem criar token", async () => {
+		const response = await request(app)
+			.post(GENERATE_RESET_TOKEN)
+			.send({ email: "inválido" });
+
+		expect(response.status).toBe(400);
+		expect(response.body.erros).toEqual([
+			expect.objectContaining({ campo: "email" }),
 		]);
+		expect(await TokenModel.countDocuments()).toBe(0);
 	});
 });
 

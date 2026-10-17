@@ -7,6 +7,7 @@ import {
 	createAuditLogRepoMock,
 	createPasswordHasherMock,
 	createTokenProviderMock,
+	createTokenRepoMock,
 	createUserRepoMock,
 	createUuidProviderMock,
 } from "../../../helpers/mocks.js";
@@ -20,6 +21,7 @@ function setup() {
 	const uuidProvider = createUuidProviderMock();
 	const userRepo = createUserRepoMock();
 	const auditLogRepo = createAuditLogRepoMock();
+	const tokenRepo = createTokenRepoMock();
 
 	const useCase = LoginUseCase.instance(
 		passwordHasher,
@@ -27,19 +29,19 @@ function setup() {
 		uuidProvider,
 		userRepo,
 		auditLogRepo,
+		tokenRepo,
 	);
 
-	return { useCase, passwordHasher, tokenProvider, userRepo, auditLogRepo };
+	return { useCase, passwordHasher, tokenProvider, userRepo, auditLogRepo, tokenRepo };
 }
 
 describe("LoginUseCase — RF-BE-001", () => {
 	describe("credenciais válidas", () => {
-		it("autentica e devolve token, dados públicos do usuário e a flag de troca de senha", async () => {
-			const { useCase, userRepo, passwordHasher, tokenProvider } = setup();
+		it("autentica, devolve tokens e dados públicos sem expor o hash", async () => {
+			const { useCase, userRepo, passwordHasher, tokenProvider, tokenRepo } = setup();
 			const user = makeUser({
 				id: "user-7",
 				role: "manager",
-				isDefaultPassword: true,
 			});
 			userRepo.findByEmail.mockResolvedValue(user);
 
@@ -62,22 +64,24 @@ describe("LoginUseCase — RF-BE-001", () => {
 					role: "manager",
 				},
 				accessToken: "token-for-user-7",
-				requiresPasswordChange: true,
+				refreshToken: expect.any(String),
 			});
+			const savedToken = tokenRepo.save.mock.calls[0]?.[0];
+			expect(savedToken?.type).toBe("refresh");
+			expect(savedToken?.value).not.toBe(result.refreshToken);
+			expect(savedToken?.verify(result.refreshToken)).toBe(true);
 		});
 
-		it("informa que não precisa trocar a senha quando já usa a definitiva", async () => {
+		it("não inclui estado de troca de senha ausente no contrato atual", async () => {
 			const { useCase, userRepo } = setup();
-			userRepo.findByEmail.mockResolvedValue(
-				makeUser({ isDefaultPassword: false }),
-			);
+			userRepo.findByEmail.mockResolvedValue(makeUser());
 
 			const result = await useCase.execute({
 				email: "maria@empresa.com",
 				password: "Senha@123",
 			});
 
-			expect(result.requiresPasswordChange).toBe(false);
+			expect(result).not.toHaveProperty("requiresPasswordChange");
 		});
 
 		it("normaliza o e-mail (trim + minúsculas) antes de buscar", async () => {
@@ -178,6 +182,7 @@ describe("LoginUseCase — RF-BE-001", () => {
 			createUuidProviderMock(),
 			createUserRepoMock(),
 			createAuditLogRepoMock(),
+			createTokenRepoMock(),
 		);
 
 		expect(again).toBe(useCase);

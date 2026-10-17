@@ -1,12 +1,17 @@
 import { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
-import { BootstrapAdminUseCase } from "@application/use-cases/bootstrap-admin.use-case.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
+import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
+import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
+import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
+import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
+import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
+import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
 import "dotenv/config";
 import { Router } from "express";
@@ -25,7 +30,6 @@ import { MqttAdapter } from "./infrastructure/messaging/mqtt/mqtt.adapter.js";
 import { NodemailerAdapter } from "./infrastructure/messaging/smtp/nodemailer.adapter.js";
 import { WarehouseHandle } from "./infrastructure/messaging/websocket/handle/warehouse.handle.js";
 import { SocketIO } from "./infrastructure/messaging/websocket/socket-io-adapter.js";
-import { EmailChannel } from "./infrastructure/notification/email-channel.js";
 
 // Database
 
@@ -45,6 +49,7 @@ const userRepo = UserRepository.instance();
 const alertRepo = AlertRepository.instance();
 const notificationRepo = NotificationRepository.instance();
 const auditLogRepo = AuditLogRepository.instance();
+const tokenRepo = TokenRepository.instance();
 
 // Adapters
 
@@ -54,7 +59,7 @@ const uuidProvider = UuidAdapter.instance();
 
 // Notification
 
-const emailChannel = EmailChannel.instance(clientSmtp);
+const emailChannel = EmailNotificationChannel.instance(clientSmtp);
 
 // Services
 
@@ -71,15 +76,7 @@ const registerUserUseCase = RegisterUserUseCase.instance(
 	alertRepo,
 	notificationRepo,
 	auditLogRepo,
-	notificationService,
-);
-const bootstrapAdmin = BootstrapAdminUseCase.instance(
-	uuidProvider,
-	passwordHasher,
-	userRepo,
-	alertRepo,
-	notificationRepo,
-	auditLogRepo,
+	tokenRepo,
 	notificationService,
 );
 const loginUseCase = LoginUseCase.instance(
@@ -88,14 +85,29 @@ const loginUseCase = LoginUseCase.instance(
 	uuidProvider,
 	userRepo,
 	auditLogRepo,
+	tokenRepo,
 );
 const changePasswordUseCase = ChangePasswordUseCase.instance(
 	passwordHasher,
 	uuidProvider,
 	userRepo,
 	auditLogRepo,
+	tokenRepo,
 	passwordPolicyService,
 );
+const refreshTokenUseCase = RefreshTokenUseCase.instance(
+	tokenProvider,
+	tokenRepo,
+);
+const generatePasswordResetTokenUseCase =
+	GeneratePasswordResetTokenUseCase.instance(
+		uuidProvider,
+		userRepo,
+		alertRepo,
+		notificationRepo,
+		tokenRepo,
+		notificationService,
+	);
 
 // Controllers
 
@@ -105,7 +117,15 @@ const loginController = LoginController.instance(loginUseCase);
 const changePasswordController = ChangePasswordController.instance(
 	changePasswordUseCase,
 );
+const refreshTokenController =
+	RefreshTokenController.instance(refreshTokenUseCase);
+const generatePasswordResetTokenController =
+	GeneratePasswordResetTokenController.instance(
+		generatePasswordResetTokenUseCase,
+	);
+
 // Routes
+
 const routes = Router();
 const userRoutes = createUserRoutes(
 	tokenProvider,
@@ -113,6 +133,8 @@ const userRoutes = createUserRoutes(
 	registerUserController,
 	loginController,
 	changePasswordController,
+	refreshTokenController,
+	generatePasswordResetTokenController,
 	userRepo,
 );
 
@@ -131,7 +153,14 @@ httpServer.connect();
 const socketServer = SocketIO.instance(httpServer.server());
 socketServer.connect([warehouseHandler]);
 
-// Bootstrap
-try {
-	bootstrapAdmin.execute({ name: "teste", email: "teste@email.com" });
-} catch {}
+// Bootstrap admin
+
+const admin = await userRepo.findByRole("administrator");
+if (admin.length === 0) {
+	registerUserUseCase.execute({
+		actorId: "system",
+		name: "teste",
+		email: "teste@email.com",
+		role: "administrator",
+	});
+}

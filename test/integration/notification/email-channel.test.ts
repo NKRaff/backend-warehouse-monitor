@@ -1,17 +1,17 @@
-import { EmailChannel } from "@infrastructure/notification/email-channel.js";
+import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { beforeEach, describe, expect, it } from "vitest";
 import { makeNotificationMessage, makeUser } from "../../helpers/factories.js";
 import { FakeSmtpClient } from "../../helpers/fake-smtp.js";
 import { resetSingleton } from "../../helpers/singleton.js";
 
-describe("EmailChannel + templates de e-mail — RF-BE-003 / RF-BE-025", () => {
+describe("EmailNotificationChannel + templates de e-mail — RF-BE-003 / RF-BE-005 / RF-BE-025", () => {
 	const smtp = new FakeSmtpClient();
-	let channel: EmailChannel;
+	let channel: EmailNotificationChannel;
 
 	beforeEach(() => {
 		smtp.reset();
-		resetSingleton(EmailChannel);
-		channel = EmailChannel.instance(smtp);
+		resetSingleton(EmailNotificationChannel);
+		channel = EmailNotificationChannel.instance(smtp);
 	});
 
 	it("identifica-se como canal 'email'", () => {
@@ -31,7 +31,7 @@ describe("EmailChannel + templates de e-mail — RF-BE-003 / RF-BE-025", () => {
 				}),
 			});
 
-		it("envia ao destinatário com assunto e versão em texto puro", async () => {
+		it("envia ao destinatário com assunto e corpo HTML", async () => {
 			const message = welcome();
 
 			await channel.send(message);
@@ -40,19 +40,36 @@ describe("EmailChannel + templates de e-mail — RF-BE-003 / RF-BE-025", () => {
 			expect(smtp.outbox).toHaveLength(1);
 			expect(mail?.to).toBe("carlos@empresa.com");
 			expect(mail?.subject).toBe("Acesso ao sistema disponibilizado");
-			expect(mail?.text).toBe(message.message);
+			expect(mail?.html).toContain("Primeiro parágrafo.");
+			expect(mail?.html).toContain("Segunda linha<br>continua aqui.");
 		});
 
-		it("usa o template de boas-vindas, com o nome do usuário e parágrafos", async () => {
+		it("usa o template genérico, com o nome do usuário e parágrafos", async () => {
 			await channel.send(welcome());
 
 			const html = smtp.lastMail()?.html ?? "";
-			expect(html).toContain("Bem-vindo ao Sistema");
+			expect(html).toContain("Acesso ao sistema disponibilizado");
 			expect(html).toContain("<strong>Carlos Operador</strong>");
 			expect(html).toContain("Primeiro parágrafo.</p>");
 			expect(html).toContain("Segunda linha<br>continua aqui.</p>");
 			expect(html).not.toContain("Tipo de Alerta");
 		});
+	});
+
+	it("inclui no e-mail de redefinição um link com o token recebido", async () => {
+		const plainToken = "a".repeat(64);
+		await channel.send(
+			makeNotificationMessage({
+				type: "password_reset",
+				title: "Link para recuperar o acesso à sua conta",
+				message: "Utilize o link em até 15 minutos.",
+				metadata: { token: plainToken },
+			}),
+		);
+
+		const html = smtp.lastMail()?.html ?? "";
+		expect(html).toContain("Redefinição de senha");
+		expect(html).toContain(`?token=${plainToken}`);
 	});
 
 	describe("mensagem de alerta (demais tipos)", () => {
@@ -67,37 +84,39 @@ describe("EmailChannel + templates de e-mail — RF-BE-003 / RF-BE-025", () => {
 			);
 
 			const html = smtp.lastMail()?.html ?? "";
-			expect(html).toContain("Alerta Crítico");
-			expect(html).toContain("Medição Fora dos Limites");
-			expect(html).toContain("ATIVO");
-			expect(html).toContain("Tipo de Alerta");
+			expect(html).toContain("Crítico");
+			expect(html).toContain("Temperatura acima do limite");
+			expect(html).not.toContain("Tipo de Alerta");
 		});
 
 		it.each([
-			["critical", "Alerta Crítico"],
-			["warning", "Atenção / Warning"],
-			["info", "Informação do Sistema"],
+			["critical", "Crítico"],
+			["warning", "Atenção"],
+			["info", "Notificação"],
 		] as const)("severidade %s exibe '%s'", async (severity, label) => {
 			await channel.send(makeNotificationMessage({ severity }));
 
 			expect(smtp.lastMail()?.html).toContain(label);
 		});
 
-		it.each([
-			["device_offline", "Dispositivo Offline"],
-			["device_error", "Erro no Dispositivo IoT"],
-		] as const)("tipo %s exibe '%s'", async (type, label) => {
-			await channel.send(makeNotificationMessage({ type }));
+		it.each(["device_offline", "device_error"] as const)(
+			"tipo %s mantém título e mensagem na notificação de alerta",
+			async (type) => {
+				await channel.send(
+					makeNotificationMessage({ type, title: "Falha do sensor" }),
+				);
 
-			expect(smtp.lastMail()?.html).toContain(label);
-		});
+				expect(smtp.lastMail()?.html).toContain("Falha do sensor");
+				expect(smtp.lastMail()?.html).toContain("Mensagem da notificação");
+			},
+		);
 
 		it("alerta resolvido exibe o selo RESOLVIDO", async () => {
 			await channel.send(makeNotificationMessage({ status: "resolved" }));
 
 			const html = smtp.lastMail()?.html ?? "";
-			expect(html).toContain("RESOLVIDO");
-			expect(html).not.toContain(">ATIVO<");
+			expect(html).not.toContain("RESOLVIDO");
+			expect(html).not.toContain("ATIVO");
 		});
 	});
 

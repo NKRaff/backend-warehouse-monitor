@@ -62,7 +62,7 @@ describe("RegisterUserController", () => {
 		return { useCase, controller: RegisterUserController.instance(useCase) };
 	}
 
-	it("valida o corpo e delega ao use case com o ator do contexto", async () => {
+		it("valida o token e as senhas e delega ao use case", async () => {
 		const { useCase, controller } = setup();
 
 		const result = await controller.handle(body, { actorId: "admin-1" });
@@ -184,40 +184,38 @@ describe("ChangePasswordController", () => {
 		return { useCase, controller: ChangePasswordController.instance(useCase) };
 	}
 
-	it("valida o corpo e delega ao use case com o ator do contexto", async () => {
+	it("valida o corpo e delega ao use case sem sessão de usuário", async () => {
 		const { useCase, controller } = setup();
 
 		const result = await controller.handle(
-			{ password: "Nova@1234", confirmPassword: "Nova@1234" },
-			{ actorId: "user-1" },
+			{
+				resetToken: "token-1",
+				password: "Nova@1234",
+				confirmPassword: "Nova@1234",
+			},
+			{},
 		);
 
 		expect(useCase.execute).toHaveBeenCalledExactlyOnceWith({
+			resetToken: "token-1",
 			password: "Nova@1234",
 			confirmPassword: "Nova@1234",
-			actorId: "user-1",
 		});
 		expect(result).toBe(output);
-	});
-
-	it("rejeita (401) quando não há ator autenticado", async () => {
-		const { useCase, controller } = setup();
-
-		await expect(
-			controller.handle({ password: "a", confirmPassword: "a" }, {}),
-		).rejects.toThrow(UnauthorizedError);
-
-		expect(useCase.execute).not.toHaveBeenCalled();
 	});
 
 	it("rejeita corpo com campos que não são string", async () => {
 		const { useCase, controller } = setup();
 
 		const messages = await validationMessages(
-			controller.handle({ password: 1, confirmPassword: null }, { actorId: "user-1" }),
+			controller.handle(
+				{ resetToken: 1, password: 1, confirmPassword: null },
+				{},
+			),
 		);
 
 		expect(messages).toEqual({
+			resetToken: "O reset token deve ser uma string",
 			password: "A senha deve ser uma string",
 			confirmPassword: "A confirmação da senha deve ser uma string",
 		});

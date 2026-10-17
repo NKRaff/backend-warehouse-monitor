@@ -11,10 +11,13 @@ import { AlertModel } from "@infrastructure/database/mongodb/models/alert.model.
 import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
 import { NotificationModel } from "@infrastructure/database/mongodb/models/notification.model.js";
 import { UserModel } from "@infrastructure/database/mongodb/models/user.model.js";
+import { TokenModel } from "@infrastructure/database/mongodb/models/token.model.js";
 import { AlertRepository } from "@infrastructure/database/mongodb/repositories/alert.repository.js";
 import { AuditLogRepository } from "@infrastructure/database/mongodb/repositories/audit-log.repository.js";
 import { NotificationRepository } from "@infrastructure/database/mongodb/repositories/notification.repository.js";
 import { UserRepository } from "@infrastructure/database/mongodb/repositories/user.repository.js";
+import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
+import { Token } from "@domain/entities/token.js";
 import {
 	clearMongo,
 	MONGO_STARTUP_TIMEOUT,
@@ -50,7 +53,8 @@ describe("UserRepository + user.mapper", () => {
 		expect(found?.email.isVerified).toBe(false);
 		expect(found?.passwordHasher).toBe("hash-da-senha");
 		expect(found?.role).toBe("manager");
-		expect(found?.isDefaultPassword).toBe(true);
+		expect(found).not.toHaveProperty("isDefaultPassword");
+		expect((await UserModel.findById("user-1"))?.isDefaultPassword).toBe(true);
 		expect(found?.deletedAt).toBeUndefined();
 	});
 
@@ -65,7 +69,6 @@ describe("UserRepository + user.mapper", () => {
 				email,
 				passwordHashed: "hash",
 				role: "operator",
-				isDefaultPassword: false,
 				deletedAt,
 			}),
 		);
@@ -73,7 +76,7 @@ describe("UserRepository + user.mapper", () => {
 		const found = await repo.findById("user-1");
 
 		expect(found?.email.isVerified).toBe(true);
-		expect(found?.isDefaultPassword).toBe(false);
+		expect(found).not.toHaveProperty("isDefaultPassword");
 		expect(found?.deletedAt).toEqual(deletedAt);
 	});
 
@@ -127,7 +130,8 @@ describe("UserRepository + user.mapper", () => {
 
 		const found = await repo.findById("user-1");
 		expect(found?.passwordHasher).toBe("novo-hash");
-		expect(found?.isDefaultPassword).toBe(false);
+		expect(found).not.toHaveProperty("isDefaultPassword");
+		expect((await UserModel.findById("user-1"))?.isDefaultPassword).toBe(false);
 	});
 
 	it("updatePassword em usuário inexistente não cria nada", async () => {
@@ -262,5 +266,53 @@ describe("AuditLogRepository + audit-log.mapper", () => {
 			de: "operator",
 			para: "manager",
 		});
+	});
+});
+
+describe("TokenRepository + token.mapper — RF-BE-005", () => {
+	const repo = TokenRepository.instance();
+
+	it("persiste somente o hash e localiza o token pelo valor recebido", async () => {
+		const token = Token.createPasswordReset("reset-1", "user-1");
+		const plainValue = token.value;
+		token.value = token.hash();
+		await repo.save(token);
+
+		const found = await repo.findByValue(plainValue);
+		const stored = await TokenModel.findById("reset-1");
+
+		expect(found).not.toBeNull();
+		expect(found?.value).toBe(token.value);
+		expect(found?.verify(plainValue)).toBe(true);
+		expect(stored?.valueHash).toBe(token.value);
+		expect(stored?.valueHash).not.toBe(plainValue);
+	});
+
+	it("localiza token por usuário e tipo e retorna null quando ausente", async () => {
+		const token = Token.createPasswordReset("reset-1", "user-1");
+		token.value = token.hash();
+		await repo.save(token);
+
+		expect(
+			(await repo.findByUserAndType("user-1", "password_reset"))?.id,
+		).toBe("reset-1");
+		await expect(
+			repo.findByUserAndType("user-1", "refresh"),
+		).resolves.toBeNull();
+	});
+
+	it("atualiza e invalida o token removendo-o pelo identificador", async () => {
+		const token = Token.createPasswordReset("reset-1", "user-1");
+		token.value = token.hash();
+		await repo.save(token);
+		const updatedExpiry = new Date(Date.now() + 30_000);
+
+		await repo.updateToken("reset-1", "new-hash", updatedExpiry);
+		const updated = await TokenModel.findById("reset-1");
+		expect(updated?.valueHash).toBe("new-hash");
+		expect(updated?.expiresAt).toEqual(updatedExpiry);
+
+		await repo.deleteById("reset-1");
+		expect(await TokenModel.findById("reset-1")).toBeNull();
 	});
 });

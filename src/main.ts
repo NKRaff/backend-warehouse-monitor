@@ -155,7 +155,7 @@ socketServer.connect([warehouseHandler]);
 
 // Bootstrap admin
 
-const admin = await userRepo.findByRole("administrator");
+const admin = await userRepo.findByRole("administrator", true);
 if (admin.length === 0) {
 	registerUserUseCase.execute({
 		actorId: "system",

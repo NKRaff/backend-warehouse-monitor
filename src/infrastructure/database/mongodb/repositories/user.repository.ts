@@ -41,8 +41,13 @@ export class UserRepository implements IUserRepository {
 		return userToDomain(userModel);
 	}
 
-	async findByRole(role: UserRole): Promise<User[]> {
-		const usersModel = await UserModel.find({ role });
+	async findByRole(role: UserRole, active: boolean): Promise<User[]> {
+		const usersModel = await UserModel.find({
+			role,
+			deletedAt: {
+				$exists: !active,
+			},
+		});
 		return usersModel.map((userModel) => {
 			return userToDomain(userModel);
 		});

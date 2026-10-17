@@ -7,4 +7,5 @@ export interface IUserRepository {
 	findByEmail(email: string): Promise<User | null>;
 	findByRole(role: UserRole, active: boolean): Promise<User[]>;
 	updatePassword(userId: string, password: string): Promise<void>;
+	deleteById(id: string): Promise<void>;
 }

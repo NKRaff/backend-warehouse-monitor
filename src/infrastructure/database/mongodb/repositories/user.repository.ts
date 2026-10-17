@@ -59,4 +59,10 @@ export class UserRepository implements IUserRepository {
 			isDefaultPassword: false,
 		});
 	}
+
+	async deleteById(id: string): Promise<void> {
+		await UserModel.findByIdAndUpdate(id, {
+			deletedAt: new Date(),
+		});
+	}
 }

@@ -1,23 +1,23 @@
 import { Alert } from "@domain/entities/alert.js";
 import { AuditLog } from "@domain/entities/audit-log.js";
 import { Notification } from "@domain/entities/notification.js";
+import { Token } from "@domain/entities/token.js";
 import { User } from "@domain/entities/user.js";
 import { Email } from "@domain/object-values/email.js";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { alertToDomain } from "@infrastructure/database/mongodb/mappers/alert.mapper.js";
 import { auditLogToDomain } from "@infrastructure/database/mongodb/mappers/audit-log.mapper.js";
 import { notificationToDomain } from "@infrastructure/database/mongodb/mappers/notification.mapper.js";
 import { AlertModel } from "@infrastructure/database/mongodb/models/alert.model.js";
 import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
 import { NotificationModel } from "@infrastructure/database/mongodb/models/notification.model.js";
-import { UserModel } from "@infrastructure/database/mongodb/models/user.model.js";
 import { TokenModel } from "@infrastructure/database/mongodb/models/token.model.js";
+import { UserModel } from "@infrastructure/database/mongodb/models/user.model.js";
 import { AlertRepository } from "@infrastructure/database/mongodb/repositories/alert.repository.js";
 import { AuditLogRepository } from "@infrastructure/database/mongodb/repositories/audit-log.repository.js";
 import { NotificationRepository } from "@infrastructure/database/mongodb/repositories/notification.repository.js";
-import { UserRepository } from "@infrastructure/database/mongodb/repositories/user.repository.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
-import { Token } from "@domain/entities/token.js";
+import { UserRepository } from "@infrastructure/database/mongodb/repositories/user.repository.js";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
 	clearMongo,
 	MONGO_STARTUP_TIMEOUT,
@@ -106,8 +106,8 @@ describe("UserRepository + user.mapper", () => {
 		await repo.save(admin("admin-2", "admin2@empresa.com"));
 		await repo.save(newUser({ id: "user-1", email: "gestora@empresa.com" }));
 
-		const admins = await repo.findByRole("administrator");
-		const operators = await repo.findByRole("operator");
+		const admins = await repo.findByRole("administrator", true);
+		const operators = await repo.findByRole("operator", true);
 
 		expect(admins.map((u) => u.id).sort()).toEqual(["admin-1", "admin-2"]);
 		expect(admins.every((u) => u.role === "administrator")).toBe(true);
@@ -225,9 +225,9 @@ describe("NotificationRepository + notification.mapper", () => {
 
 		const doc = await NotificationModel.findById("notification-1");
 
-		expect(notificationToDomain(doc as NonNullable<typeof doc>).readedAt).toEqual(
-			readedAt,
-		);
+		expect(
+			notificationToDomain(doc as NonNullable<typeof doc>).readedAt,
+		).toEqual(readedAt);
 	});
 });
 
@@ -257,7 +257,12 @@ describe("AuditLogRepository + audit-log.mapper", () => {
 	});
 
 	it("persiste metadados livres", async () => {
-		await repo.save(AuditLog.create({ ...props, metadata: { campo: "role", de: "operator", para: "manager" } }));
+		await repo.save(
+			AuditLog.create({
+				...props,
+				metadata: { campo: "role", de: "operator", para: "manager" },
+			}),
+		);
 
 		const doc = await AuditLogModel.findById("log-1");
 
@@ -293,9 +298,9 @@ describe("TokenRepository + token.mapper — RF-BE-005", () => {
 		token.value = token.hash();
 		await repo.save(token);
 
-		expect(
-			(await repo.findByUserAndType("user-1", "password_reset"))?.id,
-		).toBe("reset-1");
+		expect((await repo.findByUserAndType("user-1", "password_reset"))?.id).toBe(
+			"reset-1",
+		);
 		await expect(
 			repo.findByUserAndType("user-1", "refresh"),
 		).resolves.toBeNull();

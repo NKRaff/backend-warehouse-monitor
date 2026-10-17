@@ -9,7 +9,6 @@ type UserOverrides = Partial<{
 	email: string;
 	passwordHashed: string;
 	role: UserRole;
-	isDefaultPassword: boolean;
 	deletedAt: Date;
 	verified: boolean;
 }>;
@@ -27,7 +26,6 @@ export function makeUser(overrides: UserOverrides = {}): User {
 		email,
 		passwordHashed: overrides.passwordHashed ?? "hashed:Senha@123",
 		role: overrides.role ?? "administrator",
-		isDefaultPassword: overrides.isDefaultPassword ?? false,
 		deletedAt: overrides.deletedAt,
 	});
 }

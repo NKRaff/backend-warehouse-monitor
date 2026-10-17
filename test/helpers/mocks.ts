@@ -4,6 +4,7 @@ import type { IUuidProvider } from "@application/ports/uuid-provider.interface.j
 import type { IAlertRepository } from "@application/repositories/alert.interface.js";
 import type { IAuditLogRepository } from "@application/repositories/audit-log.interface.js";
 import type { INotificationRepository } from "@application/repositories/notification.interface.js";
+import type { ITokenRepository } from "@application/repositories/token.interface.js";
 import type { IUserRepository } from "@application/repositories/user.interface.js";
 import type { NotificationService } from "@application/services/notification.service.js";
 import { vi } from "vitest";
@@ -67,6 +68,24 @@ export function createAuditLogRepoMock() {
 	return {
 		save: vi.fn<IAuditLogRepository["save"]>().mockResolvedValue(undefined),
 	} satisfies IAuditLogRepository;
+}
+
+export function createTokenRepoMock() {
+	return {
+		save: vi.fn<ITokenRepository["save"]>().mockResolvedValue(undefined),
+		findByValue: vi
+			.fn<ITokenRepository["findByValue"]>()
+			.mockResolvedValue(null),
+		findByUserAndType: vi
+			.fn<ITokenRepository["findByUserAndType"]>()
+			.mockResolvedValue(null),
+		updateToken: vi
+			.fn<ITokenRepository["updateToken"]>()
+			.mockResolvedValue(undefined),
+		deleteById: vi
+			.fn<ITokenRepository["deleteById"]>()
+			.mockResolvedValue(undefined),
+	} satisfies ITokenRepository;
 }
 
 /**

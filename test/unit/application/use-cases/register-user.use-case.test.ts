@@ -1,6 +1,7 @@
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
 import { ConflictError } from "@shared/errors/conflict-error.js";
 import { UnprocessableEntityError } from "@shared/errors/unprocessable-entity-error.js";
+import { Token } from "@domain/entities/token.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { makeUser } from "../../../helpers/factories.js";
 import {
@@ -9,6 +10,7 @@ import {
 	createNotificationRepoMock,
 	createNotificationServiceMock,
 	createPasswordHasherMock,
+	createTokenRepoMock,
 	createUserRepoMock,
 	createUuidProviderMock,
 } from "../../../helpers/mocks.js";
@@ -23,6 +25,7 @@ function setup() {
 	const alertRepo = createAlertRepoMock();
 	const notificationRepo = createNotificationRepoMock();
 	const auditLogRepo = createAuditLogRepoMock();
+	const tokenRepo = createTokenRepoMock();
 	const { service, notify } = createNotificationServiceMock();
 
 	const useCase = RegisterUserUseCase.instance(
@@ -32,6 +35,7 @@ function setup() {
 		alertRepo,
 		notificationRepo,
 		auditLogRepo,
+		tokenRepo,
 		service,
 	);
 
@@ -42,6 +46,7 @@ function setup() {
 		alertRepo,
 		notificationRepo,
 		auditLogRepo,
+		tokenRepo,
 		notify,
 	};
 }
@@ -90,7 +95,7 @@ describe("RegisterUserUseCase — RF-BE-002 / RF-BE-003", () => {
 			});
 		});
 
-		it("guarda apenas o hash da senha temporária e exige a troca no primeiro acesso", async () => {
+		it("guarda apenas o hash da senha temporária", async () => {
 			const { useCase, userRepo, passwordHasher } = setup();
 
 			await useCase.execute(validInput());
@@ -101,7 +106,6 @@ describe("RegisterUserUseCase — RF-BE-002 / RF-BE-003", () => {
 			expect(temporaryPassword).toMatch(/^[\x21-\x7e]{8,}$/);
 			expect(savedUser?.passwordHasher).toBe(`hashed:${temporaryPassword}`);
 			expect(savedUser?.passwordHasher).not.toBe(temporaryPassword);
-			expect(savedUser?.isDefaultPassword).toBe(true);
 		});
 
 		it("gera senhas temporárias digitáveis (ASCII imprimível, sem espaços) e diferentes a cada cadastro", async () => {
@@ -127,7 +131,7 @@ describe("RegisterUserUseCase — RF-BE-002 / RF-BE-003", () => {
 			expect(alert?.type).toBe("register_user");
 			expect(alert?.severity).toBe("info");
 			expect(alert?.status).toBe("active");
-			expect(alert?.title).toBe("Acesso ao sistema disponibilizado");
+			expect(alert?.title).toBe("Novo link para definir sua senha");
 			expect(notification?.alertId).toBe(alert?.id);
 			expect(notification?.recipientId).toBe(savedUser?.id);
 			expect(notification?.channels).toEqual(["email"]);
@@ -149,6 +153,7 @@ describe("RegisterUserUseCase — RF-BE-002 / RF-BE-003", () => {
 			expect(message?.status).toBe("active");
 			expect(message?.title).toBe(alert?.title);
 			expect(message?.message).toBe(alert?.description);
+			expect(message?.metadata?.token).toBeInstanceOf(Token);
 		});
 
 		it("audita a criação com o administrador como ator (RF-BE-031)", async () => {
@@ -279,6 +284,7 @@ describe("RegisterUserUseCase — RF-BE-002 / RF-BE-003", () => {
 			createAlertRepoMock(),
 			createNotificationRepoMock(),
 			createAuditLogRepoMock(),
+			createTokenRepoMock(),
 			service,
 		);
 

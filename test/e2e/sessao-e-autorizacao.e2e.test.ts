@@ -46,14 +46,14 @@ async function login(email: string, password: string) {
 }
 
 describe("E2E • Sessão e autorização (RF-BE-006 / RF-BE-007 / RF-BE-008)", () => {
-	it("nenhuma rota protegida responde sem autenticação", async () => {
+	it("cadastro exige autenticação, enquanto token de redefinição é validado por conta própria", async () => {
 		const register = await request(app).post("/api/user/register").send(newUser);
 		const change = await request(app)
-			.patch("/api/user/change-password")
+			.patch("/api/user/change-password/token-inexistente")
 			.send({ password: "NovaSenha@456", confirmPassword: "NovaSenha@456" });
 
 		expect(register.status).toBe(401);
-		expect(change.status).toBe(401);
+		expect(change.status).toBe(404);
 	});
 
 	it("rejeita um token cuja assinatura foi adulterada", async () => {

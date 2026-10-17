@@ -31,12 +31,14 @@ export async function seedUser(options: SeedUserOptions = {}) {
 		name: options.name ?? `Usuário Teste ${n}`,
 		email: options.email ?? `usuario${n}@empresa.com`,
 		role: options.role ?? "administrator",
-		isDefaultPassword: options.isDefaultPassword ?? false,
 		passwordHashed: await passwordHasher.hash(password),
 		...(options.deletedAt && { deletedAt: options.deletedAt }),
 	});
 
-	await UserModel.create(userToPersistence(user));
+	await UserModel.create({
+		...userToPersistence(user),
+		isDefaultPassword: options.isDefaultPassword ?? false,
+	});
 
 	return { user, password };
 }

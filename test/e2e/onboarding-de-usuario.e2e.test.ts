@@ -1,3 +1,6 @@
+import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
+import { TokenModel } from "@infrastructure/database/mongodb/models/token.model.js";
+import { UserModel } from "@infrastructure/database/mongodb/models/user.model.js";
 import type { Express } from "express";
 import request from "supertest";
 import {
@@ -10,14 +13,7 @@ import {
 	it,
 	vi,
 } from "vitest";
-import { AlertModel } from "@infrastructure/database/mongodb/models/alert.model.js";
-import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
-import { NotificationModel } from "@infrastructure/database/mongodb/models/notification.model.js";
-import { UserModel } from "@infrastructure/database/mongodb/models/user.model.js";
-import {
-	extractTemporaryPassword,
-	FakeSmtpClient,
-} from "../helpers/fake-smtp.js";
+import { FakeSmtpClient } from "../helpers/fake-smtp.js";
 import {
 	clearMongo,
 	MONGO_STARTUP_TIMEOUT,
@@ -47,126 +43,75 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-describe("E2E • Ciclo de vida de acesso de um novo usuário (RF-BE-001/002/003/004/007/031)", () => {
-	it("administrador cadastra → colaborador recebe a senha temporária → define a definitiva → passa a operar normalmente", async () => {
-		// 1. O administrador (criado por seed, já com senha definitiva) entra no sistema
-		const { user: admin, password: adminPassword } = await seedUser({
-			role: "administrator",
-			isDefaultPassword: false,
-		});
-		const adminSession = request.agent(app);
-		await adminSession
-			.post("/api/user/login")
-			.send({ email: admin.email.value, password: adminPassword })
-			.expect(200);
+async function registerOperator() {
+	const { user: admin, password } = await seedUser({
+		role: "administrator",
+		isDefaultPassword: false,
+	});
+	const adminSession = request.agent(app);
+	await adminSession
+		.post("/api/user/login")
+		.send({ email: admin.email.value, password })
+		.expect(200);
+	const response = await adminSession
+		.post("/api/user/register")
+		.send({ name: "Carlos Operador", email: "carlos@empresa.com", role: "operator" })
+		.expect(201);
+	return { admin, adminSession, operatorId: response.body.user.id as string };
+}
 
-		// 2. Cadastra um operador
-		const registered = await adminSession
-			.post("/api/user/register")
-			.send({ name: "Carlos Operador", email: "carlos@empresa.com", role: "operator" })
-			.expect(201);
-		const operatorId: string = registered.body.user.id;
+function tokenFromLastEmail(): string {
+	const html = smtp.lastMail()?.html ?? "";
+	const token = /[?&amp;]token=([a-f0-9]{64})/.exec(html)?.[1];
+	expect(token).toBeDefined();
+	return token as string;
+}
 
-		// 3. O operador recebe a senha temporária por e-mail
+describe("E2E • redefinição de senha de um novo usuário — RF-BE-002 / RF-BE-005 / RF-BE-031", () => {
+	it("admin cadastra → usuário solicita link → redefine a senha → entra com a nova senha", async () => {
+		const { admin, operatorId } = await registerOperator();
 		await vi.waitFor(() => expect(smtp.outbox).toHaveLength(1));
-		const temporaryPassword = extractTemporaryPassword(smtp.lastMail());
-		expect(smtp.lastMail()?.to).toBe("carlos@empresa.com");
-		expect(temporaryPassword).toBeTruthy();
 
-		// 4. Primeiro login: autentica, mas o sistema exige a troca de senha
-		const operatorSession = request.agent(app);
-		const firstLogin = await operatorSession
+		const resetResponse = await request(app)
+			.post("/api/user/generate-password-reset-token")
+			.send({ email: "CARLOS@EMPRESA.COM" });
+		expect(resetResponse.status).toBe(200);
+		await vi.waitFor(() => expect(smtp.outbox).toHaveLength(2));
+		const plainToken = tokenFromLastEmail();
+		const storedToken = await TokenModel.findOne({ userId: operatorId });
+		expect(storedToken?.valueHash).not.toBe(plainToken);
+		expect(storedToken?.type).toBe("password_reset");
+
+		const weakPassword = await request(app)
+			.patch(`/api/user/change-password/${plainToken}`)
+			.send({ password: "abc", confirmPassword: "abc" });
+		expect(weakPassword.status).toBe(422);
+		expect(await TokenModel.countDocuments({ userId: operatorId })).toBe(1);
+
+		const changed = await request(app)
+			.patch(`/api/user/change-password/${plainToken}`)
+			.send({ password: "NovaSenha@456", confirmPassword: "NovaSenha@456" });
+		expect(changed.status).toBe(200);
+		expect(await TokenModel.countDocuments({ userId: operatorId })).toBe(0);
+
+		const login = await request(app)
 			.post("/api/user/login")
-			.send({ email: "carlos@empresa.com", password: temporaryPassword })
-			.expect(200);
-		expect(firstLogin.body.requiresPasswordChange).toBe(true);
-		expect(firstLogin.body.user.role).toBe("operator");
+			.send({ email: "carlos@empresa.com", password: "NovaSenha@456" });
+		expect(login.status).toBe(200);
+		expect(login.body.user.id).toBe(operatorId);
+		expect(login.body).not.toHaveProperty("requiresPasswordChange");
 
-		// 5. O operador não tem permissão para cadastrar outros usuários (RBAC)
-		const forbidden = await operatorSession
-			.post("/api/user/register")
-			.send({ name: "Intruso Teste", email: "intruso@empresa.com", role: "administrator" });
-		expect(forbidden.status).toBe(403);
-		expect(await UserModel.countDocuments({ email: "intruso@empresa.com" })).toBe(0);
-
-		// 6. Tenta uma senha fraca: recusada, continua com a temporária
-		const weak = await operatorSession
-			.patch("/api/user/change-password")
-			.send({ password: "123", confirmPassword: "123" });
-		expect(weak.status).toBe(422);
-		expect((await UserModel.findById(operatorId))?.isDefaultPassword).toBe(true);
-
-		// 7. Define uma senha forte
-		await operatorSession
-			.patch("/api/user/change-password")
-			.send({ password: "NovaSenha@456", confirmPassword: "NovaSenha@456" })
-			.expect(200);
-
-		// 8. A senha temporária deixa de funcionar; a nova autentica sem exigir troca
-		await request(app)
-			.post("/api/user/login")
-			.send({ email: "carlos@empresa.com", password: temporaryPassword })
-			.expect(422);
-		const secondLogin = await request(app)
-			.post("/api/user/login")
-			.send({ email: "carlos@empresa.com", password: "NovaSenha@456" })
-			.expect(200);
-		expect(secondLogin.body.requiresPasswordChange).toBe(false);
-
-		// 9. Trilha de auditoria completa, na ordem em que os fatos aconteceram
-		const trail = await AuditLogModel.find().sort({ _id: 1 }).lean();
-		expect(trail.map((log) => [log.action, log.actorId])).toEqual([
-			["login", admin.id],
-			["create", admin.id],
-			["login", operatorId],
-			["change_password", operatorId],
-			["login", operatorId],
-		]);
-		expect(trail[1]?.resourceId).toBe(operatorId);
-
-		// 10. Alerta + notificação do cadastro ficaram registrados
-		expect(await AlertModel.countDocuments({ type: "register_user" })).toBe(1);
-		expect(await NotificationModel.countDocuments({ recipientId: operatorId })).toBe(1);
+		const logs = await AuditLogModel.find({ resourceId: operatorId });
+		expect(logs.map((log) => log.action)).toEqual(
+			expect.arrayContaining(["create", "change_password", "login"]),
+		);
+		expect(logs.find((log) => log.action === "create")?.actorId).toBe(admin.id);
 	});
 
-	it("administrador recém-criado só cadastra depois de trocar a senha temporária", async () => {
-		const { user, password } = await seedUser({
-			role: "administrator",
-			isDefaultPassword: true,
-		});
-		const session = request.agent(app);
-		await session
-			.post("/api/user/login")
-			.send({ email: user.email.value, password })
-			.expect(200);
-		const newUser = { name: "Ana Gestora", email: "ana@empresa.com", role: "manager" };
+	it("e-mail duplicado continua retornando 409", async () => {
+		const { adminSession } = await registerOperator();
 
-		const blocked = await session.post("/api/user/register").send(newUser);
-		expect(blocked.status).toBe(403);
-		expect(blocked.body.mensagem).toMatch(/alterar sua senha/);
-
-		await session
-			.patch("/api/user/change-password")
-			.send({ password: "NovaSenha@456", confirmPassword: "NovaSenha@456" })
-			.expect(200);
-
-		await session.post("/api/user/register").send(newUser).expect(201);
-		expect(await UserModel.countDocuments({ email: "ana@empresa.com" })).toBe(1);
-	});
-
-	it("um e-mail não pode ser cadastrado duas vezes, mesmo escrito de formas diferentes", async () => {
-		const { user, password } = await seedUser();
-		const session = request.agent(app);
-		await session
-			.post("/api/user/login")
-			.send({ email: user.email.value, password })
-			.expect(200);
-
-		await session
-			.post("/api/user/register")
-			.send({ name: "Carlos Operador", email: "carlos@empresa.com", role: "operator" })
-			.expect(201);
-		const duplicate = await session
+		const duplicate = await adminSession
 			.post("/api/user/register")
 			.send({ name: "Carlos Outro", email: "Carlos@Empresa.com", role: "manager" });
 

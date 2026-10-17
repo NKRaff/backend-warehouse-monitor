@@ -5,7 +5,6 @@ import type {
 import type { IUseCase } from "@application/use-cases/use-case.interface.js";
 import type { RequestContext } from "@presentation/types/request-context.js";
 import { ChangePasswordSchema } from "@presentation/validators/schemas/change-password.schema.js";
-import { UnauthorizedError } from "@shared/errors/unauthorized-error.js";
 import type { IController } from "./controller.interface.js";
 
 export class ChangePasswordController
@@ -33,11 +32,8 @@ export class ChangePasswordController
 
 	async handle(
 		input: unknown,
-		context: RequestContext,
+		_context: RequestContext,
 	): Promise<ChangePasswordOutputDto> {
-		if (!context.actorId) {
-			throw new UnauthorizedError("Id do usuario não encontrado");
-		}
 		const data = ChangePasswordSchema.parse(input);
 		return await this.useCase.execute(data);
 	}

@@ -45,7 +45,7 @@ export class Token {
 	}
 
 	hash(): string {
-		return createHash("sha255").update(this.props.value).digest("hex");
+		return createHash("sha256").update(this.props.value).digest("hex");
 	}
 
 	refresh() {
@@ -54,7 +54,7 @@ export class Token {
 	}
 
 	verify(token: string): boolean {
-		token = createHash("sha255").update(token).digest("hex");
+		token = createHash("sha256").update(token).digest("hex");
 		return this.props.value === token;
 	}
 

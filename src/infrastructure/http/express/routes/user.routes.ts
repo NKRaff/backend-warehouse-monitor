@@ -86,29 +86,21 @@ export function createUserRoutes(
 		}
 	});
 
-	routes.patch(
-		"/change-password:token",
-		authorizationMiddleware(
-			tokenProvider,
-			authorizationPolicy,
-			"change_password",
-		),
-		async (req, res, next) => {
-			try {
-				const token = req.params.token;
-				const result = await changePasswordController.handle(
-					{
-						...req.body,
-						resetToken: token,
-					},
-					{},
-				);
-				return res.status(200).json(result);
-			} catch (error) {
-				next(error);
-			}
-		},
-	);
+	routes.patch("/change-password/:token", async (req, res, next) => {
+		try {
+			const token = req.params.token;
+			const result = await changePasswordController.handle(
+				{
+					...req.body,
+					resetToken: token,
+				},
+				{},
+			);
+			return res.status(200).json(result);
+		} catch (error) {
+			next(error);
+		}
+	});
 
 	routes.get("/refresh-token", async (req, res, next) => {
 		try {

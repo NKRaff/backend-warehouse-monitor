@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import type { ITokenRepository } from "@application/repositories/token.interface.js";
 import type { Token } from "@domain/entities/token.js";
 import type { TokenType } from "@domain/types/token-type.js";
@@ -21,8 +22,9 @@ export class TokenRepository implements ITokenRepository {
 		await TokenModel.create(model);
 	}
 
-	async findByValue(tokenValueHash: string): Promise<Token | null> {
-		const tokenModel = await TokenModel.findOne({ token: tokenValueHash });
+	async findByValue(tokenValue: string): Promise<Token | null> {
+		const valueHash = createHash("sha256").update(tokenValue).digest("hex");
+		const tokenModel = await TokenModel.findOne({ valueHash });
 
 		if (tokenModel === null) {
 			return null;

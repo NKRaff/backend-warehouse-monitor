@@ -2,8 +2,8 @@ import type { UserRole } from "@domain/types/user-role.js";
 
 export type UpdateUserInputDto = {
 	userId: string;
-	name?: string;
-	email?: string;
+	name?: string | undefined;
+	email?: string | undefined;
 };
 
 export type UpdateUserOutputDto = {

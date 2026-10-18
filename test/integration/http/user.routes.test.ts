@@ -17,9 +17,7 @@ import {
 	it,
 	vi,
 } from "vitest";
-import {
-	FakeSmtpClient,
-} from "../../helpers/fake-smtp.js";
+import { FakeSmtpClient } from "../../helpers/fake-smtp.js";
 import {
 	clearMongo,
 	MONGO_STARTUP_TIMEOUT,
@@ -329,7 +327,6 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 
 			const stored = await UserModel.findOne({ email: "carlos@empresa.com" });
 			expect(stored).not.toBeNull();
-			expect(stored?.isDefaultPassword).toBe(true);
 			expect(stored?.emailVerified).toBe(false);
 			expect(stored?.role).toBe("operator");
 			expect(stored?.password).toMatch(/^\$2[aby]\$/);

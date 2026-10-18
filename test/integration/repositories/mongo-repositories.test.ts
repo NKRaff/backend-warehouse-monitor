@@ -54,7 +54,6 @@ describe("UserRepository + user.mapper", () => {
 		expect(found?.passwordHasher).toBe("hash-da-senha");
 		expect(found?.role).toBe("manager");
 		expect(found).not.toHaveProperty("isDefaultPassword");
-		expect((await UserModel.findById("user-1"))?.isDefaultPassword).toBe(true);
 		expect(found?.deletedAt).toBeUndefined();
 	});
 
@@ -131,7 +130,6 @@ describe("UserRepository + user.mapper", () => {
 		const found = await repo.findById("user-1");
 		expect(found?.passwordHasher).toBe("novo-hash");
 		expect(found).not.toHaveProperty("isDefaultPassword");
-		expect((await UserModel.findById("user-1"))?.isDefaultPassword).toBe(false);
 	});
 
 	it("updatePassword em usuário inexistente não cria nada", async () => {

@@ -2,7 +2,11 @@ import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.j
 import { NotFoundError } from "@shared/errors/not-found-error.js";
 import { beforeEach, describe, expect, it } from "vitest";
 import { makeUser } from "../../../helpers/factories.js";
-import { createAuditLogRepoMock, createUserRepoMock, createUuidProviderMock } from "../../../helpers/mocks.js";
+import {
+	createAuditLogRepoMock,
+	createUserRepoMock,
+	createUuidProviderMock,
+} from "../../../helpers/mocks.js";
 import { resetSingleton } from "../../../helpers/singleton.js";
 
 describe("ChangeRoleUseCase — RF-BE-009", () => {
@@ -20,5 +24,20 @@ describe("ChangeRoleUseCase — RF-BE-009", () => {
 		const users = createUserRepoMock();
 		const useCase = ChangeRoleUseCase.instance(createUuidProviderMock(), users, createAuditLogRepoMock());
 		await expect(useCase.execute({ userId: "missing", role: "manager", actorId: "admin-1" })).rejects.toThrow(NotFoundError);
+	});
+	it("retorna a mesma instância criada anteriormente", () => {
+		const firstInstance = ChangeRoleUseCase.instance(
+			createUuidProviderMock(),
+			createUserRepoMock(),
+			createAuditLogRepoMock(),
+		);
+
+		const secondInstance = ChangeRoleUseCase.instance(
+			createUuidProviderMock(),
+			createUserRepoMock(),
+			createAuditLogRepoMock(),
+		);
+
+		expect(secondInstance).toBe(firstInstance);
 	});
 });

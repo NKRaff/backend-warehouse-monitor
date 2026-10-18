@@ -684,4 +684,52 @@ describe("edição, papel e remoção de usuários — RF-BE-008/RF-BE-009", () 
 		expect((await agent.patch(CHANGE_ROLE).send({ userId: target.user.id, role: "manager" })).status).toBe(403);
 		expect((await agent.delete(DELETE_USER).send({ userId: target.user.id })).status).toBe(403);
 	});
+
+	it("exige sessão para alterar papel ou remover usuário", async () => {
+		await request(app).patch(CHANGE_ROLE).send({ userId: "target", role: "manager" }).expect(401);
+		await request(app).delete(DELETE_USER).send({ userId: "target" }).expect(401);
+	});
+
+	it("rejeita papel inválido sem alterar o usuário", async () => {
+		const { agent } = await adminSession();
+		const target = await seedUser({ role: "operator" });
+
+		const response = await agent.patch(CHANGE_ROLE).send({ userId: target.user.id, role: "owner" });
+
+		expect(response.status).toBe(400);
+		expect(response.body.erros).toEqual(expect.arrayContaining([
+			expect.objectContaining({ campo: "role" }),
+		]));
+		expect((await UserModel.findById(target.user.id))?.role).toBe("operator");
+		expect(await AuditLogModel.countDocuments({ resourceId: target.user.id })).toBe(0);
+	});
+
+	it("retorna 404 ao alterar o papel de usuário inexistente", async () => {
+		const { agent } = await adminSession();
+
+		const response = await agent.patch(CHANGE_ROLE).send({ userId: "missing-user", role: "manager" });
+
+		expect(response.status).toBe(404);
+		expect(await AuditLogModel.countDocuments({ resourceId: "missing-user" })).toBe(0);
+	});
+
+	it("retorna 404 ao remover usuário inexistente", async () => {
+		const { agent } = await adminSession();
+
+		const response = await agent.delete(DELETE_USER).send({ userId: "missing-user" });
+
+		expect(response.status).toBe(404);
+		expect(await AuditLogModel.countDocuments({ resourceId: "missing-user" })).toBe(0);
+	});
+
+	it("permite remover um administrador quando outro permanece ativo", async () => {
+		const { agent } = await adminSession();
+		const secondAdmin = await seedUser({ role: "administrator" });
+
+		const response = await agent.delete(DELETE_USER).send({ userId: secondAdmin.user.id });
+
+		expect(response.status).toBe(200);
+		expect((await UserModel.findById(secondAdmin.user.id))?.deletedAt).toBeInstanceOf(Date);
+		expect(await UserModel.countDocuments({ role: "administrator", deletedAt: { $exists: false } })).toBe(1);
+	});
 });

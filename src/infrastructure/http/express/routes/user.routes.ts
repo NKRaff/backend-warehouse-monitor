@@ -1,17 +1,18 @@
 import type { ChangePasswordOutputDto } from "@application/dtos/change-password.dto.js";
+import type { ChangeRoleOutputDto } from "@application/dtos/change-role-user.dto.js";
+import type { DeleteUserOutputDto } from "@application/dtos/delete-user.dto.js";
 import type { GeneratePasswordResetTokenOutputDto } from "@application/dtos/generate-password-reset-token.dto.js";
 import type { LoginOutputDto } from "@application/dtos/login.dto.js";
 import type { RefreshTokenOutputDto } from "@application/dtos/refresh-token.dto.js";
 import type { RegisterUserOutputDto } from "@application/dtos/register-user.dto.js";
+import type { UpdateUserOutputDto } from "@application/dtos/update-user.dto.js";
 import type { ITokenProvider } from "@application/ports/token-provider.interface.js";
-import type { IUserRepository } from "@application/repositories/user.interface.js";
 import type { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import type { IController } from "@presentation/controllers/controller.interface.js";
 import { UnauthorizedError } from "@shared/errors/unauthorized-error.js";
 import { Router } from "express";
 import { env } from "../../../config/env.js";
 import { authorizationMiddleware } from "../middlewares/authorization-middleware.js";
-import { requiredChangePasswordMiddleware } from "../middlewares/required-change-password.middleware.js";
 
 export function createUserRoutes(
 	tokenProvider: ITokenProvider,
@@ -21,7 +22,9 @@ export function createUserRoutes(
 	changePasswordController: IController<ChangePasswordOutputDto>,
 	refreshTokenController: IController<RefreshTokenOutputDto>,
 	generatePasswordResetTokenController: IController<GeneratePasswordResetTokenOutputDto>,
-	userRepo: IUserRepository,
+	updateUserController: IController<UpdateUserOutputDto>,
+	changeRoleController: IController<ChangeRoleOutputDto>,
+	deleteUserController: IController<DeleteUserOutputDto>,
 ): Router {
 	const routes = Router();
 
@@ -32,7 +35,6 @@ export function createUserRoutes(
 			authorizationPolicy,
 			"register_user",
 		),
-		requiredChangePasswordMiddleware(userRepo),
 		async (req, res, next) => {
 			try {
 				const actorId = req.user?.id;
@@ -129,6 +131,52 @@ export function createUserRoutes(
 			next(error);
 		}
 	});
+
+	routes.patch(
+		"/update_user",
+		authorizationMiddleware(tokenProvider, authorizationPolicy, "update_user"),
+		async (req, res, next) => {
+			try {
+				const result = await updateUserController.handle(req.body, {});
+
+				return res.status(200).json(result);
+			} catch (error) {
+				next(error);
+			}
+		},
+	);
+
+	routes.patch(
+		"/change-role",
+		authorizationMiddleware(tokenProvider, authorizationPolicy, "change_role"),
+		async (req, res, next) => {
+			try {
+				const result = await changeRoleController.handle(req.body, {
+					actorId: req.user?.id,
+				});
+
+				return res.status(200).json(result);
+			} catch (error) {
+				next(error);
+			}
+		},
+	);
+
+	routes.delete(
+		"/delete_user",
+		authorizationMiddleware(tokenProvider, authorizationPolicy, "delete_user"),
+		async (req, res, next) => {
+			try {
+				const result = await deleteUserController.handle(req.body, {
+					actorId: req.user?.id,
+				});
+
+				return res.status(200).json(result);
+			} catch (error) {
+				next(error);
+			}
+		},
+	);
 
 	return routes;
 }

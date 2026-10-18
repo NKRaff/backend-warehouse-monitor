@@ -17,9 +17,7 @@ import {
 	it,
 	vi,
 } from "vitest";
-import {
-	FakeSmtpClient,
-} from "../../helpers/fake-smtp.js";
+import { FakeSmtpClient } from "../../helpers/fake-smtp.js";
 import {
 	clearMongo,
 	MONGO_STARTUP_TIMEOUT,
@@ -33,6 +31,9 @@ const LOGIN = "/api/user/login";
 const REGISTER = "/api/user/register";
 const RESET_PASSWORD = "/api/user/change-password";
 const GENERATE_RESET_TOKEN = "/api/user/generate-password-reset-token";
+const UPDATE_USER = "/api/user/update_user";
+const CHANGE_ROLE = "/api/user/change-role";
+const DELETE_USER = "/api/user/delete_user";
 
 const smtp = new FakeSmtpClient();
 let app: Express;
@@ -329,7 +330,6 @@ describe("POST /api/user/register — RF-BE-002 / RF-BE-003 / RF-BE-006 / RF-BE-
 
 			const stored = await UserModel.findOne({ email: "carlos@empresa.com" });
 			expect(stored).not.toBeNull();
-			expect(stored?.isDefaultPassword).toBe(true);
 			expect(stored?.emailVerified).toBe(false);
 			expect(stored?.role).toBe("operator");
 			expect(stored?.password).toMatch(/^\$2[aby]\$/);
@@ -623,5 +623,113 @@ describe("rotas inexistentes", () => {
 		const res = await request(app).get(LOGIN);
 
 		expect(res.status).toBe(404);
+	});
+});
+
+describe("edição, papel e remoção de usuários — RF-BE-008/RF-BE-009", () => {
+	it("atualiza nome e e-mail e persiste auditoria", async () => {
+		const { agent } = await adminSession();
+		const target = await seedUser({ role: "operator" });
+		const response = await agent.patch(UPDATE_USER).send({ userId: target.user.id, name: "Carlos Souza", email: "carlos@empresa.com" });
+		expect(response.status).toBe(200);
+		expect(response.body.user).toMatchObject({ id: target.user.id, name: "Carlos Souza", email: { value: "carlos@empresa.com" } });
+		expect(await UserModel.findById(target.user.id)).toMatchObject({ name: "Carlos Souza", email: "carlos@empresa.com" });
+		expect(await AuditLogModel.countDocuments({ resourceId: target.user.id, action: "update" })).toBe(1);
+	});
+
+	it("rejeita atualização vazia com 422", async () => {
+		const { agent } = await adminSession();
+		const target = await seedUser({ role: "operator" });
+		const response = await agent.patch(UPDATE_USER).send({ userId: target.user.id });
+		expect(response.status).toBe(422);
+	});
+
+	it("permite a operador editar o próprio perfil conforme a matriz atual", async () => {
+		const target = await seedUser({ role: "operator" });
+		const { agent } = await loginAs(target.user.email.value, target.password);
+		const response = await agent.patch(UPDATE_USER).send({ userId: target.user.id, name: "Operador Editado" });
+		expect(response.status).toBe(200);
+	});
+
+	it("altera papel somente para administrador e grava ator na auditoria", async () => {
+		const { agent, admin } = await adminSession();
+		const target = await seedUser({ role: "operator" });
+		const response = await agent.patch(CHANGE_ROLE).send({ userId: target.user.id, role: "manager" });
+		expect(response.status).toBe(200);
+		expect(await UserModel.findById(target.user.id)).toMatchObject({ role: "manager" });
+		expect(await AuditLogModel.findOne({ resourceId: target.user.id, action: "update" })).toMatchObject({ actorId: admin.id, metadata: { old: "operator", new: "manager" } });
+	});
+
+	it("remove em soft delete, grava auditoria e apaga os tokens do usuário", async () => {
+		const { agent, admin } = await adminSession();
+		const target = await seedUser({ role: "operator" });
+		await TokenModel.create({ _id: "refresh-1", userId: target.user.id, type: "refresh", valueHash: "hash", expiresAt: new Date(Date.now() + 60_000) });
+		const response = await agent.delete(DELETE_USER).send({ userId: target.user.id });
+		expect(response.status).toBe(200);
+		expect(await UserModel.findById(target.user.id)).toHaveProperty("deletedAt");
+		expect(await TokenModel.countDocuments({ userId: target.user.id })).toBe(0);
+		expect(await AuditLogModel.findOne({ resourceId: target.user.id, action: "delete" })).toMatchObject({ actorId: admin.id });
+	});
+
+	it("não remove o último administrador ativo", async () => {
+		const { agent, admin } = await adminSession();
+		const response = await agent.delete(DELETE_USER).send({ userId: admin.id });
+		expect(response.status).toBe(422);
+		expect((await UserModel.findById(admin.id))?.deletedAt).toBeUndefined();
+	});
+
+	it("nega a operador a alteração de papel e a remoção", async () => {
+		const target = await seedUser({ role: "operator" });
+		const { agent } = await loginAs(target.user.email.value, target.password);
+		expect((await agent.patch(CHANGE_ROLE).send({ userId: target.user.id, role: "manager" })).status).toBe(403);
+		expect((await agent.delete(DELETE_USER).send({ userId: target.user.id })).status).toBe(403);
+	});
+
+	it("exige sessão para alterar papel ou remover usuário", async () => {
+		await request(app).patch(CHANGE_ROLE).send({ userId: "target", role: "manager" }).expect(401);
+		await request(app).delete(DELETE_USER).send({ userId: "target" }).expect(401);
+	});
+
+	it("rejeita papel inválido sem alterar o usuário", async () => {
+		const { agent } = await adminSession();
+		const target = await seedUser({ role: "operator" });
+
+		const response = await agent.patch(CHANGE_ROLE).send({ userId: target.user.id, role: "owner" });
+
+		expect(response.status).toBe(400);
+		expect(response.body.erros).toEqual(expect.arrayContaining([
+			expect.objectContaining({ campo: "role" }),
+		]));
+		expect((await UserModel.findById(target.user.id))?.role).toBe("operator");
+		expect(await AuditLogModel.countDocuments({ resourceId: target.user.id })).toBe(0);
+	});
+
+	it("retorna 404 ao alterar o papel de usuário inexistente", async () => {
+		const { agent } = await adminSession();
+
+		const response = await agent.patch(CHANGE_ROLE).send({ userId: "missing-user", role: "manager" });
+
+		expect(response.status).toBe(404);
+		expect(await AuditLogModel.countDocuments({ resourceId: "missing-user" })).toBe(0);
+	});
+
+	it("retorna 404 ao remover usuário inexistente", async () => {
+		const { agent } = await adminSession();
+
+		const response = await agent.delete(DELETE_USER).send({ userId: "missing-user" });
+
+		expect(response.status).toBe(404);
+		expect(await AuditLogModel.countDocuments({ resourceId: "missing-user" })).toBe(0);
+	});
+
+	it("permite remover um administrador quando outro permanece ativo", async () => {
+		const { agent } = await adminSession();
+		const secondAdmin = await seedUser({ role: "administrator" });
+
+		const response = await agent.delete(DELETE_USER).send({ userId: secondAdmin.user.id });
+
+		expect(response.status).toBe(200);
+		expect((await UserModel.findById(secondAdmin.user.id))?.deletedAt).toBeInstanceOf(Date);
+		expect(await UserModel.countDocuments({ role: "administrator", deletedAt: { $exists: false } })).toBe(1);
 	});
 });

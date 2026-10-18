@@ -38,6 +38,16 @@ export class User {
 		return new User(props);
 	}
 
+	update(props: Partial<Pick<UserProps, "name" | "email">>): void {
+		if (props.name) {
+			this.props.name = props.name;
+		}
+
+		if (props.email) {
+			this.props.email = props.email;
+		}
+	}
+
 	get id(): string {
 		return this.props.id;
 	}

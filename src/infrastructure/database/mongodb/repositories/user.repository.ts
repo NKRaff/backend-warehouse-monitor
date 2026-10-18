@@ -41,10 +41,30 @@ export class UserRepository implements IUserRepository {
 		return userToDomain(userModel);
 	}
 
-	async findByRole(role: UserRole): Promise<User[]> {
-		const usersModel = await UserModel.find({ role });
+	async findByRole(role: UserRole, active: boolean): Promise<User[]> {
+		const usersModel = await UserModel.find({
+			role,
+			deletedAt: {
+				$exists: !active,
+			},
+		});
 		return usersModel.map((userModel) => {
 			return userToDomain(userModel);
+		});
+	}
+
+	async updateUser(user: User): Promise<void> {
+		const model = userToPersistence(user);
+		await UserModel.findByIdAndUpdate(user.id, {
+			name: model.name,
+			email: model.email,
+			emailVerified: model.emailVerified,
+		});
+	}
+
+	async updateRole(id: string, role: UserRole): Promise<void> {
+		await UserModel.findByIdAndUpdate(id, {
+			role,
 		});
 	}
 
@@ -52,6 +72,12 @@ export class UserRepository implements IUserRepository {
 		await UserModel.findByIdAndUpdate(userId, {
 			password,
 			isDefaultPassword: false,
+		});
+	}
+
+	async deleteById(id: string): Promise<void> {
+		await UserModel.findByIdAndUpdate(id, {
+			deletedAt: new Date(),
 		});
 	}
 }

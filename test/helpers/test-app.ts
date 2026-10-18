@@ -3,10 +3,13 @@ import { AuthorizationPolicy } from "@application/services/authorization-policy.
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
+import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
+import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
+import { UpdateUserUseCase } from "@application/use-cases/update-user-use-case.js";
 import { BcryptPasswordHasherAdapter } from "@infrastructure/cryptography/bcrypt-password-hasher.adapter.js";
 import { JwtTokenAdapter } from "@infrastructure/cryptography/jwt-token.adapter.js";
 import { AlertRepository } from "@infrastructure/database/mongodb/repositories/alert.repository.js";
@@ -19,10 +22,13 @@ import { createUserRoutes } from "@infrastructure/http/express/routes/user.route
 import { UuidAdapter } from "@infrastructure/identifier/uuid.adapter.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
+import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
+import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
+import { UpdateUserController } from "@presentation/controllers/update-user.controller.js";
 import { Router } from "express";
 import { resetSingleton } from "./singleton.js";
 
@@ -110,21 +116,38 @@ export function createTestApp(smtp: SmtpClient) {
 			tokenRepo,
 			notificationService,
 		);
-
-	const registerUserController = RegisterUserController.instance(
-		registerUserUseCase,
+	const updateUserUseCase = UpdateUserUseCase.instance(
+		uuidProvider,
+		userRepo,
+		auditLogRepo,
 	);
+	const changeRoleUseCase = ChangeRoleUseCase.instance(
+		uuidProvider,
+		userRepo,
+		auditLogRepo,
+	);
+	const deleteUserUseCase = DeleteUserUseCase.instance(
+		uuidProvider,
+		userRepo,
+		auditLogRepo,
+		tokenRepo,
+	);
+
+	const registerUserController =
+		RegisterUserController.instance(registerUserUseCase);
 	const loginController = LoginController.instance(loginUseCase);
 	const changePasswordController = ChangePasswordController.instance(
 		changePasswordUseCase,
 	);
-	const refreshTokenController = RefreshTokenController.instance(
-		refreshTokenUseCase,
-	);
+	const refreshTokenController =
+		RefreshTokenController.instance(refreshTokenUseCase);
 	const generatePasswordResetTokenController =
 		GeneratePasswordResetTokenController.instance(
 			generatePasswordResetTokenUseCase,
 		);
+	const updateUserController = UpdateUserController.instance(updateUserUseCase);
+	const deleteUserController = DeleteUserController.instance(deleteUserUseCase);
+	const changeRoleController = ChangeRoleController.instance(changeRoleUseCase);
 
 	const routes = Router();
 	routes.use(
@@ -137,7 +160,9 @@ export function createTestApp(smtp: SmtpClient) {
 			changePasswordController,
 			refreshTokenController,
 			generatePasswordResetTokenController,
-			userRepo,
+			updateUserController,
+			changeRoleController,
+			deleteUserController,
 		),
 	);
 

@@ -10,7 +10,6 @@ export function userToDomain(raw: UserDocument): User {
 		email: new Email(raw.email),
 		passwordHashed: raw.password,
 		role: raw.role as UserRole,
-		isDefaultPassword: raw.isDefaultPassword,
 		deletedAt: raw.deletedAt ?? undefined,
 	});
 
@@ -31,7 +30,6 @@ export function userToPersistence(
 		emailVerified: user.email.isVerified,
 		password: user.passwordHasher,
 		role: user.role,
-		isDefaultPassword: user.isDefaultPassword,
 		...(user.deletedAt && { deletedAt: user.deletedAt }),
 	};
 }

@@ -49,6 +49,9 @@ export function createUserRepoMock() {
 		updatePassword: vi
 			.fn<IUserRepository["updatePassword"]>()
 			.mockResolvedValue(undefined),
+		updateUser: vi.fn<IUserRepository["updateUser"]>().mockResolvedValue(undefined),
+		updateRole: vi.fn<IUserRepository["updateRole"]>().mockResolvedValue(undefined),
+		deleteById: vi.fn<IUserRepository["deleteById"]>().mockResolvedValue(undefined),
 	} satisfies IUserRepository;
 }
 
@@ -84,6 +87,9 @@ export function createTokenRepoMock() {
 			.mockResolvedValue(undefined),
 		deleteById: vi
 			.fn<ITokenRepository["deleteById"]>()
+			.mockResolvedValue(undefined),
+		deleteAllByUser: vi
+			.fn<ITokenRepository["deleteAllByUser"]>()
 			.mockResolvedValue(undefined),
 	} satisfies ITokenRepository;
 }

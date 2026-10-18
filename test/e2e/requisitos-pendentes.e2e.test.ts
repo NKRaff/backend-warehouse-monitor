@@ -14,10 +14,7 @@ describe("Requisitos de backend pendentes", () => {
 		it.todo("RF-BE-003: reenviar credenciais gera nova senha temporária e invalida a anterior");
 		it.todo("RF-BE-004: rejeita definir como senha definitiva a própria senha temporária");
 		it.todo("RF-BE-005: redefinição de senha por token de curta duração enviado por e-mail");
-		it.todo("RF-BE-008: remover usuário invalida sessões e apaga dados de autenticação");
-		it.todo("RF-BE-008: não permite remover o único administrador ativo");
 		it.todo("Bootstrap: considerar apenas administradores ativos (findByRole hoje inclui removidos)");
-		it.todo("RF-BE-009: administrador edita nome, e-mail e papel de um usuário");
 		it.todo("RF-BE-010: bloqueio temporário após 5 logins malsucedidos em 10 min (por IP e por usuário)");
 	});
 

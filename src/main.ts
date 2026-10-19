@@ -3,6 +3,7 @@ import { NotificationService } from "@application/services/notification.service.
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
+import { CreateWarehouseUseCase } from "@application/use-cases/create-warehouse.use-case.js";
 import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
@@ -10,9 +11,12 @@ import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-ca
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
 import { UpdateUserUseCase } from "@application/use-cases/update-user-use-case.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
+import { WarehouseRepository } from "@infrastructure/database/mongodb/repositories/warehouse.repository.js";
+import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
 import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
+import { CreateWarehouseController } from "@presentation/controllers/create-warehouse.controller.js";
 import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
@@ -56,6 +60,7 @@ const alertRepo = AlertRepository.instance();
 const notificationRepo = NotificationRepository.instance();
 const auditLogRepo = AuditLogRepository.instance();
 const tokenRepo = TokenRepository.instance();
+const warehouseRepo = WarehouseRepository.instance();
 
 // Adapters
 
@@ -130,6 +135,11 @@ const deleteUserUseCase = DeleteUserUseCase.instance(
 	auditLogRepo,
 	tokenRepo,
 );
+const createWarehouseUseCase = CreateWarehouseUseCase.instance(
+	uuidProvider,
+	warehouseRepo,
+	auditLogRepo,
+);
 
 // Controllers
 
@@ -148,6 +158,9 @@ const generatePasswordResetTokenController =
 const updateUserController = UpdateUserController.instance(updateUserUseCase);
 const deleteUserController = DeleteUserController.instance(deleteUserUseCase);
 const changeRoleController = ChangeRoleController.instance(changeRoleUseCase);
+const createWarehouseController = CreateWarehouseController.instance(
+	createWarehouseUseCase,
+);
 
 // Routes
 
@@ -164,8 +177,14 @@ const userRoutes = createUserRoutes(
 	changeRoleController,
 	deleteUserController,
 );
+const warehouseRoutes = createWarehouseRoutes(
+	tokenProvider,
+	authorizationPolicyService,
+	createWarehouseController,
+);
 
 routes.use("/user", userRoutes);
+routes.use("/warehouse", warehouseRoutes);
 
 // Socket Handlers
 const warehouseHandler = new WarehouseHandle();

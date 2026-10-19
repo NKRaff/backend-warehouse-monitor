@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import express, { type Express, type Router } from "express";
 import { env } from "../../config/env.js";
 import { errorHandle } from "./middlewares/error-handle.js";
+import { rateLimitMiddleware } from "./middlewares/rate-limit.middleware.js";
 
 export class ExpressApp {
 	private readonly app: Express;
@@ -11,6 +12,7 @@ export class ExpressApp {
 
 		this.app.use(express.json());
 		this.app.use(cookieParser(env.cookie.secret));
+		this.app.use(rateLimitMiddleware);
 		this.app.use("/api", routes);
 		this.app.use(errorHandle);
 	}

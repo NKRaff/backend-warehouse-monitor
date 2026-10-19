@@ -39,6 +39,7 @@ export default defineConfig({
 			COOKIE_EXPIRES_IN_MIN: "60",
 			BCRYPT_ROUNDS: "4",
 			RATE_LIMIT_MAX_REQUESTS: "100",
+			RATE_LIMIT_WINDOW_TIME_IN_MIN: "15",
 		},
 		coverage: {
 			provider: "v8",

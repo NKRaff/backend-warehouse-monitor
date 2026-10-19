@@ -101,6 +101,9 @@ export function createWarehouseRepoMock() {
 		findByName: vi
 			.fn<IWarehouseRepository["findByName"]>()
 			.mockResolvedValue(null),
+		deletedById: vi
+			.fn<IWarehouseRepository["deletedById"]>()
+			.mockResolvedValue(undefined),
 	} satisfies IWarehouseRepository;
 }
 

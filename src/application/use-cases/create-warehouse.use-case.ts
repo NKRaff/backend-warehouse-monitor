@@ -7,6 +7,7 @@ import type { IAuditLogRepository } from "@application/repositories/audit-log.in
 import type { IWarehouseRepository } from "@application/repositories/warehouse.interface.js";
 import { AuditLog } from "@domain/entities/audit-log.js";
 import { Warehouse } from "@domain/entities/warehouse.js";
+import { MeasurementLimits } from "@domain/object-values/measurement-limits.js";
 import { ConflictError } from "@shared/errors/conflict-error.js";
 import type { IUseCase } from "./use-case.interface.js";
 
@@ -52,7 +53,12 @@ export class CreateWarehouseUseCase
 			condition: input.condition,
 			category: input.category,
 			...(input.description && { description: input.description }),
-			...(input.limits && { limits: input.limits }),
+			...(input.limits && {
+				limits: new MeasurementLimits(
+					input.limits.temperature,
+					input.limits.humidity,
+				),
+			}),
 		});
 
 		const auditLog = AuditLog.create({
@@ -76,7 +82,12 @@ export class CreateWarehouseUseCase
 				condition: warehouse.condition,
 				description: warehouse.description,
 				name: warehouse.name,
-				...(warehouse.limits && { limits: warehouse.limits }),
+				...(warehouse.limits && {
+					limits: {
+						temperature: warehouse.limits.temperature,
+						humidity: warehouse.limits.humidity,
+					},
+				}),
 			},
 		};
 	}

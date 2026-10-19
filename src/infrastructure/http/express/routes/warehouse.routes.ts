@@ -1,8 +1,8 @@
 import type { CreateWarehouseOutputDto } from "@application/dtos/create-warehouse.dto.js";
+import type { DeleteWarehouseOutputDto } from "@application/dtos/delete-warehouse.dto.js";
 import type { ITokenProvider } from "@application/ports/token-provider.interface.js";
 import type { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import type { IController } from "@presentation/controllers/controller.interface.js";
-import type { DeleteWarehouseController } from "@presentation/controllers/delete-warehouse.controller.js";
 import { Router } from "express";
 import { authorizationMiddleware } from "../middlewares/authorization-middleware.js";
 
@@ -10,7 +10,7 @@ export function createWarehouseRoutes(
 	tokenProvider: ITokenProvider,
 	authorizationPolicy: AuthorizationPolicy,
 	createWarehouseController: IController<CreateWarehouseOutputDto>,
-	deleteWarehouseController: IController<DeleteWarehouseController>,
+	deleteWarehouseController: IController<DeleteWarehouseOutputDto>,
 ): Router {
 	const routes = Router();
 

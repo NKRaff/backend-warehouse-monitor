@@ -38,6 +38,11 @@ export function warehouseToPersistence(
 		description: warehouse.description,
 		name: warehouse.name,
 		status: warehouse.status,
-		...(warehouse.limits && { limits: warehouse.limits }),
+		...(warehouse.limits && {
+			limits: {
+				temperature: warehouse.limits.temperature,
+				humidity: warehouse.limits.humidity,
+			},
+		}),
 	};
 }

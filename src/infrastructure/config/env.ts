@@ -105,5 +105,6 @@ export const env = {
 
 	rateLimit: {
 		maxRequest: getNumber("RATE_LIMIT_MAX_REQUESTS"),
+		windowTime: getNumber("RATE_LIMIT_WINDOW_TIME_IN_MIN") * 60 * 1000,
 	},
 };

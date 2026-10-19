@@ -4,6 +4,7 @@ import { NotificationService } from "@application/services/notification.service.
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
+import { CreateWarehouseUseCase } from "@application/use-cases/create-warehouse.use-case.js";
 import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
@@ -17,12 +18,15 @@ import { AuditLogRepository } from "@infrastructure/database/mongodb/repositorie
 import { NotificationRepository } from "@infrastructure/database/mongodb/repositories/notification.repository.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { UserRepository } from "@infrastructure/database/mongodb/repositories/user.repository.js";
+import { WarehouseRepository } from "@infrastructure/database/mongodb/repositories/warehouse.repository.js";
 import { ExpressApp } from "@infrastructure/http/express/express.app.js";
 import { createUserRoutes } from "@infrastructure/http/express/routes/user.routes.js";
+import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
 import { UuidAdapter } from "@infrastructure/identifier/uuid.adapter.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
 import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
+import { CreateWarehouseController } from "@presentation/controllers/create-warehouse.controller.js";
 import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
@@ -43,6 +47,7 @@ export function createTestApp(smtp: SmtpClient) {
 		NotificationRepository,
 		AuditLogRepository,
 		TokenRepository,
+		WarehouseRepository,
 		BcryptPasswordHasherAdapter,
 		JwtTokenAdapter,
 		UuidAdapter,
@@ -55,11 +60,13 @@ export function createTestApp(smtp: SmtpClient) {
 		ChangePasswordUseCase,
 		RefreshTokenUseCase,
 		GeneratePasswordResetTokenUseCase,
+		CreateWarehouseUseCase,
 		RegisterUserController,
 		LoginController,
 		ChangePasswordController,
 		RefreshTokenController,
 		GeneratePasswordResetTokenController,
+		CreateWarehouseController,
 	);
 
 	const userRepo = UserRepository.instance();
@@ -67,6 +74,7 @@ export function createTestApp(smtp: SmtpClient) {
 	const notificationRepo = NotificationRepository.instance();
 	const auditLogRepo = AuditLogRepository.instance();
 	const tokenRepo = TokenRepository.instance();
+	const warehouseRepo = WarehouseRepository.instance();
 
 	const passwordHasher = BcryptPasswordHasherAdapter.instance();
 	const tokenProvider = JwtTokenAdapter.instance();
@@ -132,6 +140,11 @@ export function createTestApp(smtp: SmtpClient) {
 		auditLogRepo,
 		tokenRepo,
 	);
+	const createWarehouseUseCase = CreateWarehouseUseCase.instance(
+		uuidProvider,
+		warehouseRepo,
+		auditLogRepo,
+	);
 
 	const registerUserController =
 		RegisterUserController.instance(registerUserUseCase);
@@ -148,6 +161,9 @@ export function createTestApp(smtp: SmtpClient) {
 	const updateUserController = UpdateUserController.instance(updateUserUseCase);
 	const deleteUserController = DeleteUserController.instance(deleteUserUseCase);
 	const changeRoleController = ChangeRoleController.instance(changeRoleUseCase);
+	const createWarehouseController = CreateWarehouseController.instance(
+		createWarehouseUseCase,
+	);
 
 	const routes = Router();
 	routes.use(
@@ -163,6 +179,14 @@ export function createTestApp(smtp: SmtpClient) {
 			updateUserController,
 			changeRoleController,
 			deleteUserController,
+		),
+	);
+	routes.use(
+		"/warehouse",
+		createWarehouseRoutes(
+			tokenProvider,
+			authorizationPolicy,
+			createWarehouseController,
 		),
 	);
 

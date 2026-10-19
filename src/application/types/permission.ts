@@ -4,4 +4,5 @@ export type Permission =
 	| "change_password"
 	| "update_user"
 	| "change_role"
-	| "delete_user";
+	| "delete_user"
+	| "manager_warehouse";

@@ -24,7 +24,10 @@ export class WarehouseRepository implements IWarehouseRepository {
 	}
 
 	async findByName(name: string): Promise<Warehouse | null> {
-		const warehouseModel = await WarehouseModel.findOne({ name });
+		const warehouseModel = await WarehouseModel.findOne({
+			name,
+			deletedAt: { $exists: false },
+		});
 
 		if (warehouseModel === null) {
 			return null;

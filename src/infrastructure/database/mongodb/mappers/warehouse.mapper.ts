@@ -25,6 +25,7 @@ export function warehouseToDomain(raw: WarehouseDocument): Warehouse {
 				},
 			),
 		}),
+		...(raw.deletedAt && { deletedAt: raw.deletedAt }),
 	});
 }
 
@@ -44,5 +45,6 @@ export function warehouseToPersistence(
 				humidity: warehouse.limits.humidity,
 			},
 		}),
+		...(warehouse.deletedAt && { deletedAt: warehouse.deletedAt }),
 	};
 }

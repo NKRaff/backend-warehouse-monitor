@@ -23,7 +23,7 @@ const limitsSchema = new Schema(
 const warehouseSchema = new Schema(
 	{
 		_id: { type: String, required: true },
-		name: { type: String, required: true, unique: true },
+		name: { type: String, required: true },
 		condition: { type: String, required: true },
 		category: { type: String, required: true },
 		status: { type: String, required: true },
@@ -32,6 +32,7 @@ const warehouseSchema = new Schema(
 			type: limitsSchema,
 			required: false,
 		},
+		deletedAt: { type: Date, required: false },
 	},
 	{
 		timestamps: false,

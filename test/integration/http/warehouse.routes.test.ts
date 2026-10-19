@@ -15,6 +15,7 @@ import { createTestApp } from "../../helpers/test-app.js";
 
 const smtp = new FakeSmtpClient();
 const CREATE_WAREHOUSE = "/api/warehouse/create";
+const DELETE_WAREHOUSE = "/api/warehouse/delete-warehouse";
 let app: Express;
 
 beforeAll(async () => {
@@ -139,5 +140,94 @@ describe("POST /api/warehouse/create — RF-BE-011", () => {
 		expect(
 			await AuditLogModel.countDocuments({ resourceType: "warehouse" }),
 		).toBe(1);
+	});
+});
+
+async function seedWarehouse(id = "warehouse-1") {
+	return WarehouseModel.create({
+		_id: id,
+		name: "Câmara Fria",
+		category: "food",
+		condition: "cold",
+		status: "inactive",
+		description: "Armazenamento refrigerado",
+	});
+}
+
+describe("DELETE /api/warehouse/delete-warehouse — RF-BE-013", () => {
+	it.each(["manager", "administrator"] as const)(
+		"permite ao papel %s remover logicamente o armazém e registra auditoria",
+		async (role) => {
+			const { agent, user } = await sessionFor(role);
+			const warehouse = await seedWarehouse();
+
+			const response = await agent
+				.delete(DELETE_WAREHOUSE)
+				.send({ warehouseId: warehouse._id });
+
+			expect(response.status).toBe(200);
+			expect(response.body).toEqual({
+				message: "Armazém excluido com sucesso",
+			});
+			const stored = await WarehouseModel.findById(warehouse._id);
+			expect(stored?.deletedAt).toBeInstanceOf(Date);
+			expect(stored).toMatchObject({
+				name: warehouse.name,
+				category: warehouse.category,
+				condition: warehouse.condition,
+			});
+			expect(
+				await AuditLogModel.findOne({
+					resourceId: warehouse._id,
+					action: "delete",
+				}),
+			).toMatchObject({
+				actorId: user.id,
+				resourceType: "warehouse",
+			});
+		},
+	);
+
+	it("exige autenticação e não altera o armazém", async () => {
+		const warehouse = await seedWarehouse();
+
+		await request(app)
+			.delete(DELETE_WAREHOUSE)
+			.send({ warehouseId: warehouse._id })
+			.expect(401);
+
+		expect((await WarehouseModel.findById(warehouse._id))?.deletedAt).toBeUndefined();
+		expect(await AuditLogModel.countDocuments({ action: "delete" })).toBe(0);
+	});
+
+	it("nega operador conforme a matriz atual e preserva o armazém", async () => {
+		const { agent } = await sessionFor("operator");
+		const warehouse = await seedWarehouse();
+
+		await agent
+			.delete(DELETE_WAREHOUSE)
+			.send({ warehouseId: warehouse._id })
+			.expect(403);
+
+		expect((await WarehouseModel.findById(warehouse._id))?.deletedAt).toBeUndefined();
+		expect(await AuditLogModel.countDocuments({ action: "delete" })).toBe(0);
+	});
+
+	it("rejeita payload inválido sem remover ou auditar", async () => {
+		const { agent } = await sessionFor("manager");
+		const warehouse = await seedWarehouse();
+
+		const response = await agent
+			.delete(DELETE_WAREHOUSE)
+			.send({ warehouseId: 123 });
+
+		expect(response.status).toBe(400);
+		expect(response.body.erros).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ campo: "warehouseId" }),
+			]),
+		);
+		expect((await WarehouseModel.findById(warehouse._id))?.deletedAt).toBeUndefined();
+		expect(await AuditLogModel.countDocuments({ action: "delete" })).toBe(0);
 	});
 });

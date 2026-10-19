@@ -12,6 +12,7 @@ type WarehouseProps = {
 	status: WarehouseStatus;
 	description: string;
 	limits?: MeasurementLimits | undefined;
+	deletedAt?: Date | undefined;
 };
 
 export class Warehouse {
@@ -24,7 +25,7 @@ export class Warehouse {
 	}
 
 	static create(
-		props: Omit<WarehouseProps, "status" | "description"> &
+		props: Omit<WarehouseProps, "status" | "description" | "deletedAt"> &
 			Partial<Pick<WarehouseProps, "description">>,
 	): Warehouse {
 		props.name = props.name.trim();
@@ -78,5 +79,9 @@ export class Warehouse {
 	}
 	get limits(): MeasurementLimits | undefined {
 		return this.props.limits;
+	}
+
+	get deletedAt(): Date | undefined {
+		return this.props.deletedAt;
 	}
 }

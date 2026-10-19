@@ -8,7 +8,18 @@ export type CreateWarehouseInputDto = {
 	condition: StorageCondition;
 	category: StorageCategory;
 	description?: string | undefined;
-	limits?: MeasurementLimits | undefined;
+	limits?:
+		| {
+				temperature: {
+					min: number;
+					max: number;
+				};
+				humidity: {
+					min: number;
+					max: number;
+				};
+		  }
+		| undefined;
 };
 
 export type CreateWarehouseOutputDto = {

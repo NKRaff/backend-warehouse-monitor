@@ -9,9 +9,10 @@ export const PermissionMatrix: Record<UserRole, Permission[]> = {
 		"update_user",
 		"change_role",
 		"delete_user",
+		"manager_warehouse",
 	],
 
-	manager: ["change_password", "login", "update_user"],
+	manager: ["change_password", "login", "update_user", "manager_warehouse"],
 
 	operator: ["change_password", "login", "update_user"],
 };

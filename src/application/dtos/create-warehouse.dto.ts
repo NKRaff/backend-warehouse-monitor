@@ -1,0 +1,40 @@
+import type { MeasurementLimit } from "@domain/types/measurement-limit.js";
+import type { StorageCategory } from "@domain/types/storage-category.js";
+import type { StorageCondition } from "@domain/types/storage-condition.js";
+
+export type CreateWarehouseInputDto = {
+	actorId: string;
+	name: string;
+	condition: StorageCondition;
+	category: StorageCategory;
+	description?: string | undefined;
+	limits?:
+		| {
+				temperature: {
+					min: number;
+					max: number;
+				};
+				humidity: {
+					min: number;
+					max: number;
+				};
+		  }
+		| undefined;
+};
+
+export type CreateWarehouseOutputDto = {
+	message: string;
+	warehouse: {
+		id: string;
+		name: string;
+		condition: StorageCondition;
+		category: StorageCategory;
+		description: string;
+		limits?:
+			| {
+					temperature: MeasurementLimit;
+					humidity: MeasurementLimit;
+			  }
+			| undefined;
+	};
+};

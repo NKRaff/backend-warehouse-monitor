@@ -70,6 +70,9 @@ describe("AuthorizationPolicy (RBAC) — RF-BE-007", () => {
 			["administrator", "change_password", true],
 			["manager", "change_password", true],
 			["operator", "change_password", true],
+			["administrator", "manager_warehouse", true],
+			["manager", "manager_warehouse", true],
+			["operator", "manager_warehouse", false],
 		];
 
 		it.each(matrix)("%s + %s => %s", async (role, permission, allowed) => {

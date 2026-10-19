@@ -28,6 +28,7 @@ import { seedUser } from "../../helpers/seed.js";
 import { createTestApp } from "../../helpers/test-app.js";
 
 const LOGIN = "/api/user/login";
+const REFRESH_TOKEN = "/api/user/refresh-token";
 const REGISTER = "/api/user/register";
 const RESET_PASSWORD = "/api/user/change-password";
 const GENERATE_RESET_TOKEN = "/api/user/generate-password-reset-token";
@@ -211,6 +212,45 @@ describe("POST /api/user/login — RF-BE-001", () => {
 
 		expect(res.status).toBe(400);
 		expect(res.body.mensagem).toBe("JSON invalido");
+	});
+});
+
+describe("GET /api/user/refresh-token — RF-BE-001", () => {
+	it("sem cookie refresh_token responde 401", async () => {
+		const response = await request(app).get(REFRESH_TOKEN);
+
+		expect(response.status).toBe(401);
+		expect(response.body.mensagem).toBe("Refresh token não encontrado nos cookies");
+		expect(response.headers["set-cookie"]).toBeUndefined();
+	});
+
+	it("rotaciona refresh token e renova os cookies da sessão", async () => {
+		const { user, password } = await seedUser();
+		const { agent, response: loginResponse } = await loginAs(
+			user.email.value,
+			password,
+		);
+		const originalRefresh = /refresh_token=([^;]+)/.exec(
+			String(loginResponse.headers["set-cookie"]),
+		)?.[1];
+		expect(originalRefresh).toBeDefined();
+
+		const response = await agent.get(REFRESH_TOKEN);
+
+		expect(response.status).toBe(200);
+		expect(response.body).toBe("Token resetado com sucesso");
+		const cookies = String(response.headers["set-cookie"]);
+		const rotatedRefresh = /refresh_token=([^;]+)/.exec(cookies)?.[1];
+		expect(cookies).toMatch(/access_token=[^;]+;.*HttpOnly/i);
+		expect(cookies).toMatch(/refresh_token=[^;]+;.*HttpOnly/i);
+		expect(rotatedRefresh).toBeDefined();
+		expect(rotatedRefresh).not.toBe(originalRefresh);
+		expect(await TokenModel.countDocuments({ userId: user.id, type: "refresh" })).toBe(1);
+
+		const replay = await request(app)
+			.get(REFRESH_TOKEN)
+			.set("Cookie", `refresh_token=${originalRefresh}`);
+		expect(replay.status).toBe(404);
 	});
 });
 

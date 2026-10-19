@@ -6,6 +6,7 @@ import type { IAuditLogRepository } from "@application/repositories/audit-log.in
 import type { INotificationRepository } from "@application/repositories/notification.interface.js";
 import type { ITokenRepository } from "@application/repositories/token.interface.js";
 import type { IUserRepository } from "@application/repositories/user.interface.js";
+import type { IWarehouseRepository } from "@application/repositories/warehouse.interface.js";
 import type { NotificationService } from "@application/services/notification.service.js";
 import { vi } from "vitest";
 
@@ -92,6 +93,15 @@ export function createTokenRepoMock() {
 			.fn<ITokenRepository["deleteAllByUser"]>()
 			.mockResolvedValue(undefined),
 	} satisfies ITokenRepository;
+}
+
+export function createWarehouseRepoMock() {
+	return {
+		save: vi.fn<IWarehouseRepository["save"]>().mockResolvedValue(undefined),
+		findByName: vi
+			.fn<IWarehouseRepository["findByName"]>()
+			.mockResolvedValue(null),
+	} satisfies IWarehouseRepository;
 }
 
 /**

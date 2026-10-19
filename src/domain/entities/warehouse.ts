@@ -11,7 +11,7 @@ type WarehouseProps = {
 	category: StorageCategory;
 	status: WarehouseStatus;
 	description: string;
-	limits?: MeasurementLimits;
+	limits?: MeasurementLimits | undefined;
 };
 
 export class Warehouse {
@@ -24,7 +24,7 @@ export class Warehouse {
 	}
 
 	static create(
-		props: Omit<WarehouseProps, "status"> &
+		props: Omit<WarehouseProps, "status" | "description"> &
 			Partial<Pick<WarehouseProps, "description">>,
 	): Warehouse {
 		props.name = props.name.trim();

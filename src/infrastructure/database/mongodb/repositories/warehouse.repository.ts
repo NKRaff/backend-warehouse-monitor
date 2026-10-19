@@ -35,4 +35,8 @@ export class WarehouseRepository implements IWarehouseRepository {
 
 		return warehouseToDomain(warehouseModel);
 	}
+
+	async deletedById(id: string): Promise<void> {
+		await WarehouseModel.findByIdAndUpdate(id, { deletedAt: new Date() });
+	}
 }

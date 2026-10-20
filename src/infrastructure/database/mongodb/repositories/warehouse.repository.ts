@@ -1,5 +1,9 @@
 import type { IWarehouseRepository } from "@application/repositories/warehouse.interface.js";
 import type { Warehouse } from "@domain/entities/warehouse.js";
+import type { MeasurementLimits } from "@domain/object-values/measurement-limits.js";
+import type { StorageCategory } from "@domain/types/storage-category.js";
+import type { StorageCondition } from "@domain/types/storage-condition.js";
+import type { WarehouseStatus } from "@domain/types/warehouse-status.js";
 import {
 	warehouseToDomain,
 	warehouseToPersistence,
@@ -23,6 +27,16 @@ export class WarehouseRepository implements IWarehouseRepository {
 		await WarehouseModel.create(model);
 	}
 
+	async findById(id: string): Promise<Warehouse | null> {
+		const warehouseModel = await WarehouseModel.findById(id);
+
+		if (warehouseModel === null) {
+			return null;
+		}
+
+		return warehouseToDomain(warehouseModel);
+	}
+
 	async findByName(name: string): Promise<Warehouse | null> {
 		const warehouseModel = await WarehouseModel.findOne({
 			name,
@@ -34,6 +48,32 @@ export class WarehouseRepository implements IWarehouseRepository {
 		}
 
 		return warehouseToDomain(warehouseModel);
+	}
+
+	async updateById(
+		id: string,
+		name?: string,
+		condition?: StorageCondition,
+		category?: StorageCategory,
+		status?: WarehouseStatus,
+		description?: string,
+		limits?: MeasurementLimits,
+	): Promise<void> {
+		await WarehouseModel.findByIdAndUpdate(id, {
+			$set: {
+				...(name !== undefined && { name }),
+				...(condition !== undefined && { condition }),
+				...(category !== undefined && { category }),
+				...(status !== undefined && { status }),
+				...(description !== undefined && { description }),
+				...(limits !== undefined && {
+					limits: {
+						temperature: limits.temperature,
+						humidity: limits.humidity,
+					},
+				}),
+			},
+		});
 	}
 
 	async deletedById(id: string): Promise<void> {

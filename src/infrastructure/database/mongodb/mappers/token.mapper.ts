@@ -1,12 +1,11 @@
 import { Token } from "@domain/entities/token.js";
-import type { TokenType } from "@domain/types/token-type.js";
 import type { TokenDocument } from "../models/token.model.js";
 
 export function tokenToDomain(raw: TokenDocument): Token {
 	return Token.restore({
 		id: raw._id,
 		userId: raw.userId,
-		type: raw.type as TokenType,
+		type: raw.type,
 		value: raw.valueHash,
 		expiresAt: raw.expiresAt,
 	});

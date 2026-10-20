@@ -1,3 +1,4 @@
+import { UserRole } from "@domain/types/user-role.js";
 import { type InferSchemaType, model, Schema } from "mongoose";
 
 const userSchema = new Schema(
@@ -6,7 +7,7 @@ const userSchema = new Schema(
 		name: { type: String, required: true },
 		email: { type: String, required: true, unique: true },
 		password: { type: String, required: true },
-		role: { type: String, required: true },
+		role: { type: String, enum: Object.values(UserRole), required: true },
 		emailVerified: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date, require: false },
 	},

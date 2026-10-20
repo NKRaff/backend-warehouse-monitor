@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import type { TokenType } from "@domain/types/token-type.js";
+import { TokenType } from "@domain/types/token-type.js";
 
 type TokenProps = {
 	readonly id: string;
@@ -18,7 +18,7 @@ export class Token {
 		return new Token({
 			id,
 			userId,
-			type: "password_reset",
+			type: TokenType.PASSWORD_RESET,
 			value,
 			expiresAt,
 		});
@@ -30,7 +30,7 @@ export class Token {
 		return new Token({
 			id,
 			userId,
-			type: "refresh",
+			type: TokenType.REFRESH,
 			value,
 			expiresAt,
 		});
@@ -66,7 +66,7 @@ export class Token {
 		return this.props.userId;
 	}
 
-	get type(): string {
+	get type(): TokenType {
 		return this.props.type;
 	}
 

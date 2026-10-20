@@ -1,22 +1,19 @@
-import type { StorageCategory } from "@domain/types/storage-category.js";
-import type { StorageCondition } from "@domain/types/storage-condition.js";
+import { StorageCategory } from "@domain/types/storage-category.js";
+import { StorageCondition } from "@domain/types/storage-condition.js";
 import z from "zod";
-
-const categories: StorageCategory[] = [
-	"chemical",
-	"electronic",
-	"food",
-	"general",
-	"pharmaceutical",
-];
-const conditions: StorageCondition[] = ["ambient", "cold", "frozen"];
 
 export const CreateWarehouseSchema = z.object({
 	name: z
 		.string("O nome deve ser string")
 		.min(4, "Nome deve ter no minimo 4 caracteres"),
-	category: z.enum(categories, "A categoria escolhida não é valida"),
-	condition: z.enum(conditions, "A condição escolhida não é valida"),
+	category: z.enum(
+		Object.values(StorageCategory),
+		"A categoria escolhida não é valida",
+	),
+	condition: z.enum(
+		Object.values(StorageCondition),
+		"A condição escolhida não é valida",
+	),
 	description: z.string("A descrição deve ser uma string").optional(),
 	limits: z
 		.object({

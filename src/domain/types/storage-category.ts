@@ -1,6 +1,10 @@
+export const StorageCategory = {
+	FOOD: "food",
+	PHARMACEUTICAL: "pharmaceutical",
+	CHEMICAL: "chemical",
+	ELECTRONIC: "electronic",
+	GENERAL: "general",
+} as const;
+
 export type StorageCategory =
-	| "food"
-	| "pharmaceutical"
-	| "chemical"
-	| "electronic"
-	| "general";
+	(typeof StorageCategory)[keyof typeof StorageCategory];

@@ -17,7 +17,9 @@ describe("AuthorizationPolicy (RBAC) — RF-BE-007", () => {
 	beforeEach(() => {
 		resetSingleton(AuthorizationPolicy);
 		userRepo = createUserRepoMock();
-		policy = AuthorizationPolicy.instance(userRepo as unknown as PolicyDependency);
+		policy = AuthorizationPolicy.instance(
+			userRepo as unknown as PolicyDependency,
+		);
 	});
 
 	it("rejeita (401) quando o usuário do token não existe mais", async () => {
@@ -50,7 +52,9 @@ describe("AuthorizationPolicy (RBAC) — RF-BE-007", () => {
 			policy.hasPermission("user-1", "register_user"),
 		).rejects.toThrow(ForbiddenError);
 
-		userRepo.findById.mockResolvedValueOnce(makeUser({ role: "administrator" }));
+		userRepo.findById.mockResolvedValueOnce(
+			makeUser({ role: "administrator" }),
+		);
 		await expect(
 			policy.hasPermission("user-1", "register_user"),
 		).resolves.toBeUndefined();
@@ -70,9 +74,9 @@ describe("AuthorizationPolicy (RBAC) — RF-BE-007", () => {
 			["administrator", "change_password", true],
 			["manager", "change_password", true],
 			["operator", "change_password", true],
-			["administrator", "manager_warehouse", true],
-			["manager", "manager_warehouse", true],
-			["operator", "manager_warehouse", false],
+			["administrator", "manage_warehouse", true],
+			["manager", "manage_warehouse", true],
+			["operator", "manage_warehouse", false],
 		];
 
 		it.each(matrix)("%s + %s => %s", async (role, permission, allowed) => {

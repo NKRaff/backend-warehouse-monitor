@@ -12,6 +12,7 @@ import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
 import { UpdateUserUseCase } from "@application/use-cases/update-user-use-case.js";
+import { UpdateWarehouseUseCase } from "@application/use-cases/update-warehouse.use-case.js";
 import { BcryptPasswordHasherAdapter } from "@infrastructure/cryptography/bcrypt-password-hasher.adapter.js";
 import { JwtTokenAdapter } from "@infrastructure/cryptography/jwt-token.adapter.js";
 import { AlertRepository } from "@infrastructure/database/mongodb/repositories/alert.repository.js";
@@ -35,6 +36,7 @@ import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
 import { UpdateUserController } from "@presentation/controllers/update-user.controller.js";
+import { UpdateWarehouseController } from "@presentation/controllers/update-warehouse.controller.js";
 import { Router } from "express";
 import { resetSingleton } from "./singleton.js";
 
@@ -64,6 +66,7 @@ export function createTestApp(smtp: SmtpClient) {
 		GeneratePasswordResetTokenUseCase,
 		CreateWarehouseUseCase,
 		DeleteWarehouseUseCase,
+		UpdateWarehouseUseCase,
 		RegisterUserController,
 		LoginController,
 		ChangePasswordController,
@@ -71,6 +74,7 @@ export function createTestApp(smtp: SmtpClient) {
 		GeneratePasswordResetTokenController,
 		CreateWarehouseController,
 		DeleteWarehouseController,
+		UpdateWarehouseController,
 	);
 
 	const userRepo = UserRepository.instance();
@@ -154,6 +158,11 @@ export function createTestApp(smtp: SmtpClient) {
 		warehouseRepo,
 		auditLogRepo,
 	);
+	const updateWarehouseUseCase = UpdateWarehouseUseCase.instance(
+		uuidProvider,
+		warehouseRepo,
+		auditLogRepo,
+	);
 
 	const registerUserController =
 		RegisterUserController.instance(registerUserUseCase);
@@ -175,6 +184,9 @@ export function createTestApp(smtp: SmtpClient) {
 	);
 	const deleteWarehouseController = DeleteWarehouseController.instance(
 		deleteWarehouseUseCase,
+	);
+	const updateWarehouseController = UpdateWarehouseController.instance(
+		updateWarehouseUseCase,
 	);
 
 	const routes = Router();
@@ -200,6 +212,7 @@ export function createTestApp(smtp: SmtpClient) {
 			authorizationPolicy,
 			createWarehouseController,
 			deleteWarehouseController,
+			updateWarehouseController,
 		),
 	);
 

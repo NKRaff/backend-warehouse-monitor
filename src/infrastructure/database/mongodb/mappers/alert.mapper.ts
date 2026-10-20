@@ -1,18 +1,15 @@
 import { Alert } from "@domain/entities/alert.js";
-import type { AlertSeverity } from "@domain/types/alert-severity.js";
-import type { AlertStatus } from "@domain/types/alert-status.js";
-import type { AlertType } from "@domain/types/alert-type.js";
 import type { AlertDocument } from "../models/alert.model.js";
 
 export function alertToDomain(raw: AlertDocument): Alert {
 	return Alert.restore({
 		id: raw._id,
-		type: raw.type as AlertType,
-		severity: raw.severity as AlertSeverity,
+		type: raw.type,
+		severity: raw.severity,
 		title: raw.title,
 		description: raw.description,
 		occurredAt: raw.occurredAt,
-		status: raw.status as AlertStatus,
+		status: raw.status,
 		resolvedAt: raw.resolvedAt ?? undefined,
 		resolvedById: raw.resolvedById ?? undefined,
 	});

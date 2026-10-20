@@ -1,3 +1,6 @@
+import { StorageCategory } from "@domain/types/storage-category.js";
+import { StorageCondition } from "@domain/types/storage-condition.js";
+import { WarehouseStatus } from "@domain/types/warehouse-status.js";
 import { type InferSchemaType, model, Schema } from "mongoose";
 
 const measurementRangeSchema = new Schema(
@@ -24,9 +27,21 @@ const warehouseSchema = new Schema(
 	{
 		_id: { type: String, required: true },
 		name: { type: String, required: true },
-		condition: { type: String, required: true },
-		category: { type: String, required: true },
-		status: { type: String, required: true },
+		condition: {
+			type: String,
+			enum: Object.values(StorageCondition),
+			required: true,
+		},
+		category: {
+			type: String,
+			enum: Object.values(StorageCategory),
+			required: true,
+		},
+		status: {
+			type: String,
+			enum: Object.values(WarehouseStatus),
+			required: true,
+		},
 		description: { type: String, required: true },
 		limits: {
 			type: limitsSchema,

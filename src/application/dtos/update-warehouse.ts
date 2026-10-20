@@ -1,4 +1,5 @@
 import type { MeasurementLimits } from "@domain/object-values/measurement-limits.js";
+import type { MeasurementLimit } from "@domain/types/measurement-limit.js";
 import type { StorageCategory } from "@domain/types/storage-category.js";
 import type { StorageCondition } from "@domain/types/storage-condition.js";
 import type { WarehouseStatus } from "@domain/types/warehouse-status.js";
@@ -25,6 +26,11 @@ export type UpdateWarehouseOutputDto = {
 		category: StorageCategory;
 		status: WarehouseStatus;
 		description: string;
-		limits?: MeasurementLimits | undefined;
+		limits?:
+			| {
+					temperature: MeasurementLimit;
+					humidity: MeasurementLimit;
+			  }
+			| undefined;
 	};
 };

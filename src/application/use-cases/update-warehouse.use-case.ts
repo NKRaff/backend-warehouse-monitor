@@ -89,7 +89,13 @@ export class UpdateWarehouseUseCase
 					...(warehouse.description && {
 						description: warehouseExist.description,
 					}),
-					...(warehouse.limits && { limits: warehouseExist.limits }),
+					...(warehouse.limits &&
+						warehouseExist.limits && {
+							limits: {
+								temperature: warehouseExist.limits.temperature,
+								humidity: warehouseExist.limits.humidity,
+							},
+						}),
 					...(warehouse.name && { name: warehouseExist.name }),
 					...(warehouse.status && { status: warehouseExist.status }),
 				},
@@ -97,7 +103,12 @@ export class UpdateWarehouseUseCase
 					...(warehouse.category && { category: warehouse.category }),
 					...(warehouse.condition && { condition: warehouse.condition }),
 					...(warehouse.description && { description: warehouse.description }),
-					...(warehouse.limits && { limits: warehouse.limits }),
+					...(warehouse.limits && {
+						limits: {
+							temperature: warehouse.limits.temperature,
+							humidity: warehouse.limits.humidity,
+						},
+					}),
 					...(warehouse.name && { name: warehouse.name }),
 					...(warehouse.status && { status: warehouse.status }),
 				},
@@ -105,6 +116,8 @@ export class UpdateWarehouseUseCase
 		});
 
 		await this.auditLogRepo.save(auditLog);
+
+		const limits = warehouse.limits ?? warehouseExist.limits;
 
 		return {
 			message: "Armazém atualizado com sucesso",
@@ -115,7 +128,12 @@ export class UpdateWarehouseUseCase
 				description: warehouse.description ?? warehouseExist.description,
 				name: warehouse.name ?? warehouseExist.name,
 				status: warehouse.status ?? warehouseExist.status,
-				limits: warehouse.limits ?? warehouseExist.limits,
+				...(limits && {
+					limits: {
+						temperature: limits.temperature,
+						humidity: limits.humidity,
+					},
+				}),
 			},
 		};
 	}

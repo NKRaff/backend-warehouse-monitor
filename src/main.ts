@@ -11,6 +11,7 @@ import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
 import { UpdateUserUseCase } from "@application/use-cases/update-user-use-case.js";
+import { UpdateWarehouseUseCase } from "@application/use-cases/update-warehouse.use-case.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { WarehouseRepository } from "@infrastructure/database/mongodb/repositories/warehouse.repository.js";
 import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
@@ -25,6 +26,7 @@ import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
 import { UpdateUserController } from "@presentation/controllers/update-user.controller.js";
+import { UpdateWarehouseController } from "@presentation/controllers/update-warehouse.controller.js";
 import "dotenv/config";
 import { Router } from "express";
 import { BcryptPasswordHasherAdapter } from "./infrastructure/cryptography/bcrypt-password-hasher.adapter.js";
@@ -147,6 +149,11 @@ const deleteWarehouseUseCase = DeleteWarehouseUseCase.instance(
 	warehouseRepo,
 	auditLogRepo,
 );
+const updateWarehouseUseCase = UpdateWarehouseUseCase.instance(
+	uuidProvider,
+	warehouseRepo,
+	auditLogRepo,
+);
 
 // Controllers
 
@@ -171,6 +178,9 @@ const createWarehouseController = CreateWarehouseController.instance(
 const deleteWarehouseController = DeleteWarehouseController.instance(
 	deleteWarehouseUseCase,
 );
+const updateWarehouseController = UpdateWarehouseController.instance(
+	updateWarehouseUseCase,
+);
 
 // Routes
 
@@ -192,6 +202,7 @@ const warehouseRoutes = createWarehouseRoutes(
 	authorizationPolicyService,
 	createWarehouseController,
 	deleteWarehouseController,
+	updateWarehouseController,
 );
 
 routes.use("/user", userRoutes);

@@ -8,6 +8,7 @@ import type { RegisterUserOutputDto } from "@application/dtos/register-user.dto.
 import type { UpdateUserOutputDto } from "@application/dtos/update-user.dto.js";
 import type { ITokenProvider } from "@application/ports/token-provider.interface.js";
 import type { AuthorizationPolicy } from "@application/services/authorization-policy.js";
+import { Permission } from "@application/types/permission.js";
 import type { IController } from "@presentation/controllers/controller.interface.js";
 import { UnauthorizedError } from "@shared/errors/unauthorized-error.js";
 import { Router } from "express";
@@ -33,7 +34,7 @@ export function createUserRoutes(
 		authorizationMiddleware(
 			tokenProvider,
 			authorizationPolicy,
-			"register_user",
+			Permission.REGISTER_USER,
 		),
 		async (req, res, next) => {
 			try {
@@ -134,7 +135,11 @@ export function createUserRoutes(
 
 	routes.patch(
 		"/update_user",
-		authorizationMiddleware(tokenProvider, authorizationPolicy, "update_user"),
+		authorizationMiddleware(
+			tokenProvider,
+			authorizationPolicy,
+			Permission.UPDATE_USER,
+		),
 		async (req, res, next) => {
 			try {
 				const result = await updateUserController.handle(req.body, {});
@@ -148,7 +153,11 @@ export function createUserRoutes(
 
 	routes.patch(
 		"/change-role",
-		authorizationMiddleware(tokenProvider, authorizationPolicy, "change_role"),
+		authorizationMiddleware(
+			tokenProvider,
+			authorizationPolicy,
+			Permission.CHANGE_ROLE,
+		),
 		async (req, res, next) => {
 			try {
 				const result = await changeRoleController.handle(req.body, {
@@ -164,7 +173,11 @@ export function createUserRoutes(
 
 	routes.delete(
 		"/delete_user",
-		authorizationMiddleware(tokenProvider, authorizationPolicy, "delete_user"),
+		authorizationMiddleware(
+			tokenProvider,
+			authorizationPolicy,
+			Permission.DELETE_USER,
+		),
 		async (req, res, next) => {
 			try {
 				const result = await deleteUserController.handle(req.body, {

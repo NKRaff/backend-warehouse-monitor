@@ -1,6 +1,5 @@
 import { User } from "@domain/entities/user.js";
 import { Email } from "@domain/object-values/email.js";
-import type { UserRole } from "@domain/types/user-role.js";
 import type { UserDocument } from "../models/user.model.js";
 
 export function userToDomain(raw: UserDocument): User {
@@ -9,7 +8,7 @@ export function userToDomain(raw: UserDocument): User {
 		name: raw.name,
 		email: new Email(raw.email),
 		passwordHashed: raw.password,
-		role: raw.role as UserRole,
+		role: raw.role,
 		deletedAt: raw.deletedAt ?? undefined,
 	});
 

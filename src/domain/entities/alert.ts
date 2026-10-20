@@ -1,5 +1,5 @@
 import type { AlertSeverity } from "@domain/types/alert-severity.js";
-import type { AlertStatus } from "@domain/types/alert-status.js";
+import { AlertStatus } from "@domain/types/alert-status.js";
 import type { AlertType } from "@domain/types/alert-type.js";
 import { ConflictError } from "@shared/errors/conflict-error.js";
 
@@ -26,7 +26,7 @@ export class Alert {
 			...props,
 			title: props.title.trim(),
 			description: props.description.trim(),
-			status: "active",
+			status: AlertStatus.ACTIVE,
 			occurredAt: props.occurredAt ?? new Date(),
 		});
 	}

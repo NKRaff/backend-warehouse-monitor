@@ -2,6 +2,7 @@ import type { CreateWarehouseOutputDto } from "@application/dtos/create-warehous
 import type { DeleteWarehouseOutputDto } from "@application/dtos/delete-warehouse.dto.js";
 import type { ITokenProvider } from "@application/ports/token-provider.interface.js";
 import type { AuthorizationPolicy } from "@application/services/authorization-policy.js";
+import { Permission } from "@application/types/permission.js";
 import type { IController } from "@presentation/controllers/controller.interface.js";
 import { Router } from "express";
 import { authorizationMiddleware } from "../middlewares/authorization-middleware.js";
@@ -19,7 +20,7 @@ export function createWarehouseRoutes(
 		authorizationMiddleware(
 			tokenProvider,
 			authorizationPolicy,
-			"manager_warehouse",
+			Permission.MANAGE_WAREHOUSE,
 		),
 		async (req, res, next) => {
 			try {
@@ -39,7 +40,7 @@ export function createWarehouseRoutes(
 		authorizationMiddleware(
 			tokenProvider,
 			authorizationPolicy,
-			"manager_warehouse",
+			Permission.MANAGE_WAREHOUSE,
 		),
 		async (req, res, next) => {
 			try {

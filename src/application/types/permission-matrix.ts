@@ -1,18 +1,27 @@
 import type { UserRole } from "@domain/types/user-role.js";
-import type { Permission } from "./permission.js";
+import { Permission } from "./permission.js";
 
-export const PermissionMatrix: Record<UserRole, Permission[]> = {
+export const PermissionMatrix: Record<UserRole, readonly Permission[]> = {
 	administrator: [
-		"register_user",
-		"change_password",
-		"login",
-		"update_user",
-		"change_role",
-		"delete_user",
-		"manager_warehouse",
+		Permission.REGISTER_USER,
+		Permission.LOGIN,
+		Permission.CHANGE_PASSWORD,
+		Permission.UPDATE_USER,
+		Permission.CHANGE_ROLE,
+		Permission.DELETE_USER,
+		Permission.MANAGE_WAREHOUSE,
 	],
 
-	manager: ["change_password", "login", "update_user", "manager_warehouse"],
+	manager: [
+		Permission.LOGIN,
+		Permission.CHANGE_PASSWORD,
+		Permission.UPDATE_USER,
+		Permission.MANAGE_WAREHOUSE,
+	],
 
-	operator: ["change_password", "login", "update_user"],
-};
+	operator: [
+		Permission.LOGIN,
+		Permission.CHANGE_PASSWORD,
+		Permission.UPDATE_USER,
+	],
+} as const;

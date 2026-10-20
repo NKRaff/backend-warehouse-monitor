@@ -61,7 +61,7 @@ export class UpdateWarehouseUseCase
 
 		const warehouseExist = await this.warehouseRepo.findById(warehouse.id);
 
-		if (warehouseExist === null) {
+		if (warehouseExist === null || warehouseExist.deletedAt) {
 			throw new NotFoundError("Nenhum armazém relacionado ao id");
 		}
 

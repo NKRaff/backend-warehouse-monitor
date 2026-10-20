@@ -20,7 +20,7 @@ describe("Requisitos de backend pendentes", () => {
 
 	describe("Ambientes (Warehouse)", () => {
 		it.todo("RF-BE-011: cadastrar ambiente");
-		it.todo("RF-BE-012: atualizar ambiente");
+		it.todo("RF-BE-012: requisitos restantes de atualizacao (ator operator e armazem removido)");
 		it.todo("RF-BE-013: excluir ambiente desvincula dispositivos e cancela inscrições MQTT");
 		it.todo("RF-BE-014: listar ambientes ativos com paginação");
 	});

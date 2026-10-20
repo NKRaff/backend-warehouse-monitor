@@ -1,8 +1,8 @@
+import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
+import { WarehouseModel } from "@infrastructure/database/mongodb/models/warehouse.model.js";
 import type { Express } from "express";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
-import { WarehouseModel } from "@infrastructure/database/mongodb/models/warehouse.model.js";
 import { FakeSmtpClient } from "../../helpers/fake-smtp.js";
 import {
 	clearMongo,
@@ -16,6 +16,7 @@ import { createTestApp } from "../../helpers/test-app.js";
 const smtp = new FakeSmtpClient();
 const CREATE_WAREHOUSE = "/api/warehouse/create";
 const DELETE_WAREHOUSE = "/api/warehouse/delete-warehouse";
+const UPDATE_WAREHOUSE = "/api/warehouse/update-warehouse";
 let app: Express;
 
 beforeAll(async () => {
@@ -56,9 +57,7 @@ describe("POST /api/warehouse/create — RF-BE-011", () => {
 		async (role) => {
 			const { agent, user } = await sessionFor(role);
 
-			const response = await agent
-				.post(CREATE_WAREHOUSE)
-				.send(validWarehouse);
+			const response = await agent.post(CREATE_WAREHOUSE).send(validWarehouse);
 
 			expect(response.status).toBe(201);
 			expect(response.body).toMatchObject({
@@ -76,7 +75,9 @@ describe("POST /api/warehouse/create — RF-BE-011", () => {
 				status: "inactive",
 				description: "No description",
 			});
-			expect(await AuditLogModel.findOne({ resourceId: stored?._id })).toMatchObject({
+			expect(
+				await AuditLogModel.findOne({ resourceId: stored?._id }),
+			).toMatchObject({
 				actorId: user.id,
 				action: "create",
 				resourceType: "warehouse",
@@ -105,9 +106,7 @@ describe("POST /api/warehouse/create — RF-BE-011", () => {
 
 		expect(response.status).toBe(400);
 		expect(response.body.erros).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({ campo: "category" }),
-			]),
+			expect.arrayContaining([expect.objectContaining({ campo: "category" })]),
 		);
 		expect(await WarehouseModel.countDocuments()).toBe(0);
 	});
@@ -115,15 +114,13 @@ describe("POST /api/warehouse/create — RF-BE-011", () => {
 	it("rejeita limites inconsistentes sem persistir", async () => {
 		const { agent } = await sessionFor("manager");
 
-		const response = await agent
-			.post(CREATE_WAREHOUSE)
-			.send({
-				...validWarehouse,
-				limits: {
-					temperature: { min: 8, max: 2 },
-					humidity: { min: 30, max: 60 },
-				},
-			});
+		const response = await agent.post(CREATE_WAREHOUSE).send({
+			...validWarehouse,
+			limits: {
+				temperature: { min: 8, max: 2 },
+				humidity: { min: 30, max: 60 },
+			},
+		});
 
 		expect(response.status).toBe(422);
 		expect(await WarehouseModel.countDocuments()).toBe(0);
@@ -136,7 +133,9 @@ describe("POST /api/warehouse/create — RF-BE-011", () => {
 		const response = await agent.post(CREATE_WAREHOUSE).send(validWarehouse);
 
 		expect(response.status).toBe(409);
-		expect(await WarehouseModel.countDocuments({ name: validWarehouse.name })).toBe(1);
+		expect(
+			await WarehouseModel.countDocuments({ name: validWarehouse.name }),
+		).toBe(1);
 		expect(
 			await AuditLogModel.countDocuments({ resourceType: "warehouse" }),
 		).toBe(1);
@@ -196,7 +195,9 @@ describe("DELETE /api/warehouse/delete-warehouse — RF-BE-013", () => {
 			.send({ warehouseId: warehouse._id })
 			.expect(401);
 
-		expect((await WarehouseModel.findById(warehouse._id))?.deletedAt).toBeUndefined();
+		expect(
+			(await WarehouseModel.findById(warehouse._id))?.deletedAt,
+		).toBeUndefined();
 		expect(await AuditLogModel.countDocuments({ action: "delete" })).toBe(0);
 	});
 
@@ -209,7 +210,9 @@ describe("DELETE /api/warehouse/delete-warehouse — RF-BE-013", () => {
 			.send({ warehouseId: warehouse._id })
 			.expect(403);
 
-		expect((await WarehouseModel.findById(warehouse._id))?.deletedAt).toBeUndefined();
+		expect(
+			(await WarehouseModel.findById(warehouse._id))?.deletedAt,
+		).toBeUndefined();
 		expect(await AuditLogModel.countDocuments({ action: "delete" })).toBe(0);
 	});
 
@@ -227,7 +230,210 @@ describe("DELETE /api/warehouse/delete-warehouse — RF-BE-013", () => {
 				expect.objectContaining({ campo: "warehouseId" }),
 			]),
 		);
-		expect((await WarehouseModel.findById(warehouse._id))?.deletedAt).toBeUndefined();
+		expect(
+			(await WarehouseModel.findById(warehouse._id))?.deletedAt,
+		).toBeUndefined();
 		expect(await AuditLogModel.countDocuments({ action: "delete" })).toBe(0);
+	});
+});
+
+describe("PATCH /api/warehouse/update-warehouse — RF-BE-012", () => {
+	it.each(["manager", "administrator"] as const)(
+		"permite ao papel %s atualizar parcialmente e registra auditoria",
+		async (role) => {
+			const { agent, user } = await sessionFor(role);
+			const warehouse = await seedWarehouse();
+			const oldLimits = {
+				temperature: { min: 2, max: 8 },
+				humidity: { min: 30, max: 60 },
+			};
+			await WarehouseModel.findByIdAndUpdate(warehouse._id, {
+				limits: oldLimits,
+			});
+			const limits = {
+				temperature: { min: 1, max: 9 },
+				humidity: { min: 25, max: 65 },
+			};
+
+			const response = await agent.patch(UPDATE_WAREHOUSE).send({
+				id: warehouse._id,
+				name: "  Câmara Atualizada  ",
+				status: "active",
+				limits,
+			});
+
+			expect(response.status).toBe(200);
+			expect(response.body).toMatchObject({
+				message: "Armazém atualizado com sucesso",
+				warehouse: {
+					id: warehouse._id,
+					name: "Câmara Atualizada",
+					status: "active",
+					condition: "cold",
+					category: "food",
+					description: "Armazenamento refrigerado",
+					limits,
+				},
+			});
+			expect(await WarehouseModel.findById(warehouse._id)).toMatchObject({
+				name: "Câmara Atualizada",
+				status: "active",
+				limits,
+			});
+			expect(
+				await AuditLogModel.findOne({
+					resourceId: warehouse._id,
+					action: "update",
+				}),
+			).toMatchObject({
+				actorId: user.id,
+				resourceType: "warehouse",
+				metadata: {
+					old: expect.objectContaining({
+						name: warehouse.name,
+						status: "inactive",
+						limits: oldLimits,
+					}),
+					new: expect.objectContaining({
+						name: "Câmara Atualizada",
+						status: "active",
+						limits,
+					}),
+				},
+			});
+		},
+	);
+
+	it("exige autenticacao", async () => {
+		const warehouse = await seedWarehouse();
+
+		await request(app)
+			.patch(UPDATE_WAREHOUSE)
+			.send({ id: warehouse._id, name: "Câmara Atualizada" })
+			.expect(401);
+
+		expect((await WarehouseModel.findById(warehouse._id))?.name).toBe(
+			warehouse.name,
+		);
+		expect(await AuditLogModel.countDocuments({ action: "update" })).toBe(0);
+	});
+
+	it("nega operador conforme a matriz atual sem alterar o armazem", async () => {
+		const { agent } = await sessionFor("operator");
+		const warehouse = await seedWarehouse();
+
+		await agent
+			.patch(UPDATE_WAREHOUSE)
+			.send({ id: warehouse._id, name: "Câmara Atualizada" })
+			.expect(403);
+
+		expect((await WarehouseModel.findById(warehouse._id))?.name).toBe(
+			warehouse.name,
+		);
+		expect(await AuditLogModel.countDocuments({ action: "update" })).toBe(0);
+	});
+
+	it("rejeita campos invalidos sem persistir ou auditar", async () => {
+		const { agent } = await sessionFor("manager");
+		const warehouse = await seedWarehouse();
+
+		const response = await agent
+			.patch(UPDATE_WAREHOUSE)
+			.send({ id: warehouse._id, category: "misc" });
+
+		expect(response.status).toBe(400);
+		expect(response.body.erros).toEqual(
+			expect.arrayContaining([expect.objectContaining({ campo: "category" })]),
+		);
+		expect((await WarehouseModel.findById(warehouse._id))?.category).toBe(
+			warehouse.category,
+		);
+		expect(await AuditLogModel.countDocuments({ action: "update" })).toBe(0);
+	});
+
+	it("rejeita atualizacao sem campos", async () => {
+		const { agent } = await sessionFor("manager");
+		const warehouse = await seedWarehouse();
+
+		const response = await agent
+			.patch(UPDATE_WAREHOUSE)
+			.send({ id: warehouse._id });
+
+		expect(response.status).toBe(422);
+		expect((await WarehouseModel.findById(warehouse._id))?.name).toBe(
+			warehouse.name,
+		);
+		expect(await AuditLogModel.countDocuments({ action: "update" })).toBe(0);
+	});
+
+	it("rejeita limites inconsistentes sem persistir", async () => {
+		const { agent } = await sessionFor("manager");
+		const warehouse = await seedWarehouse();
+
+		const response = await agent.patch(UPDATE_WAREHOUSE).send({
+			id: warehouse._id,
+			limits: {
+				temperature: { min: 8, max: 2 },
+				humidity: { min: 30, max: 60 },
+			},
+		});
+
+		expect(response.status).toBe(422);
+		expect(
+			(await WarehouseModel.findById(warehouse._id))?.limits,
+		).toBeUndefined();
+		expect(await AuditLogModel.countDocuments({ action: "update" })).toBe(0);
+	});
+
+	it("retorna nao encontrado para id inexistente sem auditar", async () => {
+		const { agent } = await sessionFor("manager");
+
+		await agent
+			.patch(UPDATE_WAREHOUSE)
+			.send({ id: "warehouse-missing", name: "Câmara Atualizada" })
+			.expect(404);
+
+		expect(await AuditLogModel.countDocuments({ action: "update" })).toBe(0);
+	});
+
+	it("RF-BE-012: rejeita armazem removido como indisponivel para edicao", async () => {
+		const { agent } = await sessionFor("manager");
+		const warehouse = await seedWarehouse();
+		await WarehouseModel.findByIdAndUpdate(warehouse._id, {
+			deletedAt: new Date(),
+		});
+
+		// Defeito conhecido: findById no repositório inclui armazéns removidos.
+		await agent
+			.patch(UPDATE_WAREHOUSE)
+			.send({ id: warehouse._id, name: "Câmara Atualizada" })
+			.expect(404);
+	});
+
+	it("registra ambas as atualizacoes concorrentes e aplica os campos enviados", async () => {
+		const { agent } = await sessionFor("manager");
+		const warehouse = await seedWarehouse();
+
+		const [nameUpdate, descriptionUpdate] = await Promise.all([
+			agent
+				.patch(UPDATE_WAREHOUSE)
+				.send({ id: warehouse._id, name: "Câmara Atualizada" }),
+			agent
+				.patch(UPDATE_WAREHOUSE)
+				.send({ id: warehouse._id, description: "Descricao atualizada" }),
+		]);
+
+		expect(nameUpdate.status).toBe(200);
+		expect(descriptionUpdate.status).toBe(200);
+		expect(await WarehouseModel.findById(warehouse._id)).toMatchObject({
+			name: "Câmara Atualizada",
+			description: "Descricao atualizada",
+		});
+		expect(
+			await AuditLogModel.countDocuments({
+				resourceId: warehouse._id,
+				action: "update",
+			}),
+		).toBe(2);
 	});
 });

@@ -98,9 +98,15 @@ export function createTokenRepoMock() {
 export function createWarehouseRepoMock() {
 	return {
 		save: vi.fn<IWarehouseRepository["save"]>().mockResolvedValue(undefined),
+		findById: vi
+			.fn<IWarehouseRepository["findById"]>()
+			.mockResolvedValue(null),
 		findByName: vi
 			.fn<IWarehouseRepository["findByName"]>()
 			.mockResolvedValue(null),
+		updateById: vi
+			.fn<IWarehouseRepository["updateById"]>()
+			.mockResolvedValue(undefined),
 		deletedById: vi
 			.fn<IWarehouseRepository["deletedById"]>()
 			.mockResolvedValue(undefined),

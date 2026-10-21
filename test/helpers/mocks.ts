@@ -104,6 +104,7 @@ export function createWarehouseRepoMock() {
 		findByName: vi
 			.fn<IWarehouseRepository["findByName"]>()
 			.mockResolvedValue(null),
+		findAll: vi.fn<IWarehouseRepository["findAll"]>().mockResolvedValue([]),
 		updateById: vi
 			.fn<IWarehouseRepository["updateById"]>()
 			.mockResolvedValue(undefined),

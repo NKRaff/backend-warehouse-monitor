@@ -7,6 +7,8 @@ import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.j
 import { CreateWarehouseUseCase } from "@application/use-cases/create-warehouse.use-case.js";
 import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { DeleteWarehouseUseCase } from "@application/use-cases/delete-warehouse.use-case.js";
+import { GetWarehouseUseCase } from "@application/use-cases/get-warehouse.use-case.js";
+import { ListAllWarehouseUseCase } from "@application/use-cases/list-all-warehouse.use-case.js";
 import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
@@ -31,6 +33,8 @@ import { ChangeRoleController } from "@presentation/controllers/change-role.cont
 import { CreateWarehouseController } from "@presentation/controllers/create-warehouse.controller.js";
 import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { DeleteWarehouseController } from "@presentation/controllers/delete-warehouse.controller.js";
+import { GetWarehouseController } from "@presentation/controllers/get-warehouse.controller.js";
+import { ListAllWarehouseController } from "@presentation/controllers/list-all-warehouse.controller.js";
 import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
@@ -67,6 +71,8 @@ export function createTestApp(smtp: SmtpClient) {
 		CreateWarehouseUseCase,
 		DeleteWarehouseUseCase,
 		UpdateWarehouseUseCase,
+		GetWarehouseUseCase,
+		ListAllWarehouseUseCase,
 		RegisterUserController,
 		LoginController,
 		ChangePasswordController,
@@ -75,6 +81,8 @@ export function createTestApp(smtp: SmtpClient) {
 		CreateWarehouseController,
 		DeleteWarehouseController,
 		UpdateWarehouseController,
+		GetWarehouseController,
+		ListAllWarehouseController,
 	);
 
 	const userRepo = UserRepository.instance();
@@ -163,6 +171,8 @@ export function createTestApp(smtp: SmtpClient) {
 		warehouseRepo,
 		auditLogRepo,
 	);
+	const getWarehouseUseCase = GetWarehouseUseCase.instance(warehouseRepo);
+	const listAllWarehouseUseCase = ListAllWarehouseUseCase.instance(warehouseRepo);
 
 	const registerUserController =
 		RegisterUserController.instance(registerUserUseCase);
@@ -188,6 +198,8 @@ export function createTestApp(smtp: SmtpClient) {
 	const updateWarehouseController = UpdateWarehouseController.instance(
 		updateWarehouseUseCase,
 	);
+	const getWarehouseController = GetWarehouseController.instance(getWarehouseUseCase);
+	const listAllWarehouseController = ListAllWarehouseController.instance(listAllWarehouseUseCase);
 
 	const routes = Router();
 	routes.use(
@@ -213,6 +225,8 @@ export function createTestApp(smtp: SmtpClient) {
 			createWarehouseController,
 			deleteWarehouseController,
 			updateWarehouseController,
+			getWarehouseController,
+			listAllWarehouseController,
 		),
 	);
 

@@ -17,6 +17,8 @@ const smtp = new FakeSmtpClient();
 const CREATE_WAREHOUSE = "/api/warehouse/create";
 const DELETE_WAREHOUSE = "/api/warehouse/delete-warehouse";
 const UPDATE_WAREHOUSE = "/api/warehouse/update-warehouse";
+const GET_WAREHOUSE = "/api/warehouse";
+const LIST_WAREHOUSES = "/api/warehouse/warehouses/";
 let app: Express;
 
 beforeAll(async () => {
@@ -435,5 +437,64 @@ describe("PATCH /api/warehouse/update-warehouse — RF-BE-012", () => {
 				action: "update",
 			}),
 		).toBe(2);
+	});
+});
+
+describe("GET /api/warehouse/warehouses/ e GET /api/warehouse/:warehouseId — RF-BE-014", () => {
+	it("lista somente ambientes ativos, aplica offset/limit da query e inclui descrição", async () => {
+		const { agent } = await sessionFor("operator");
+		const first = await seedWarehouse("0190f1a0-7b00-7000-8000-000000000001");
+		await seedWarehouse("0190f1a0-7b00-7000-8000-000000000002");
+		await WarehouseModel.findByIdAndUpdate(first._id, { deletedAt: new Date() });
+
+		const response = await agent.get(LIST_WAREHOUSES).query({ offSet: 0, limit: 1 });
+
+		expect(response.status).toBe(200);
+		expect(response.body.warehouses).toHaveLength(1);
+		expect(response.body.warehouses[0]).toMatchObject({
+			id: "0190f1a0-7b00-7000-8000-000000000002",
+			name: "Câmara Fria",
+			description: "Armazenamento refrigerado",
+		});
+	});
+
+	it("retorna lista vazia sem erro quando não há ambientes ativos", async () => {
+		const { agent } = await sessionFor("operator");
+
+		const response = await agent.get(LIST_WAREHOUSES).query({ offSet: 0, limit: 10 });
+
+		expect(response.status).toBe(200);
+		expect(response.body.warehouses).toEqual([]);
+	});
+
+	it("exige autenticação para listar", async () => {
+		await request(app).get(LIST_WAREHOUSES).query({ offSet: 0, limit: 10 }).expect(401);
+	});
+
+	it("rejeita paginação ausente ou não numérica", async () => {
+		const { agent } = await sessionFor("operator");
+
+		await agent.get(LIST_WAREHOUSES).query({ offSet: "inválido", limit: 10 }).expect(400);
+		await agent.get(LIST_WAREHOUSES).expect(400);
+	});
+
+	it("retorna os dados de um ambiente consultado por UUID v7", async () => {
+		const { agent } = await sessionFor("operator");
+		const warehouse = await seedWarehouse("0190f1a0-7b00-7000-8000-000000000003");
+
+		const response = await agent.get(`${GET_WAREHOUSE}/${warehouse._id}`);
+
+		expect(response.status).toBe(200);
+		expect(response.body.warehouse).toMatchObject({
+			id: warehouse._id,
+			name: "Câmara Fria",
+			description: "Armazenamento refrigerado",
+		});
+	});
+
+	it("retorna 404 quando o ambiente consultado não existe", async () => {
+		const { agent } = await sessionFor("operator");
+
+		await agent.get(`${GET_WAREHOUSE}/0190f1a0-7b00-7000-8000-000000000004`).expect(404);
 	});
 });

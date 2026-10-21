@@ -82,6 +82,23 @@ export function createWarehouseRoutes(
 	);
 
 	routes.get(
+		"/warehouses/",
+		authorizationMiddleware(
+			tokenProvider,
+			authorizationPolicy,
+			Permission.LIST_WAREHOUSE,
+		),
+		async (req, res, next) => {
+			try {
+				const result = await listAllWarehouseController.handle(req.query, {});
+				return res.status(200).json(result);
+			} catch (error) {
+				next(error);
+			}
+		},
+	);
+
+	routes.get(
 		"/:warehouseId",
 		authorizationMiddleware(
 			tokenProvider,
@@ -91,23 +108,6 @@ export function createWarehouseRoutes(
 		async (req, res, next) => {
 			try {
 				const result = await getWarehouseController.handle(req.params, {});
-				return res.status(200).json(result);
-			} catch (error) {
-				next(error);
-			}
-		},
-	);
-
-	routes.get(
-		"/warehouses/",
-		authorizationMiddleware(
-			tokenProvider,
-			authorizationPolicy,
-			Permission.LIST_WAREHOUSE,
-		),
-		async (req, res, next) => {
-			try {
-				const result = await listAllWarehouseController.handle(req.params, {});
 				return res.status(200).json(result);
 			} catch (error) {
 				next(error);

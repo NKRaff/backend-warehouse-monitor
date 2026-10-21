@@ -12,6 +12,7 @@ export type ListAllWarehouseOutputDto = {
 	warehouses: {
 		id: string;
 		name: string;
+		description: string;
 		category: StorageCategory;
 		condition: StorageCondition;
 		status: WarehouseStatus;

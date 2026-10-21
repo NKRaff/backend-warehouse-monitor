@@ -37,6 +37,7 @@ export class ListAllWarehouseUseCase
 					category: warehouse.category,
 					condition: warehouse.condition,
 					name: warehouse.name,
+					description: warehouse.description,
 					status: warehouse.status,
 				};
 			}),

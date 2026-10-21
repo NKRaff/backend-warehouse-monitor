@@ -34,6 +34,7 @@ export class GetWarehouseUseCase
 				condition: warehouse.condition,
 				description: warehouse.description,
 				id: warehouse.id,
+				name: warehouse.name,
 				status: warehouse.status,
 				...(warehouse.deletedAt && { deletedAt: warehouse.deletedAt }),
 				...(warehouse.limits && {

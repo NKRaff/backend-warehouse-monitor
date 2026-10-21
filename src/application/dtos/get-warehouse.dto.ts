@@ -11,6 +11,7 @@ export type GetWarehouseOutputDto = {
 	message: string;
 	warehouse: {
 		id: string;
+		name: string;
 		condition: StorageCondition;
 		category: StorageCategory;
 		status: WarehouseStatus;

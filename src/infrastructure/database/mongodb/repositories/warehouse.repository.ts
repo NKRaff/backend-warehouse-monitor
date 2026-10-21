@@ -50,6 +50,18 @@ export class WarehouseRepository implements IWarehouseRepository {
 		return warehouseToDomain(warehouseModel);
 	}
 
+	async findAll(offset: number, limit: number): Promise<Warehouse[]> {
+		const warehouses = await WarehouseModel.find({
+			deletedAt: { $exists: false },
+		})
+			.skip(offset)
+			.limit(limit);
+
+		return warehouses.map((warehouse) => {
+			return warehouseToDomain(warehouse);
+		});
+	}
+
 	async updateById(
 		id: string,
 		name?: string,

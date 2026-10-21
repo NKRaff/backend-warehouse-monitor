@@ -6,6 +6,7 @@ export const Permission = {
 	CHANGE_ROLE: "change_role",
 	DELETE_USER: "delete_user",
 	MANAGE_WAREHOUSE: "manage_warehouse",
+	LIST_WAREHOUSE: "list_warehouse",
 } as const;
 
 export type Permission = (typeof Permission)[keyof typeof Permission];

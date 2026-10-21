@@ -8,6 +8,7 @@ export interface IWarehouseRepository {
 	save(warehouse: Warehouse): Promise<void>;
 	findById(id: string): Promise<Warehouse | null>;
 	findByName(name: string): Promise<Warehouse | null>;
+	findAll(offset: number, limit: number): Promise<Warehouse[]>;
 	updateById(
 		id: string,
 		name?: string,

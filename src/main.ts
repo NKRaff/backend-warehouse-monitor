@@ -7,6 +7,8 @@ import { CreateWarehouseUseCase } from "@application/use-cases/create-warehouse.
 import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { DeleteWarehouseUseCase } from "@application/use-cases/delete-warehouse.use-case.js";
 import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
+import { GetWarehouseUseCase } from "@application/use-cases/get-warehouse.use-case.js";
+import { ListAllWarehouseUseCase } from "@application/use-cases/list-all-warehouse.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
@@ -22,6 +24,8 @@ import { CreateWarehouseController } from "@presentation/controllers/create-ware
 import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { DeleteWarehouseController } from "@presentation/controllers/delete-warehouse.controller.js";
 import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
+import { GetWarehouseController } from "@presentation/controllers/get-warehouse.controller.js";
+import { ListAllWarehouseController } from "@presentation/controllers/list-all-warehouse.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
@@ -154,6 +158,8 @@ const updateWarehouseUseCase = UpdateWarehouseUseCase.instance(
 	warehouseRepo,
 	auditLogRepo,
 );
+const getWarehouseUseCase = GetWarehouseUseCase.instance(warehouseRepo);
+const listAllWarehouseUseCase = ListAllWarehouseUseCase.instance(warehouseRepo);
 
 // Controllers
 
@@ -181,6 +187,11 @@ const deleteWarehouseController = DeleteWarehouseController.instance(
 const updateWarehouseController = UpdateWarehouseController.instance(
 	updateWarehouseUseCase,
 );
+const getWarehouseController =
+	GetWarehouseController.instance(getWarehouseUseCase);
+const listAllWarehouseController = ListAllWarehouseController.instance(
+	listAllWarehouseUseCase,
+);
 
 // Routes
 
@@ -203,6 +214,8 @@ const warehouseRoutes = createWarehouseRoutes(
 	createWarehouseController,
 	deleteWarehouseController,
 	updateWarehouseController,
+	getWarehouseController,
+	listAllWarehouseController,
 );
 
 routes.use("/user", userRoutes);

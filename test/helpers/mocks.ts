@@ -7,6 +7,7 @@ import type { INotificationRepository } from "@application/repositories/notifica
 import type { ITokenRepository } from "@application/repositories/token.interface.js";
 import type { IUserRepository } from "@application/repositories/user.interface.js";
 import type { IWarehouseRepository } from "@application/repositories/warehouse.interface.js";
+import type { IDeviceRepository } from "@application/repositories/device.interface.js";
 import type { NotificationService } from "@application/services/notification.service.js";
 import { vi } from "vitest";
 
@@ -112,6 +113,14 @@ export function createWarehouseRepoMock() {
 			.fn<IWarehouseRepository["deletedById"]>()
 			.mockResolvedValue(undefined),
 	} satisfies IWarehouseRepository;
+}
+
+export function createDeviceRepoMock() {
+	return {
+		unlinkWarehouse: vi
+			.fn<IDeviceRepository["unlinkWarehouse"]>()
+			.mockResolvedValue(undefined),
+	} satisfies IDeviceRepository;
 }
 
 /**

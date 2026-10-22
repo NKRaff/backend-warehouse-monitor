@@ -9,11 +9,13 @@ import { auditLogToDomain } from "@infrastructure/database/mongodb/mappers/audit
 import { notificationToDomain } from "@infrastructure/database/mongodb/mappers/notification.mapper.js";
 import { AlertModel } from "@infrastructure/database/mongodb/models/alert.model.js";
 import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
+import { DeviceModel } from "@infrastructure/database/mongodb/models/device.model.js";
 import { NotificationModel } from "@infrastructure/database/mongodb/models/notification.model.js";
 import { TokenModel } from "@infrastructure/database/mongodb/models/token.model.js";
 import { UserModel } from "@infrastructure/database/mongodb/models/user.model.js";
 import { AlertRepository } from "@infrastructure/database/mongodb/repositories/alert.repository.js";
 import { AuditLogRepository } from "@infrastructure/database/mongodb/repositories/audit-log.repository.js";
+import { DeviceRepository } from "@infrastructure/database/mongodb/repositories/device.repository.js";
 import { NotificationRepository } from "@infrastructure/database/mongodb/repositories/notification.repository.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { UserRepository } from "@infrastructure/database/mongodb/repositories/user.repository.js";
@@ -28,6 +30,73 @@ import {
 beforeAll(startMongo, MONGO_STARTUP_TIMEOUT);
 afterAll(stopMongo);
 beforeEach(clearMongo);
+
+describe("DeviceRepository", () => {
+	const repo = DeviceRepository.instance();
+
+	it("desvincula todos os dispositivos do armazém, marca-os offline e preserva os demais", async () => {
+		await DeviceModel.create([
+			{
+				_id: "AA:BB:CC:DD:EE:01",
+				name: "Sensor vinculado 1",
+				warehouseId: "warehouse-1",
+				lastMeasurementId: "measurement-1",
+				deviceStatus: "online",
+				monitoringStatus: "enabled",
+			},
+			{
+				_id: "AA:BB:CC:DD:EE:02",
+				name: "Sensor vinculado 2",
+				warehouseId: "warehouse-1",
+				lastMeasurementId: "measurement-2",
+				deviceStatus: "error",
+				monitoringStatus: "disabled",
+			},
+			{
+				_id: "AA:BB:CC:DD:EE:03",
+				name: "Sensor de outro armazém",
+				warehouseId: "warehouse-2",
+				lastMeasurementId: "measurement-3",
+				deviceStatus: "online",
+				monitoringStatus: "enabled",
+			},
+		]);
+
+		await repo.unlinkWarehouse("warehouse-1");
+
+		const unlinked = await DeviceModel.find({
+			_id: { $in: ["AA:BB:CC:DD:EE:01", "AA:BB:CC:DD:EE:02"] },
+		}).sort({ _id: 1 });
+		expect(unlinked).toHaveLength(2);
+		expect(unlinked.map(({ warehouseId, deviceStatus }) => ({ warehouseId, deviceStatus }))).toEqual([
+			{ warehouseId: undefined, deviceStatus: "offline" },
+			{ warehouseId: undefined, deviceStatus: "offline" },
+		]);
+		expect(unlinked[0]?.monitoringStatus).toBe("enabled");
+		expect(unlinked[1]?.monitoringStatus).toBe("disabled");
+		expect(await DeviceModel.findById("AA:BB:CC:DD:EE:03")).toMatchObject({
+			warehouseId: "warehouse-2",
+			deviceStatus: "online",
+		});
+	});
+
+	it("não altera dispositivos quando o armazém não possui vínculos", async () => {
+		await DeviceModel.create({
+			_id: "AA:BB:CC:DD:EE:04",
+			name: "Sensor independente",
+			warehouseId: "warehouse-2",
+			lastMeasurementId: "measurement-4",
+			deviceStatus: "online",
+			monitoringStatus: "enabled",
+		});
+
+		await expect(repo.unlinkWarehouse("warehouse-missing")).resolves.toBeUndefined();
+		expect(await DeviceModel.findById("AA:BB:CC:DD:EE:04")).toMatchObject({
+			warehouseId: "warehouse-2",
+			deviceStatus: "online",
+		});
+	});
+});
 
 const newUser = (overrides: Partial<{ id: string; email: string }> = {}) =>
 	User.create({

@@ -23,6 +23,7 @@ import { NotificationRepository } from "@infrastructure/database/mongodb/reposit
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { UserRepository } from "@infrastructure/database/mongodb/repositories/user.repository.js";
 import { WarehouseRepository } from "@infrastructure/database/mongodb/repositories/warehouse.repository.js";
+import { DeviceRepository } from "@infrastructure/database/mongodb/repositories/device.repository.js";
 import { ExpressApp } from "@infrastructure/http/express/express.app.js";
 import { createUserRoutes } from "@infrastructure/http/express/routes/user.routes.js";
 import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
@@ -56,6 +57,7 @@ export function createTestApp(smtp: SmtpClient) {
 		AuditLogRepository,
 		TokenRepository,
 		WarehouseRepository,
+		DeviceRepository,
 		BcryptPasswordHasherAdapter,
 		JwtTokenAdapter,
 		UuidAdapter,
@@ -91,6 +93,7 @@ export function createTestApp(smtp: SmtpClient) {
 	const auditLogRepo = AuditLogRepository.instance();
 	const tokenRepo = TokenRepository.instance();
 	const warehouseRepo = WarehouseRepository.instance();
+	const deviceRepo = DeviceRepository.instance();
 
 	const passwordHasher = BcryptPasswordHasherAdapter.instance();
 	const tokenProvider = JwtTokenAdapter.instance();
@@ -165,6 +168,7 @@ export function createTestApp(smtp: SmtpClient) {
 		uuidProvider,
 		warehouseRepo,
 		auditLogRepo,
+		deviceRepo,
 	);
 	const updateWarehouseUseCase = UpdateWarehouseUseCase.instance(
 		uuidProvider,

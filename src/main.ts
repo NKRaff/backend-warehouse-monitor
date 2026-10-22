@@ -14,6 +14,7 @@ import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-ca
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
 import { UpdateUserUseCase } from "@application/use-cases/update-user-use-case.js";
 import { UpdateWarehouseUseCase } from "@application/use-cases/update-warehouse.use-case.js";
+import { DeviceRepository } from "@infrastructure/database/mongodb/repositories/device.repository.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { WarehouseRepository } from "@infrastructure/database/mongodb/repositories/warehouse.repository.js";
 import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
@@ -69,6 +70,7 @@ const notificationRepo = NotificationRepository.instance();
 const auditLogRepo = AuditLogRepository.instance();
 const tokenRepo = TokenRepository.instance();
 const warehouseRepo = WarehouseRepository.instance();
+const deviceRepo = DeviceRepository.instance();
 
 // Adapters
 
@@ -152,6 +154,7 @@ const deleteWarehouseUseCase = DeleteWarehouseUseCase.instance(
 	uuidProvider,
 	warehouseRepo,
 	auditLogRepo,
+	deviceRepo,
 );
 const updateWarehouseUseCase = UpdateWarehouseUseCase.instance(
 	uuidProvider,

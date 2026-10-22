@@ -2,6 +2,7 @@ import { DeleteWarehouseUseCase } from "@application/use-cases/delete-warehouse.
 import { beforeEach, describe, expect, it } from "vitest";
 import {
 	createAuditLogRepoMock,
+	createDeviceRepoMock,
 	createUuidProviderMock,
 	createWarehouseRepoMock,
 } from "../../../helpers/mocks.js";
@@ -13,17 +14,21 @@ describe("DeleteWarehouseUseCase — RF-BE-013", () => {
 	it("reutiliza a instância configurada primeiro", async () => {
 		const firstWarehouses = createWarehouseRepoMock();
 		const firstAudit = createAuditLogRepoMock();
+		const firstDevices = createDeviceRepoMock();
 		const first = DeleteWarehouseUseCase.instance(
 			createUuidProviderMock(),
 			firstWarehouses,
 			firstAudit,
+			firstDevices,
 		);
 		const ignoredWarehouses = createWarehouseRepoMock();
 		const ignoredAudit = createAuditLogRepoMock();
+		const ignoredDevices = createDeviceRepoMock();
 		const second = DeleteWarehouseUseCase.instance(
 			createUuidProviderMock(),
 			ignoredWarehouses,
 			ignoredAudit,
+			ignoredDevices,
 		);
 
 		expect(second).toBe(first);
@@ -34,15 +39,19 @@ describe("DeleteWarehouseUseCase — RF-BE-013", () => {
 		);
 		expect(ignoredWarehouses.deletedById).not.toHaveBeenCalled();
 		expect(ignoredAudit.save).not.toHaveBeenCalled();
+		expect(firstDevices.unlinkWarehouse).toHaveBeenCalledExactlyOnceWith("warehouse-1");
+		expect(ignoredDevices.unlinkWarehouse).not.toHaveBeenCalled();
 	});
 
 	it("marca o armazém como removido e registra auditoria com o ator", async () => {
 		const warehouses = createWarehouseRepoMock();
 		const audit = createAuditLogRepoMock();
+		const devices = createDeviceRepoMock();
 		const useCase = DeleteWarehouseUseCase.instance(
 			createUuidProviderMock(),
 			warehouses,
 			audit,
+			devices,
 		);
 
 		await expect(
@@ -51,6 +60,10 @@ describe("DeleteWarehouseUseCase — RF-BE-013", () => {
 
 		expect(warehouses.deletedById).toHaveBeenCalledExactlyOnceWith(
 			"warehouse-1",
+		);
+		expect(devices.unlinkWarehouse).toHaveBeenCalledExactlyOnceWith("warehouse-1");
+		expect(devices.unlinkWarehouse.mock.invocationCallOrder[0]).toBeLessThan(
+			warehouses.deletedById.mock.invocationCallOrder[0],
 		);
 		expect(audit.save).toHaveBeenCalledWith(
 			expect.objectContaining({
@@ -67,10 +80,12 @@ describe("DeleteWarehouseUseCase — RF-BE-013", () => {
 		const warehouses = createWarehouseRepoMock();
 		warehouses.deletedById.mockRejectedValue(new Error("falha ao gravar"));
 		const audit = createAuditLogRepoMock();
+		const devices = createDeviceRepoMock();
 		const useCase = DeleteWarehouseUseCase.instance(
 			createUuidProviderMock(),
 			warehouses,
 			audit,
+			devices,
 		);
 
 		await expect(
@@ -82,11 +97,13 @@ describe("DeleteWarehouseUseCase — RF-BE-013", () => {
 	it("propaga falha ao registrar auditoria após solicitar a remoção", async () => {
 		const warehouses = createWarehouseRepoMock();
 		const audit = createAuditLogRepoMock();
+		const devices = createDeviceRepoMock();
 		audit.save.mockRejectedValue(new Error("falha na auditoria"));
 		const useCase = DeleteWarehouseUseCase.instance(
 			createUuidProviderMock(),
 			warehouses,
 			audit,
+			devices,
 		);
 
 		await expect(

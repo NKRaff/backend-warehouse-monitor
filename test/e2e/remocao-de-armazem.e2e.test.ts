@@ -2,6 +2,7 @@ import type { Express } from "express";
 import request from "supertest";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
+import { DeviceModel } from "@infrastructure/database/mongodb/models/device.model.js";
 import { WarehouseModel } from "@infrastructure/database/mongodb/models/warehouse.model.js";
 import { FakeSmtpClient } from "../helpers/fake-smtp.js";
 import {
@@ -43,6 +44,14 @@ describe("E2E — remoção de armazém RF-BE-013", () => {
 			condition: "ambient",
 		});
 		expect(created.status).toBe(201);
+		await DeviceModel.create({
+			_id: "AA:BB:CC:DD:EE:FF",
+			name: "Sensor vinculado",
+			warehouseId: created.body.warehouse.id,
+			lastMeasurementId: "measurement-1",
+			deviceStatus: "online",
+			monitoringStatus: "enabled",
+		});
 
 		const response = await agent
 			.delete("/api/warehouse/delete-warehouse")
@@ -55,6 +64,10 @@ describe("E2E — remoção de armazém RF-BE-013", () => {
 			name: "Depósito para Remoção",
 			status: "inactive",
 		});
+		const device = await DeviceModel.findById("AA:BB:CC:DD:EE:FF");
+		expect(device?.warehouseId).toBeUndefined();
+		expect(device?.deviceStatus).toBe("offline");
+		expect(device?.monitoringStatus).toBe("enabled");
 		expect(
 			await AuditLogModel.findOne({
 				resourceId: created.body.warehouse.id,

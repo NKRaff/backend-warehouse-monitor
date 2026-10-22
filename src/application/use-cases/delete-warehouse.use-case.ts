@@ -41,9 +41,9 @@ export class DeleteWarehouseUseCase
 	async execute(
 		input: DeleteWarehouseInputDto,
 	): Promise<DeleteWarehouseOutputDto> {
-		await this.warehouseRepo.deletedById(input.warehouseId);
-
 		await this.deviceRepo.unlinkWarehouse(input.warehouseId);
+
+		await this.warehouseRepo.deletedById(input.warehouseId);
 
 		const auditLog = AuditLog.create({
 			action: "delete",

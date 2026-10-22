@@ -6,10 +6,18 @@ const deviceSchema = new Schema(
 	{
 		_id: { type: String, required: true },
 		name: { type: String, required: true },
-		warehouseId: { type: String, required: true, ref: "Warehouse" },
+		warehouseId: { type: String, required: false, ref: "Warehouse" },
 		lastMeasurementId: { type: String, required: true, ref: "Measurement" },
-		deviceStatus: { type: Object.values(DeviceStatus), required: true },
-		MonitoringStatus: { type: Object.values(MonitoringStatus), required: true },
+		deviceStatus: {
+			type: String,
+			enum: Object.values(DeviceStatus),
+			required: true,
+		},
+		monitoringStatus: {
+			type: String,
+			enum: Object.values(MonitoringStatus),
+			required: true,
+		},
 	},
 	{
 		timestamps: false,

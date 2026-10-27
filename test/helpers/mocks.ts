@@ -120,6 +120,8 @@ export function createDeviceRepoMock() {
 		unlinkWarehouse: vi
 			.fn<IDeviceRepository["unlinkWarehouse"]>()
 			.mockResolvedValue(undefined),
+		save: vi.fn<IDeviceRepository["save"]>().mockResolvedValue(undefined),
+		findById: vi.fn<IDeviceRepository["findById"]>().mockResolvedValue(null),
 	} satisfies IDeviceRepository;
 }
 

@@ -14,14 +14,18 @@ const baseProps = () => ({
 describe("Device (Entity)", () => {
 	describe("create()", () => {
 		it("expõe os dados informados", () => {
-			const device = Device.create(baseProps());
+			const device = Device.create({
+				mac: "AA:BB:CC:DD:EE:FF",
+				name: "Sensor câmara 1",
+				warehouseId: "warehouse-1",
+			});
 
 			expect(device.mac).toBe("AA:BB:CC:DD:EE:FF");
 			expect(device.name).toBe("Sensor câmara 1");
 			expect(device.warehouseId).toBe("warehouse-1");
-			expect(device.lastMeasurementId).toBe("measurement-0");
+			expect(device.lastMeasurementId).toBeUndefined();
 			expect(device.deviceStatus).toBe("online");
-			expect(device.monitoringStatus).toBe("enabled");
+			expect(device.monitoringStatus).toBe("disabled");
 		});
 
 		it("remove espaços nas pontas do nome", () => {
@@ -64,6 +68,7 @@ describe("Device (Entity)", () => {
 
 		it("updateMeasurement() guarda a última medição quando o monitoramento está ativo", () => {
 			const device = Device.create(baseProps());
+			device.enableMonitoring();
 
 			device.updateMeasurement("measurement-42");
 

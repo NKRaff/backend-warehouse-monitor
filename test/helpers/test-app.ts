@@ -5,6 +5,7 @@ import { PasswordPolicyService } from "@application/services/password-policy.ser
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
 import { CreateWarehouseUseCase } from "@application/use-cases/create-warehouse.use-case.js";
+import { CreateDeviceUseCase } from "@application/use-cases/create-device.use-case.js";
 import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { DeleteWarehouseUseCase } from "@application/use-cases/delete-warehouse.use-case.js";
 import { GetWarehouseUseCase } from "@application/use-cases/get-warehouse.use-case.js";
@@ -27,11 +28,13 @@ import { DeviceRepository } from "@infrastructure/database/mongodb/repositories/
 import { ExpressApp } from "@infrastructure/http/express/express.app.js";
 import { createUserRoutes } from "@infrastructure/http/express/routes/user.routes.js";
 import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
+import { createDeviceRoutes } from "@infrastructure/http/express/routes/device.routes.js";
 import { UuidAdapter } from "@infrastructure/identifier/uuid.adapter.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
 import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
 import { CreateWarehouseController } from "@presentation/controllers/create-warehouse.controller.js";
+import { CreateDeviceController } from "@presentation/controllers/create-device.controller.js";
 import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { DeleteWarehouseController } from "@presentation/controllers/delete-warehouse.controller.js";
 import { GetWarehouseController } from "@presentation/controllers/get-warehouse.controller.js";
@@ -71,6 +74,7 @@ export function createTestApp(smtp: SmtpClient) {
 		RefreshTokenUseCase,
 		GeneratePasswordResetTokenUseCase,
 		CreateWarehouseUseCase,
+		CreateDeviceUseCase,
 		DeleteWarehouseUseCase,
 		UpdateWarehouseUseCase,
 		GetWarehouseUseCase,
@@ -81,6 +85,7 @@ export function createTestApp(smtp: SmtpClient) {
 		RefreshTokenController,
 		GeneratePasswordResetTokenController,
 		CreateWarehouseController,
+		CreateDeviceController,
 		DeleteWarehouseController,
 		UpdateWarehouseController,
 		GetWarehouseController,
@@ -177,6 +182,7 @@ export function createTestApp(smtp: SmtpClient) {
 	);
 	const getWarehouseUseCase = GetWarehouseUseCase.instance(warehouseRepo);
 	const listAllWarehouseUseCase = ListAllWarehouseUseCase.instance(warehouseRepo);
+	const createDeviceUseCase = CreateDeviceUseCase.instance(deviceRepo);
 
 	const registerUserController =
 		RegisterUserController.instance(registerUserUseCase);
@@ -204,6 +210,7 @@ export function createTestApp(smtp: SmtpClient) {
 	);
 	const getWarehouseController = GetWarehouseController.instance(getWarehouseUseCase);
 	const listAllWarehouseController = ListAllWarehouseController.instance(listAllWarehouseUseCase);
+	const createDeviceController = CreateDeviceController.instance(createDeviceUseCase);
 
 	const routes = Router();
 	routes.use(
@@ -232,6 +239,10 @@ export function createTestApp(smtp: SmtpClient) {
 			getWarehouseController,
 			listAllWarehouseController,
 		),
+	);
+	routes.use(
+		"/device",
+		createDeviceRoutes(tokenProvider, authorizationPolicy, createDeviceController),
 	);
 
 	return {

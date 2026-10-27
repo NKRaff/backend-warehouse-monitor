@@ -26,10 +26,10 @@ describe("Requisitos de backend pendentes", () => {
 	});
 
 	describe("Dispositivos e MQTT", () => {
-		it.todo("RF-BE-015: cadastrar dispositivo valida MAC e inscreve nos tópicos MQTT");
+		it.todo("RF-BE-015: validar existência do armazém e inscrever MQTT no cadastro vinculado");
 		it.todo("RF-BE-016: vincular/desvincular ambiente sincroniza as inscrições MQTT");
 		it.todo("RF-BE-017: excluir dispositivo (soft delete) cancela as inscrições");
-		it.todo("RF-BE-019: unicidade do MAC entre dispositivos ativos");
+		it.todo("RF-BE-019: permitir reutilizar MAC somente após remoção lógica do dispositivo");
 		it.todo("RF-BE-020: restaurar inscrições MQTT na inicialização");
 	});
 

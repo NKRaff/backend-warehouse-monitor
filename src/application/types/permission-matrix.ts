@@ -11,6 +11,7 @@ export const PermissionMatrix: Record<UserRole, readonly Permission[]> = {
 		Permission.DELETE_USER,
 		Permission.MANAGE_WAREHOUSE,
 		Permission.LIST_WAREHOUSE,
+		Permission.MANAGE_DEVICE,
 	],
 
 	manager: [
@@ -19,6 +20,7 @@ export const PermissionMatrix: Record<UserRole, readonly Permission[]> = {
 		Permission.UPDATE_USER,
 		Permission.MANAGE_WAREHOUSE,
 		Permission.LIST_WAREHOUSE,
+		Permission.MANAGE_DEVICE,
 	],
 
 	operator: [

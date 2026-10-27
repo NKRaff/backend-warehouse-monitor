@@ -7,7 +7,7 @@ const deviceSchema = new Schema(
 		_id: { type: String, required: true },
 		name: { type: String, required: true },
 		warehouseId: { type: String, required: false, ref: "Warehouse" },
-		lastMeasurementId: { type: String, required: true, ref: "Measurement" },
+		lastMeasurementId: { type: String, required: false, ref: "Measurement" },
 		deviceStatus: {
 			type: String,
 			enum: Object.values(DeviceStatus),

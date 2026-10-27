@@ -3,6 +3,7 @@ import { NotificationService } from "@application/services/notification.service.
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
+import { CreateDeviceUseCase } from "@application/use-cases/create-device.use-case.js";
 import { CreateWarehouseUseCase } from "@application/use-cases/create-warehouse.use-case.js";
 import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { DeleteWarehouseUseCase } from "@application/use-cases/delete-warehouse.use-case.js";
@@ -17,10 +18,12 @@ import { UpdateWarehouseUseCase } from "@application/use-cases/update-warehouse.
 import { DeviceRepository } from "@infrastructure/database/mongodb/repositories/device.repository.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { WarehouseRepository } from "@infrastructure/database/mongodb/repositories/warehouse.repository.js";
+import { createDeviceRoutes } from "@infrastructure/http/express/routes/device.routes.js";
 import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
 import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
+import { CreateDeviceController } from "@presentation/controllers/create-device.controller.js";
 import { CreateWarehouseController } from "@presentation/controllers/create-warehouse.controller.js";
 import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { DeleteWarehouseController } from "@presentation/controllers/delete-warehouse.controller.js";
@@ -163,6 +166,7 @@ const updateWarehouseUseCase = UpdateWarehouseUseCase.instance(
 );
 const getWarehouseUseCase = GetWarehouseUseCase.instance(warehouseRepo);
 const listAllWarehouseUseCase = ListAllWarehouseUseCase.instance(warehouseRepo);
+const createDeviceUseCase = CreateDeviceUseCase.instance(deviceRepo);
 
 // Controllers
 
@@ -195,6 +199,8 @@ const getWarehouseController =
 const listAllWarehouseController = ListAllWarehouseController.instance(
 	listAllWarehouseUseCase,
 );
+const createDeviceController =
+	CreateDeviceController.instance(createDeviceUseCase);
 
 // Routes
 
@@ -220,9 +226,15 @@ const warehouseRoutes = createWarehouseRoutes(
 	getWarehouseController,
 	listAllWarehouseController,
 );
+const deviceRoutes = createDeviceRoutes(
+	tokenProvider,
+	authorizationPolicyService,
+	createDeviceController,
+);
 
 routes.use("/user", userRoutes);
 routes.use("/warehouse", warehouseRoutes);
+routes.use("/device", deviceRoutes);
 
 // Socket Handlers
 const warehouseHandler = new WarehouseHandle();

@@ -1,5 +1,7 @@
 import type { IDeviceRepository } from "@application/repositories/device.interface.js";
+import type { Device } from "@domain/entities/device.js";
 import { DeviceStatus } from "@domain/types/device-status.js";
+import { deviceToPersistence } from "../mappers/device.mapper.js";
 import { DeviceModel } from "../models/device.model.js";
 
 export class DeviceRepository implements IDeviceRepository {
@@ -22,5 +24,13 @@ export class DeviceRepository implements IDeviceRepository {
 				$unset: { warehouseId: "" },
 			},
 		);
+	}
+
+	async save(device: Device): Promise<void> {
+		await DeviceModel.create(deviceToPersistence(device));
+	}
+
+	async findById(mac: string): Promise<Device | null> {
+		return await DeviceModel.findById(mac);
 	}
 }

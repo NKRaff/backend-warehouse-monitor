@@ -1,5 +1,6 @@
 import { Alert } from "@domain/entities/alert.js";
 import { AuditLog } from "@domain/entities/audit-log.js";
+import { Device } from "@domain/entities/device.js";
 import { Notification } from "@domain/entities/notification.js";
 import { Token } from "@domain/entities/token.js";
 import { User } from "@domain/entities/user.js";
@@ -33,6 +34,29 @@ beforeEach(clearMongo);
 
 describe("DeviceRepository", () => {
 	const repo = DeviceRepository.instance();
+
+	it("persiste e reconstrói um dispositivo de domínio", async () => {
+		const device = Device.create({
+			mac: "AA:BB:CC:DD:EE:10",
+			name: "Sensor independente",
+		});
+
+		await repo.save(device);
+		const found = await repo.findById(device.mac);
+
+		expect(found).toBeInstanceOf(Device);
+		expect(found).toMatchObject({
+			mac: device.mac,
+			name: device.name,
+			deviceStatus: "online",
+			monitoringStatus: "disabled",
+		});
+		expect(found?.warehouseId).toBeUndefined();
+	});
+
+	it("retorna null para MAC inexistente", async () => {
+		await expect(repo.findById("AA:BB:CC:DD:EE:11")).resolves.toBeNull();
+	});
 
 	it("desvincula todos os dispositivos do armazém, marca-os offline e preserva os demais", async () => {
 		await DeviceModel.create([

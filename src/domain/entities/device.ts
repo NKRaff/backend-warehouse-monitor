@@ -1,12 +1,12 @@
-import type { DeviceStatus } from "@domain/types/device-status.js";
-import type { MonitoringStatus } from "@domain/types/monitoring-status.js";
+import { DeviceStatus } from "@domain/types/device-status.js";
+import { MonitoringStatus } from "@domain/types/monitoring-status.js";
 import { UnprocessableEntityError } from "@shared/errors/unprocessable-entity-error.js";
 
 type DeviceProps = {
 	readonly mac: string;
 	name: string;
-	warehouseId: string;
-	lastMeasurementId: string;
+	warehouseId?: string | undefined;
+	lastMeasurementId?: string | undefined;
 	deviceStatus: DeviceStatus;
 	monitoringStatus: MonitoringStatus;
 };
@@ -14,7 +14,18 @@ type DeviceProps = {
 export class Device {
 	private constructor(private props: DeviceProps) {}
 
-	static create(props: DeviceProps): Device {
+	static create(
+		props: Omit<
+			DeviceProps,
+			"lastMeasurementId" | "deviceStatus" | "monitoringStatus"
+		>,
+	): Device {
+		const macRegex = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+
+		if (!macRegex.test(props.mac)) {
+			throw new UnprocessableEntityError("Endereço mac invalido");
+		}
+
 		props.name = props.name.trim();
 
 		if (props.name.length < 4) {
@@ -23,7 +34,11 @@ export class Device {
 			);
 		}
 
-		return new Device(props);
+		return new Device({
+			...props,
+			deviceStatus: DeviceStatus.ONLINE,
+			monitoringStatus: MonitoringStatus.DISABLE,
+		});
 	}
 
 	static restore(props: DeviceProps): Device {
@@ -54,11 +69,11 @@ export class Device {
 		return this.props.name;
 	}
 
-	get warehouseId(): string {
+	get warehouseId(): string | undefined {
 		return this.props.warehouseId;
 	}
 
-	get lastMeasurementId(): string {
+	get lastMeasurementId(): string | undefined {
 		return this.props.lastMeasurementId;
 	}
 

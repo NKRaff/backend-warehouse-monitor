@@ -1,7 +1,10 @@
 import type { IDeviceRepository } from "@application/repositories/device.interface.js";
 import type { Device } from "@domain/entities/device.js";
 import { DeviceStatus } from "@domain/types/device-status.js";
-import { deviceToPersistence } from "../mappers/device.mapper.js";
+import {
+	deviceToDomain,
+	deviceToPersistence,
+} from "../mappers/device.mapper.js";
 import { DeviceModel } from "../models/device.model.js";
 
 export class DeviceRepository implements IDeviceRepository {
@@ -31,6 +34,7 @@ export class DeviceRepository implements IDeviceRepository {
 	}
 
 	async findById(mac: string): Promise<Device | null> {
-		return await DeviceModel.findById(mac);
+		const device = await DeviceModel.findById(mac);
+		return device ? deviceToDomain(device) : null;
 	}
 }

@@ -24,7 +24,7 @@ export class CreateDeviceUseCase
 	async execute(input: CreateDeviceInputDto): Promise<CreateDeviceOutputDto> {
 		const deviceExist = await this.deviceRepo.findById(input.device.mac);
 
-		if (deviceExist === null) {
+		if (deviceExist !== null) {
 			throw new ConflictError("Dispositivo ja cadastrado");
 		}
 

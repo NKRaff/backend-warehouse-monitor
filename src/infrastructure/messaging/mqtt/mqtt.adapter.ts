@@ -128,4 +128,20 @@ export class MqttAdapter implements IMqttClient {
 			});
 		});
 	}
+
+	async unsubscribe(topic: string): Promise<void> {
+		return new Promise((resolve, reject) => {
+			if (!this.client || !this.client.connected) {
+				return reject(
+					new ServiceUnavailableError(
+						"Cliente MQTT não está conectado ao broker",
+					),
+				);
+			}
+
+			this.client.unsubscribe(topic);
+
+			resolve();
+		});
+	}
 }

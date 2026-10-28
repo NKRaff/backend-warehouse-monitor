@@ -1,4 +1,5 @@
 import type { CreateDeviceOutputDto } from "@application/dtos/create-device.dto.js";
+import type { DeleteDeviceOutputDto } from "@application/dtos/delete-device.dto.js";
 import type { UpdateDeviceOutputDto } from "@application/dtos/update-device.dto.js";
 import type { ITokenProvider } from "@application/ports/token-provider.interface.js";
 import type { AuthorizationPolicy } from "@application/services/authorization-policy.js";
@@ -12,6 +13,7 @@ export function createDeviceRoutes(
 	authorizationPolicy: AuthorizationPolicy,
 	createDeviceController: IController<CreateDeviceOutputDto>,
 	updateDeviceController: IController<UpdateDeviceOutputDto>,
+	deleteDeviceController: IController<DeleteDeviceOutputDto>,
 ): Router {
 	const routes = Router();
 
@@ -49,6 +51,28 @@ export function createDeviceRoutes(
 				const actorId = req.user?.id;
 
 				const result = await updateDeviceController.handle(req.body, {
+					actorId,
+				});
+
+				return res.status(200).json(result);
+			} catch (error) {
+				next(error);
+			}
+		},
+	);
+
+	routes.delete(
+		"/delete",
+		authorizationMiddleware(
+			tokenProvider,
+			authorizationPolicy,
+			Permission.MANAGE_WAREHOUSE,
+		),
+		async (req, res, next) => {
+			try {
+				const actorId = req.user?.id;
+
+				const result = await deleteDeviceController.handle(req.body, {
 					actorId,
 				});
 

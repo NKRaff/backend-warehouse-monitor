@@ -5,6 +5,7 @@ import { ChangePasswordUseCase } from "@application/use-cases/change-password.us
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
 import { CreateDeviceUseCase } from "@application/use-cases/create-device.use-case.js";
 import { CreateWarehouseUseCase } from "@application/use-cases/create-warehouse.use-case.js";
+import { DeleteDeviceUseCase } from "@application/use-cases/delete-device.use-case.js";
 import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { DeleteWarehouseUseCase } from "@application/use-cases/delete-warehouse.use-case.js";
 import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
@@ -26,6 +27,7 @@ import { ChangePasswordController } from "@presentation/controllers/change-passw
 import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
 import { CreateDeviceController } from "@presentation/controllers/create-device.controller.js";
 import { CreateWarehouseController } from "@presentation/controllers/create-warehouse.controller.js";
+import { DeleteDeviceController } from "@presentation/controllers/delete-device.controller.js";
 import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { DeleteWarehouseController } from "@presentation/controllers/delete-warehouse.controller.js";
 import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
@@ -170,6 +172,12 @@ const getWarehouseUseCase = GetWarehouseUseCase.instance(warehouseRepo);
 const listAllWarehouseUseCase = ListAllWarehouseUseCase.instance(warehouseRepo);
 const createDeviceUseCase = CreateDeviceUseCase.instance(deviceRepo);
 const updateDeviceUseCase = UpdateDeviceUseCase.instance(deviceRepo);
+const deleteDeviceUseCase = DeleteDeviceUseCase.instance(
+	uuidProvider,
+	clientMqtt,
+	deviceRepo,
+	auditLogRepo,
+);
 
 // Controllers
 
@@ -206,6 +214,8 @@ const createDeviceController =
 	CreateDeviceController.instance(createDeviceUseCase);
 const updateDeviceController =
 	UpdateDeviceController.instance(updateDeviceUseCase);
+const deleteDeviceController =
+	DeleteDeviceController.instance(deleteDeviceUseCase);
 
 // Routes
 
@@ -236,6 +246,7 @@ const deviceRoutes = createDeviceRoutes(
 	authorizationPolicyService,
 	createDeviceController,
 	updateDeviceController,
+	deleteDeviceController,
 );
 
 routes.use("/user", userRoutes);

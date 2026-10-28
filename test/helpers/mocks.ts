@@ -122,6 +122,9 @@ export function createDeviceRepoMock() {
 			.mockResolvedValue(undefined),
 		save: vi.fn<IDeviceRepository["save"]>().mockResolvedValue(undefined),
 		findById: vi.fn<IDeviceRepository["findById"]>().mockResolvedValue(null),
+		updateById: vi
+			.fn<IDeviceRepository["updateById"]>()
+			.mockResolvedValue(undefined),
 	} satisfies IDeviceRepository;
 }
 

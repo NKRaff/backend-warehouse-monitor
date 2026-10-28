@@ -58,6 +58,40 @@ describe("DeviceRepository", () => {
 		await expect(repo.findById("AA:BB:CC:DD:EE:11")).resolves.toBeNull();
 	});
 
+	it("atualiza apenas os campos recebidos", async () => {
+		await DeviceModel.create({
+			_id: "AA:BB:CC:DD:EE:12",
+			name: "Sensor anterior",
+			warehouseId: "0190f1a0-7b00-7000-8000-000000000012",
+			lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000013",
+			deviceStatus: "online",
+			monitoringStatus: "disabled",
+		});
+
+		await repo.updateById({
+			mac: "AA:BB:CC:DD:EE:12",
+			name: "Sensor atualizado",
+			monitoringStatus: "enabled",
+		});
+
+		expect(await DeviceModel.findById("AA:BB:CC:DD:EE:12")).toMatchObject({
+			name: "Sensor atualizado",
+			warehouseId: "0190f1a0-7b00-7000-8000-000000000012",
+			lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000013",
+			deviceStatus: "online",
+			monitoringStatus: "enabled",
+		});
+	});
+
+	it("não cria dispositivo ao atualizar MAC inexistente", async () => {
+		await repo.updateById({
+			mac: "AA:BB:CC:DD:EE:13",
+			name: "Sensor atualizado",
+		});
+
+		expect(await DeviceModel.countDocuments()).toBe(0);
+	});
+
 	it("desvincula todos os dispositivos do armazém, marca-os offline e preserva os demais", async () => {
 		await DeviceModel.create([
 			{

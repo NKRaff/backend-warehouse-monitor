@@ -61,4 +61,8 @@ export class DeviceRepository implements IDeviceRepository {
 			},
 		});
 	}
+
+	async deleteById(mac: string): Promise<void> {
+		await DeviceModel.findByIdAndDelete(mac);
+	}
 }

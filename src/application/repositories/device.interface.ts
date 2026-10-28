@@ -14,4 +14,5 @@ export interface IDeviceRepository {
 		deviceStatus?: DeviceStatus;
 		monitoringStatus?: MonitoringStatus;
 	}): Promise<void>;
+	deleteById(mac: string): Promise<void>;
 }

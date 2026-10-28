@@ -13,6 +13,7 @@ import { ListAllWarehouseUseCase } from "@application/use-cases/list-all-warehou
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
+import { UpdateDeviceUseCase } from "@application/use-cases/update-device.use-case.js";
 import { UpdateUserUseCase } from "@application/use-cases/update-user-use-case.js";
 import { UpdateWarehouseUseCase } from "@application/use-cases/update-warehouse.use-case.js";
 import { DeviceRepository } from "@infrastructure/database/mongodb/repositories/device.repository.js";
@@ -33,6 +34,7 @@ import { ListAllWarehouseController } from "@presentation/controllers/list-all-w
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
+import { UpdateDeviceController } from "@presentation/controllers/update-device.controller.js";
 import { UpdateUserController } from "@presentation/controllers/update-user.controller.js";
 import { UpdateWarehouseController } from "@presentation/controllers/update-warehouse.controller.js";
 import "dotenv/config";
@@ -167,6 +169,7 @@ const updateWarehouseUseCase = UpdateWarehouseUseCase.instance(
 const getWarehouseUseCase = GetWarehouseUseCase.instance(warehouseRepo);
 const listAllWarehouseUseCase = ListAllWarehouseUseCase.instance(warehouseRepo);
 const createDeviceUseCase = CreateDeviceUseCase.instance(deviceRepo);
+const updateDeviceUseCase = UpdateDeviceUseCase.instance(deviceRepo);
 
 // Controllers
 
@@ -201,6 +204,8 @@ const listAllWarehouseController = ListAllWarehouseController.instance(
 );
 const createDeviceController =
 	CreateDeviceController.instance(createDeviceUseCase);
+const updateDeviceController =
+	UpdateDeviceController.instance(updateDeviceUseCase);
 
 // Routes
 
@@ -230,6 +235,7 @@ const deviceRoutes = createDeviceRoutes(
 	tokenProvider,
 	authorizationPolicyService,
 	createDeviceController,
+	updateDeviceController,
 );
 
 routes.use("/user", userRoutes);

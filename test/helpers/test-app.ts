@@ -6,6 +6,7 @@ import { ChangePasswordUseCase } from "@application/use-cases/change-password.us
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
 import { CreateWarehouseUseCase } from "@application/use-cases/create-warehouse.use-case.js";
 import { CreateDeviceUseCase } from "@application/use-cases/create-device.use-case.js";
+import { UpdateDeviceUseCase } from "@application/use-cases/update-device.use-case.js";
 import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { DeleteWarehouseUseCase } from "@application/use-cases/delete-warehouse.use-case.js";
 import { GetWarehouseUseCase } from "@application/use-cases/get-warehouse.use-case.js";
@@ -35,6 +36,7 @@ import { ChangePasswordController } from "@presentation/controllers/change-passw
 import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
 import { CreateWarehouseController } from "@presentation/controllers/create-warehouse.controller.js";
 import { CreateDeviceController } from "@presentation/controllers/create-device.controller.js";
+import { UpdateDeviceController } from "@presentation/controllers/update-device.controller.js";
 import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { DeleteWarehouseController } from "@presentation/controllers/delete-warehouse.controller.js";
 import { GetWarehouseController } from "@presentation/controllers/get-warehouse.controller.js";
@@ -75,6 +77,7 @@ export function createTestApp(smtp: SmtpClient) {
 		GeneratePasswordResetTokenUseCase,
 		CreateWarehouseUseCase,
 		CreateDeviceUseCase,
+		UpdateDeviceUseCase,
 		DeleteWarehouseUseCase,
 		UpdateWarehouseUseCase,
 		GetWarehouseUseCase,
@@ -86,6 +89,7 @@ export function createTestApp(smtp: SmtpClient) {
 		GeneratePasswordResetTokenController,
 		CreateWarehouseController,
 		CreateDeviceController,
+		UpdateDeviceController,
 		DeleteWarehouseController,
 		UpdateWarehouseController,
 		GetWarehouseController,
@@ -183,6 +187,7 @@ export function createTestApp(smtp: SmtpClient) {
 	const getWarehouseUseCase = GetWarehouseUseCase.instance(warehouseRepo);
 	const listAllWarehouseUseCase = ListAllWarehouseUseCase.instance(warehouseRepo);
 	const createDeviceUseCase = CreateDeviceUseCase.instance(deviceRepo);
+	const updateDeviceUseCase = UpdateDeviceUseCase.instance(deviceRepo);
 
 	const registerUserController =
 		RegisterUserController.instance(registerUserUseCase);
@@ -211,6 +216,7 @@ export function createTestApp(smtp: SmtpClient) {
 	const getWarehouseController = GetWarehouseController.instance(getWarehouseUseCase);
 	const listAllWarehouseController = ListAllWarehouseController.instance(listAllWarehouseUseCase);
 	const createDeviceController = CreateDeviceController.instance(createDeviceUseCase);
+	const updateDeviceController = UpdateDeviceController.instance(updateDeviceUseCase);
 
 	const routes = Router();
 	routes.use(
@@ -242,7 +248,12 @@ export function createTestApp(smtp: SmtpClient) {
 	);
 	routes.use(
 		"/device",
-		createDeviceRoutes(tokenProvider, authorizationPolicy, createDeviceController),
+		createDeviceRoutes(
+			tokenProvider,
+			authorizationPolicy,
+			createDeviceController,
+			updateDeviceController,
+		),
 	);
 
 	return {

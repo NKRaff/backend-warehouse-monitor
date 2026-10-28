@@ -14,6 +14,7 @@ import { createTestApp } from "../../helpers/test-app.js";
 
 const smtp = new FakeSmtpClient();
 const CREATE_DEVICE = "/api/device/create";
+const UPDATE_DEVICE = "/api/device/update";
 let app: Express;
 
 beforeAll(async () => {
@@ -128,7 +129,7 @@ describe("POST /api/device/create — RF-BE-015/RF-BE-019", () => {
 			.expect(401);
 	});
 
-	it("nega o cadastro a operador segundo a matriz atual", async () => {
+	it("nega o cadastro a operador, que tem acesso somente de leitura", async () => {
 		const agent = await sessionFor("operator");
 
 		await agent
@@ -136,5 +137,124 @@ describe("POST /api/device/create — RF-BE-015/RF-BE-019", () => {
 			.send({ mac: "AA:BB:CC:DD:EE:06", name: "Sensor válido" })
 			.expect(403);
 		expect(await DeviceModel.countDocuments()).toBe(0);
+	});
+});
+
+describe("PATCH /api/device/update — RF-BE-016", () => {
+	const storedDevice = {
+		_id: "AA:BB:CC:DD:EE:20",
+		name: "Sensor antigo",
+		warehouseId: "0190f1a0-7b00-7000-8000-000000000020",
+		lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000021",
+		deviceStatus: "online" as const,
+		monitoringStatus: "disabled" as const,
+	};
+
+	it("atualiza os campos enviados e preserva os demais", async () => {
+		const agent = await sessionFor("manager");
+		await DeviceModel.create(storedDevice);
+		const newWarehouseId = "0190f1a0-7b00-7000-8000-000000000022";
+
+		const response = await agent.patch(UPDATE_DEVICE).send({
+			mac: storedDevice._id,
+			name: "  Sensor atualizado  ",
+			warehouseId: newWarehouseId,
+			deviceStatus: "error",
+			monitoringStatus: "enabled",
+		});
+
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual({
+			message: "Dispositivo atualizado com sucesso",
+			device: {
+				mac: storedDevice._id,
+				name: "Sensor atualizado",
+				warehouseId: newWarehouseId,
+				lastMeasurementId: storedDevice.lastMeasurementId,
+				deviceStatus: "error",
+				monitoringStatus: "enabled",
+			},
+		});
+		expect(await DeviceModel.findById(storedDevice._id)).toMatchObject({
+			...storedDevice,
+			name: "Sensor atualizado",
+			warehouseId: newWarehouseId,
+			deviceStatus: "error",
+			monitoringStatus: "enabled",
+		});
+	});
+
+	it("atualiza somente o nome e mantém vínculo e status anteriores", async () => {
+		const agent = await sessionFor("administrator");
+		await DeviceModel.create(storedDevice);
+
+		await agent
+			.patch(UPDATE_DEVICE)
+			.send({ mac: storedDevice._id, name: "Sensor novo" })
+			.expect(200);
+
+		expect(await DeviceModel.findById(storedDevice._id)).toMatchObject({
+			...storedDevice,
+			name: "Sensor novo",
+		});
+	});
+
+	it("retorna 404 para dispositivo inexistente", async () => {
+		const agent = await sessionFor("manager");
+
+		await agent
+			.patch(UPDATE_DEVICE)
+			.send({ mac: "AA:BB:CC:DD:EE:21", name: "Sensor novo" })
+			.expect(404);
+		expect(await DeviceModel.countDocuments()).toBe(0);
+	});
+
+	it("rejeita nome curto após normalização sem alterar o documento", async () => {
+		const agent = await sessionFor("manager");
+		await DeviceModel.create(storedDevice);
+
+		await agent
+			.patch(UPDATE_DEVICE)
+			.send({ mac: storedDevice._id, name: "  a " })
+			.expect(400);
+		expect((await DeviceModel.findById(storedDevice._id))?.name).toBe(
+			storedDevice.name,
+		);
+	});
+
+	it.each([
+		{ mac: "MAC-inválido", name: "Sensor válido" },
+		{ mac: storedDevice._id, name: "abc" },
+		{ mac: storedDevice._id, warehouseId: "warehouse-inválido" },
+		{ mac: storedDevice._id, deviceStatus: "unknown" },
+		{ mac: storedDevice._id, monitoringStatus: "unknown" },
+	])("rejeita campos inválidos antes de atualizar: $mac", async (body) => {
+		const agent = await sessionFor("manager");
+		await DeviceModel.create(storedDevice);
+
+		await agent.patch(UPDATE_DEVICE).send(body).expect(400);
+		expect(await DeviceModel.findById(storedDevice._id)).toMatchObject(
+			storedDevice,
+		);
+	});
+
+	it("exige autenticação", async () => {
+		await request(app)
+			.patch(UPDATE_DEVICE)
+			.send({ mac: storedDevice._id, name: "Sensor novo" })
+			.expect(401);
+	});
+
+	it("nega atualização a operador, que tem acesso somente de leitura", async () => {
+		const agent = await sessionFor("operator");
+		await DeviceModel.create(storedDevice);
+
+		await agent
+			.patch(UPDATE_DEVICE)
+			.send({ mac: storedDevice._id, name: "Sensor novo" })
+			.expect(403);
+		expect((await DeviceModel.findById(storedDevice._id))?.name).toBe(
+			storedDevice.name,
+		);
 	});
 });

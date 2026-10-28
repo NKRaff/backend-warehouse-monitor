@@ -1,3 +1,4 @@
+import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
 import { DeviceModel } from "@infrastructure/database/mongodb/models/device.model.js";
 import type { Express } from "express";
 import request from "supertest";
@@ -15,11 +16,13 @@ import { createTestApp } from "../../helpers/test-app.js";
 const smtp = new FakeSmtpClient();
 const CREATE_DEVICE = "/api/device/create";
 const UPDATE_DEVICE = "/api/device/update";
+const DELETE_DEVICE = "/api/device/delete";
 let app: Express;
+let mqttClient: ReturnType<typeof createTestApp>["mqttClient"];
 
 beforeAll(async () => {
 	await startMongo();
-	({ app } = createTestApp(smtp));
+	({ app, mqttClient } = createTestApp(smtp));
 }, MONGO_STARTUP_TIMEOUT);
 
 afterAll(stopMongo);
@@ -27,6 +30,7 @@ afterAll(stopMongo);
 beforeEach(async () => {
 	await clearMongo();
 	smtp.reset();
+	mqttClient?.unsubscribe.mockClear();
 });
 
 async function sessionFor(role: "manager" | "administrator" | "operator") {
@@ -256,5 +260,84 @@ describe("PATCH /api/device/update — RF-BE-016", () => {
 		expect((await DeviceModel.findById(storedDevice._id))?.name).toBe(
 			storedDevice.name,
 		);
+	});
+});
+
+describe("DELETE /api/device/delete — RF-BE-017", () => {
+	const storedDevice = {
+		_id: "AA:BB:CC:DD:EE:30",
+		name: "Sensor a remover",
+		deviceStatus: "online" as const,
+		monitoringStatus: "enabled" as const,
+	};
+
+	it.each(["manager", "administrator"] as const)(
+		"permite que %s remova dispositivo, cancele o tópico e audite a ação",
+		async (role) => {
+			const agent = await sessionFor(role);
+			await DeviceModel.create(storedDevice);
+
+			const response = await agent
+				.delete(DELETE_DEVICE)
+				.send({ deviceId: storedDevice._id });
+
+			expect(response.status).toBe(200);
+			expect(response.body).toEqual({
+				message: "Dispositivo excluido com sucesso",
+			});
+			expect(await DeviceModel.findById(storedDevice._id)).toBeNull();
+			expect(mqttClient.unsubscribe).toHaveBeenCalledWith(
+				`device/${storedDevice._id}/*`,
+			);
+			expect(await AuditLogModel.findOne({ resourceId: storedDevice._id })).toMatchObject({
+				action: "delete",
+				actorId: expect.stringMatching(/^seed-user-/),
+				resourceType: "device",
+			});
+		},
+	);
+
+	it("exige autenticação", async () => {
+		await request(app)
+			.delete(DELETE_DEVICE)
+			.send({ deviceId: storedDevice._id })
+			.expect(401);
+	});
+
+	it("nega exclusão a operador, que pode apenas consultar dispositivos", async () => {
+		const agent = await sessionFor("operator");
+		await DeviceModel.create(storedDevice);
+
+		await agent
+			.delete(DELETE_DEVICE)
+			.send({ deviceId: storedDevice._id })
+			.expect(403);
+
+		expect(await DeviceModel.findById(storedDevice._id)).not.toBeNull();
+		expect(mqttClient.unsubscribe).not.toHaveBeenCalled();
+	});
+
+	it("rejeita MAC inválido sem alterar dados", async () => {
+		const agent = await sessionFor("manager");
+		await DeviceModel.create(storedDevice);
+
+		await agent.delete(DELETE_DEVICE).send({ deviceId: "id-inválido" }).expect(400);
+
+		expect(await DeviceModel.findById(storedDevice._id)).not.toBeNull();
+		expect(mqttClient.unsubscribe).not.toHaveBeenCalled();
+	});
+
+	it("retorna 404 quando o dispositivo não existe", async () => {
+		const agent = await sessionFor("manager");
+
+		await agent
+			.delete(DELETE_DEVICE)
+			.send({ deviceId: storedDevice._id })
+			.expect(404);
+
+		expect(
+			await AuditLogModel.countDocuments({ resourceId: storedDevice._id }),
+		).toBe(0);
+		expect(mqttClient.unsubscribe).not.toHaveBeenCalled();
 	});
 });

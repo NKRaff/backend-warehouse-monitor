@@ -92,6 +92,35 @@ describe("DeviceRepository", () => {
 		expect(await DeviceModel.countDocuments()).toBe(0);
 	});
 
+	it("remove o dispositivo pelo MAC e não afeta os demais", async () => {
+		await DeviceModel.create([
+			{
+				_id: "AA:BB:CC:DD:EE:14",
+				name: "Sensor a remover",
+				deviceStatus: "online",
+				monitoringStatus: "disabled",
+			},
+			{
+				_id: "AA:BB:CC:DD:EE:15",
+				name: "Sensor preservado",
+				deviceStatus: "online",
+				monitoringStatus: "disabled",
+			},
+		]);
+
+		await repo.deleteById("AA:BB:CC:DD:EE:14");
+
+		expect(await DeviceModel.findById("AA:BB:CC:DD:EE:14")).toBeNull();
+		expect(await DeviceModel.findById("AA:BB:CC:DD:EE:15")).toMatchObject({
+			name: "Sensor preservado",
+		});
+	});
+
+	it("não falha ao remover MAC inexistente", async () => {
+		await expect(repo.deleteById("AA:BB:CC:DD:EE:16")).resolves.toBeUndefined();
+		expect(await DeviceModel.countDocuments()).toBe(0);
+	});
+
 	it("desvincula todos os dispositivos do armazém, marca-os offline e preserva os demais", async () => {
 		await DeviceModel.create([
 			{

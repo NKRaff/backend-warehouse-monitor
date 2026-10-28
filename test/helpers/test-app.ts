@@ -6,6 +6,7 @@ import { ChangePasswordUseCase } from "@application/use-cases/change-password.us
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
 import { CreateWarehouseUseCase } from "@application/use-cases/create-warehouse.use-case.js";
 import { CreateDeviceUseCase } from "@application/use-cases/create-device.use-case.js";
+import { DeleteDeviceUseCase } from "@application/use-cases/delete-device.use-case.js";
 import { UpdateDeviceUseCase } from "@application/use-cases/update-device.use-case.js";
 import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { DeleteWarehouseUseCase } from "@application/use-cases/delete-warehouse.use-case.js";
@@ -36,6 +37,7 @@ import { ChangePasswordController } from "@presentation/controllers/change-passw
 import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
 import { CreateWarehouseController } from "@presentation/controllers/create-warehouse.controller.js";
 import { CreateDeviceController } from "@presentation/controllers/create-device.controller.js";
+import { DeleteDeviceController } from "@presentation/controllers/delete-device.controller.js";
 import { UpdateDeviceController } from "@presentation/controllers/update-device.controller.js";
 import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { DeleteWarehouseController } from "@presentation/controllers/delete-warehouse.controller.js";
@@ -49,10 +51,11 @@ import { UpdateUserController } from "@presentation/controllers/update-user.cont
 import { UpdateWarehouseController } from "@presentation/controllers/update-warehouse.controller.js";
 import { Router } from "express";
 import { resetSingleton } from "./singleton.js";
+import { createMqttClientMock } from "./mocks.js";
 
 /**
- * Composition root de teste que espelha `src/main.ts`, sem MQTT, Socket.IO,
- * `listen()` ou SMTP real. O SMTP é injetado para inspecionar os e-mails.
+ * Composition root de teste que espelha `src/main.ts`, sem broker MQTT,
+ * Socket.IO, `listen()` ou SMTP real. Clientes externos são substituídos por fakes.
  */
 export function createTestApp(smtp: SmtpClient) {
 	resetSingleton(
@@ -77,6 +80,7 @@ export function createTestApp(smtp: SmtpClient) {
 		GeneratePasswordResetTokenUseCase,
 		CreateWarehouseUseCase,
 		CreateDeviceUseCase,
+		DeleteDeviceUseCase,
 		UpdateDeviceUseCase,
 		DeleteWarehouseUseCase,
 		UpdateWarehouseUseCase,
@@ -89,6 +93,7 @@ export function createTestApp(smtp: SmtpClient) {
 		GeneratePasswordResetTokenController,
 		CreateWarehouseController,
 		CreateDeviceController,
+		DeleteDeviceController,
 		UpdateDeviceController,
 		DeleteWarehouseController,
 		UpdateWarehouseController,
@@ -103,6 +108,7 @@ export function createTestApp(smtp: SmtpClient) {
 	const tokenRepo = TokenRepository.instance();
 	const warehouseRepo = WarehouseRepository.instance();
 	const deviceRepo = DeviceRepository.instance();
+	const mqttClient = createMqttClientMock();
 
 	const passwordHasher = BcryptPasswordHasherAdapter.instance();
 	const tokenProvider = JwtTokenAdapter.instance();
@@ -188,6 +194,12 @@ export function createTestApp(smtp: SmtpClient) {
 	const listAllWarehouseUseCase = ListAllWarehouseUseCase.instance(warehouseRepo);
 	const createDeviceUseCase = CreateDeviceUseCase.instance(deviceRepo);
 	const updateDeviceUseCase = UpdateDeviceUseCase.instance(deviceRepo);
+	const deleteDeviceUseCase = DeleteDeviceUseCase.instance(
+		uuidProvider,
+		mqttClient,
+		deviceRepo,
+		auditLogRepo,
+	);
 
 	const registerUserController =
 		RegisterUserController.instance(registerUserUseCase);
@@ -217,6 +229,8 @@ export function createTestApp(smtp: SmtpClient) {
 	const listAllWarehouseController = ListAllWarehouseController.instance(listAllWarehouseUseCase);
 	const createDeviceController = CreateDeviceController.instance(createDeviceUseCase);
 	const updateDeviceController = UpdateDeviceController.instance(updateDeviceUseCase);
+	const deleteDeviceController =
+		DeleteDeviceController.instance(deleteDeviceUseCase);
 
 	const routes = Router();
 	routes.use(
@@ -253,6 +267,7 @@ export function createTestApp(smtp: SmtpClient) {
 			authorizationPolicy,
 			createDeviceController,
 			updateDeviceController,
+			deleteDeviceController,
 		),
 	);
 
@@ -260,5 +275,6 @@ export function createTestApp(smtp: SmtpClient) {
 		app: ExpressApp.instance(routes),
 		passwordHasher,
 		tokenProvider,
+		mqttClient,
 	};
 }

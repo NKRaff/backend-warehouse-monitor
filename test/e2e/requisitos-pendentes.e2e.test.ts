@@ -31,7 +31,8 @@ describe("Requisitos de backend pendentes", () => {
 		it.todo("RF-BE-017: exclusão lógica do dispositivo em vez de remoção física");
 		it.todo("RF-BE-017: reagendar falhas ao cancelar inscrições MQTT sem impedir exclusão");
 		it.todo("RF-BE-017: preservar alertas ativos vinculados ao dispositivo removido");
-		it.todo("RF-BE-018: usuário autenticado lista e consulta dispositivos em modo somente leitura");
+		it.todo("RF-BE-018: orientar cadastro quando não houver dispositivos listados");
+		it.todo("RF-BE-018: apresentar dados da última medição ou indicação de ausência de dados");
 		it.todo("RF-BE-019: permitir reutilizar MAC somente após remoção lógica do dispositivo");
 		it.todo("RF-BE-020: restaurar inscrições MQTT na inicialização");
 	});

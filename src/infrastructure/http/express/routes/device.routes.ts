@@ -96,7 +96,10 @@ export function createDeviceRoutes(
 		),
 		async (req, res, next) => {
 			try {
-				const result = getDeviceController.handle(req.params, {});
+				const result = await getDeviceController.handle(
+					{ deviceMac: req.params.mac },
+					{},
+				);
 				return res.status(200).json(result);
 			} catch (error) {
 				next(error);

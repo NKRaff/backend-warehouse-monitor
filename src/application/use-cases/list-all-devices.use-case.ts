@@ -23,8 +23,17 @@ export class ListAllDeviceUseCase
 		const devices = await this.deviceRepo.findAll(input.offSet, input.limit);
 
 		return {
-			message: "List de Armazéns encontrado",
-			devices,
+			message: "Lista de dispositivos encontrada",
+			devices: devices.map((device) => ({
+				deviceStatus: device.deviceStatus,
+				mac: device.mac,
+				monitoringStatus: device.monitoringStatus,
+				name: device.name,
+				...(device.lastMeasurementId && {
+					lastMeasurementId: device.lastMeasurementId,
+				}),
+				...(device.warehouseId && { warehouseId: device.warehouseId }),
+			})),
 		};
 	}
 }

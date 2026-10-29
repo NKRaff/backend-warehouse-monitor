@@ -9,7 +9,9 @@ import { DeleteDeviceUseCase } from "@application/use-cases/delete-device.use-ca
 import { DeleteUserUseCase } from "@application/use-cases/delete-user.use-case.js";
 import { DeleteWarehouseUseCase } from "@application/use-cases/delete-warehouse.use-case.js";
 import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
+import { GetDeviceUseCase } from "@application/use-cases/get-device.use-case.js";
 import { GetWarehouseUseCase } from "@application/use-cases/get-warehouse.use-case.js";
+import { ListAllDeviceUseCase } from "@application/use-cases/list-all-devices.use-case.js";
 import { ListAllWarehouseUseCase } from "@application/use-cases/list-all-warehouse.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
@@ -31,7 +33,9 @@ import { DeleteDeviceController } from "@presentation/controllers/delete-device.
 import { DeleteUserController } from "@presentation/controllers/delete-user.controller.js";
 import { DeleteWarehouseController } from "@presentation/controllers/delete-warehouse.controller.js";
 import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
+import { GetDeviceController } from "@presentation/controllers/get-device.controller.js";
 import { GetWarehouseController } from "@presentation/controllers/get-warehouse.controller.js";
+import { ListAllDeviceController } from "@presentation/controllers/list-all-device.controller.js";
 import { ListAllWarehouseController } from "@presentation/controllers/list-all-warehouse.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
@@ -178,6 +182,8 @@ const deleteDeviceUseCase = DeleteDeviceUseCase.instance(
 	deviceRepo,
 	auditLogRepo,
 );
+const getDeviceUseCase = GetDeviceUseCase.instance(deviceRepo);
+const listAllDeviceUseCase = ListAllDeviceUseCase.instance(deviceRepo);
 
 // Controllers
 
@@ -216,6 +222,9 @@ const updateDeviceController =
 	UpdateDeviceController.instance(updateDeviceUseCase);
 const deleteDeviceController =
 	DeleteDeviceController.instance(deleteDeviceUseCase);
+const getDeviceController = GetDeviceController.instance(getDeviceUseCase);
+const listAllDeviceController =
+	ListAllDeviceController.instance(listAllDeviceUseCase);
 
 // Routes
 
@@ -247,6 +256,8 @@ const deviceRoutes = createDeviceRoutes(
 	createDeviceController,
 	updateDeviceController,
 	deleteDeviceController,
+	getDeviceController,
+	listAllDeviceController,
 );
 
 routes.use("/user", userRoutes);

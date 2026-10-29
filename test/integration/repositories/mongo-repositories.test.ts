@@ -58,6 +58,32 @@ describe("DeviceRepository", () => {
 		await expect(repo.findById("AA:BB:CC:DD:EE:11")).resolves.toBeNull();
 	});
 
+	it("lista dispositivos como entidades e aplica paginação", async () => {
+		await DeviceModel.create([
+			{
+				_id: "AA:BB:CC:DD:EE:17",
+				name: "Sensor página 1",
+				deviceStatus: "online",
+				monitoringStatus: "disabled",
+			},
+			{
+				_id: "AA:BB:CC:DD:EE:18",
+				name: "Sensor página 2",
+				deviceStatus: "offline",
+				monitoringStatus: "enabled",
+			},
+		]);
+
+		const firstPage = await repo.findAll(0, 1);
+		const secondPage = await repo.findAll(1, 1);
+
+		expect(firstPage).toHaveLength(1);
+		expect(secondPage).toHaveLength(1);
+		expect(firstPage[0]).toBeInstanceOf(Device);
+		expect(secondPage[0]).toBeInstanceOf(Device);
+		expect(firstPage[0]?.mac).not.toBe(secondPage[0]?.mac);
+	});
+
 	it("atualiza apenas os campos recebidos", async () => {
 		await DeviceModel.create({
 			_id: "AA:BB:CC:DD:EE:12",

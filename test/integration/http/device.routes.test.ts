@@ -341,3 +341,127 @@ describe("DELETE /api/device/delete — RF-BE-017", () => {
 		expect(mqttClient.unsubscribe).not.toHaveBeenCalled();
 	});
 });
+
+describe("GET /api/device — RF-BE-018", () => {
+	const storedDevice = {
+		_id: "AA:BB:CC:DD:EE:50",
+		name: "Sensor sala fria",
+		warehouseId: "0190f1a0-7b00-7000-8000-000000000050",
+		lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000051",
+		deviceStatus: "online" as const,
+		monitoringStatus: "enabled" as const,
+	};
+
+	it("permite ao operador consultar um dispositivo pelo MAC", async () => {
+		const agent = await sessionFor("operator");
+		await DeviceModel.create(storedDevice);
+
+		const response = await agent.get(`/api/device/${storedDevice._id}`);
+
+		expect(response.status).toBe(200);
+		expect(response.body).toEqual({
+			message: "Dispositivo encontrado",
+			device: {
+				mac: storedDevice._id,
+				name: storedDevice.name,
+				warehouseId: storedDevice.warehouseId,
+				lastMeasurementId: storedDevice.lastMeasurementId,
+				deviceStatus: storedDevice.deviceStatus,
+				monitoringStatus: storedDevice.monitoringStatus,
+			},
+		});
+	});
+
+	it("retorna 404 para MAC inexistente", async () => {
+		const agent = await sessionFor("operator");
+
+		await agent.get("/api/device/AA:BB:CC:DD:EE:59").expect(404);
+	});
+
+	it("rejeita MAC inválido na consulta", async () => {
+		const agent = await sessionFor("operator");
+
+		await agent.get("/api/device/mac-inválido").expect(400);
+	});
+
+	it("exige autenticação para consultar um dispositivo", async () => {
+		await request(app).get(`/api/device/${storedDevice._id}`).expect(401);
+	});
+
+	it.each(["operator", "manager", "administrator"] as const)(
+		"permite a %s listar dispositivos",
+		async (role) => {
+			const agent = await sessionFor(role);
+			await DeviceModel.create(storedDevice);
+
+			const response = await agent
+				.get("/api/device")
+				.query({ offSet: 0, limit: 10 });
+
+			expect(response.status).toBe(200);
+			expect(response.body.devices).toEqual([
+				{
+					mac: storedDevice._id,
+					name: storedDevice.name,
+					warehouseId: storedDevice.warehouseId,
+					lastMeasurementId: storedDevice.lastMeasurementId,
+					deviceStatus: storedDevice.deviceStatus,
+					monitoringStatus: storedDevice.monitoringStatus,
+				},
+			]);
+		},
+	);
+
+	it("respeita offset e limite na paginação", async () => {
+		const agent = await sessionFor("operator");
+		await DeviceModel.create([
+			storedDevice,
+			{
+				...storedDevice,
+				_id: "AA:BB:CC:DD:EE:53",
+				name: "Sensor depósito",
+			},
+		]);
+
+		const firstPage = await agent
+			.get("/api/device")
+			.query({ offSet: 0, limit: 1 });
+		const secondPage = await agent
+			.get("/api/device")
+			.query({ offSet: 1, limit: 1 });
+
+		expect(firstPage.body.devices).toHaveLength(1);
+		expect(secondPage.body.devices).toHaveLength(1);
+		expect(firstPage.body.devices[0].mac).not.toBe(
+			secondPage.body.devices[0].mac,
+		);
+	});
+
+	it("devolve lista vazia quando não há dispositivos", async () => {
+		const agent = await sessionFor("operator");
+
+		const response = await agent
+			.get("/api/device")
+			.query({ offSet: 0, limit: 10 });
+
+		expect(response.status).toBe(200);
+		expect(response.body.message).toBe("Lista de dispositivos encontrada");
+		expect(response.body.devices).toEqual([]);
+	});
+
+	it("rejeita paginação inválida", async () => {
+		const agent = await sessionFor("operator");
+
+		await agent
+			.get("/api/device")
+			.query({ offSet: "abc", limit: 10 })
+			.expect(400);
+	});
+
+	it("exige autenticação para listar", async () => {
+		await request(app)
+			.get("/api/device")
+			.query({ offSet: 0, limit: 10 })
+			.expect(401);
+	});
+});

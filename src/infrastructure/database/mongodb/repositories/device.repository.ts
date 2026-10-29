@@ -65,4 +65,12 @@ export class DeviceRepository implements IDeviceRepository {
 	async deleteById(mac: string): Promise<void> {
 		await DeviceModel.findByIdAndDelete(mac);
 	}
+
+	async findAll(offset: number, limit: number): Promise<Device[]> {
+		const devices = await DeviceModel.find().skip(offset).limit(limit);
+
+		return devices.map((device) => {
+			return deviceToDomain(device);
+		});
+	}
 }

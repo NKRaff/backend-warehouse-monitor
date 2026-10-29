@@ -1,5 +1,6 @@
 import type { CreateDeviceOutputDto } from "@application/dtos/create-device.dto.js";
 import type { DeleteDeviceOutputDto } from "@application/dtos/delete-device.dto.js";
+import type { GetDeviceOutputDto } from "@application/dtos/get-device.dto.js";
 import type { UpdateDeviceOutputDto } from "@application/dtos/update-device.dto.js";
 import type { ITokenProvider } from "@application/ports/token-provider.interface.js";
 import type { AuthorizationPolicy } from "@application/services/authorization-policy.js";
@@ -14,6 +15,7 @@ export function createDeviceRoutes(
 	createDeviceController: IController<CreateDeviceOutputDto>,
 	updateDeviceController: IController<UpdateDeviceOutputDto>,
 	deleteDeviceController: IController<DeleteDeviceOutputDto>,
+	getDeviceController: IController<GetDeviceOutputDto>,
 ): Router {
 	const routes = Router();
 
@@ -76,6 +78,23 @@ export function createDeviceRoutes(
 					actorId,
 				});
 
+				return res.status(200).json(result);
+			} catch (error) {
+				next(error);
+			}
+		},
+	);
+
+	routes.get(
+		"/:mac",
+		authorizationMiddleware(
+			tokenProvider,
+			authorizationPolicy,
+			Permission.LIST_DEVICE,
+		),
+		async (req, res, next) => {
+			try {
+				const result = getDeviceController.handle(req.params, {});
 				return res.status(200).json(result);
 			} catch (error) {
 				next(error);

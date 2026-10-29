@@ -8,6 +8,7 @@ export const Permission = {
 	MANAGE_WAREHOUSE: "manage_warehouse",
 	LIST_WAREHOUSE: "list_warehouse",
 	MANAGE_DEVICE: "manage_device",
+	LIST_DEVICE: "list_device",
 } as const;
 
 export type Permission = (typeof Permission)[keyof typeof Permission];

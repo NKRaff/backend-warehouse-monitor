@@ -1,5 +1,4 @@
 import type { IMqttClient } from "@application/ports/mqtt-client.interface.js";
-import type { MqttCallback } from "@application/types/mqtt-callback.js";
 import { ServiceUnavailableError } from "@shared/errors/service-unavailable-error.js";
 import type { MqttClient } from "mqtt";
 import mqtt from "mqtt";
@@ -8,7 +7,8 @@ import { env } from "../../config/env.js";
 export class MqttAdapter implements IMqttClient {
 	private static _instance: MqttAdapter;
 	private client: MqttClient | null = null;
-	private messageCallbacks = new Map<string, MqttCallback[]>();
+	private onMessageReceived: ((topic: string, payload: Buffer) => void) | null =
+		null;
 
 	private constructor() {}
 
@@ -17,6 +17,12 @@ export class MqttAdapter implements IMqttClient {
 			MqttAdapter._instance = new MqttAdapter();
 		}
 		return MqttAdapter._instance;
+	}
+
+	registerGlobalListener(
+		handler: (topic: string, payload: Buffer) => void,
+	): void {
+		this.onMessageReceived = handler;
 	}
 
 	async connect(): Promise<void> {
@@ -43,11 +49,8 @@ export class MqttAdapter implements IMqttClient {
 			});
 
 			this.client.on("message", (incomingTopic, payload) => {
-				const callbacks = this.messageCallbacks.get(incomingTopic);
-				if (callbacks) {
-					callbacks.forEach((callback) => {
-						callback(incomingTopic, payload);
-					});
+				if (this.onMessageReceived) {
+					this.onMessageReceived(incomingTopic, payload);
 				}
 			});
 
@@ -100,7 +103,7 @@ export class MqttAdapter implements IMqttClient {
 		});
 	}
 
-	public async subscribe(topic: string, callback: MqttCallback): Promise<void> {
+	public async subscribe(topic: string): Promise<void> {
 		return new Promise((resolve, reject) => {
 			if (!this.client || !this.client.connected) {
 				return reject(
@@ -109,11 +112,6 @@ export class MqttAdapter implements IMqttClient {
 					),
 				);
 			}
-
-			if (!this.messageCallbacks.has(topic)) {
-				this.messageCallbacks.set(topic, []);
-			}
-			this.messageCallbacks.get(topic)?.push(callback);
 
 			this.client.subscribe(topic, (error) => {
 				if (error) {

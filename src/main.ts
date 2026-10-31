@@ -175,7 +175,10 @@ const updateWarehouseUseCase = UpdateWarehouseUseCase.instance(
 const getWarehouseUseCase = GetWarehouseUseCase.instance(warehouseRepo);
 const listAllWarehouseUseCase = ListAllWarehouseUseCase.instance(warehouseRepo);
 const createDeviceUseCase = CreateDeviceUseCase.instance(deviceRepo);
-const updateDeviceUseCase = UpdateDeviceUseCase.instance(deviceRepo);
+const updateDeviceUseCase = UpdateDeviceUseCase.instance(
+	deviceRepo,
+	clientMqtt,
+);
 const deleteDeviceUseCase = DeleteDeviceUseCase.instance(
 	uuidProvider,
 	clientMqtt,
@@ -288,3 +291,11 @@ if (admin.length === 0) {
 		role: "administrator",
 	});
 }
+
+// Bootstrap monitoring device
+
+const devices = await deviceRepo.findAllMonitoringOn();
+devices.forEach((device) => {
+	clientMqtt.subscribe(`device/${device.mac}/telemetry`);
+	clientMqtt.subscribe(`device/${device.mac}/error`);
+});

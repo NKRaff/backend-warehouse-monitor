@@ -1,6 +1,7 @@
 import { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
+import { BootstrapMonitoringDeviceUseCase } from "@application/use-cases/bootstrap-monitoring-device.use-case.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
 import { CreateDeviceUseCase } from "@application/use-cases/create-device.use-case.js";
@@ -187,6 +188,8 @@ const deleteDeviceUseCase = DeleteDeviceUseCase.instance(
 );
 const getDeviceUseCase = GetDeviceUseCase.instance(deviceRepo);
 const listAllDeviceUseCase = ListAllDeviceUseCase.instance(deviceRepo);
+const bootstrapMonitoringDeviceUseCase =
+	BootstrapMonitoringDeviceUseCase.instance(deviceRepo, clientMqtt);
 
 // Controllers
 
@@ -294,8 +297,4 @@ if (admin.length === 0) {
 
 // Bootstrap monitoring device
 
-const devices = await deviceRepo.findAllMonitoringOn();
-devices.forEach((device) => {
-	clientMqtt.subscribe(`device/${device.mac}/telemetry`);
-	clientMqtt.subscribe(`device/${device.mac}/error`);
-});
+await bootstrapMonitoringDeviceUseCase.execute();

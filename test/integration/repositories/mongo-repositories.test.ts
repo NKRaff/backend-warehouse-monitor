@@ -84,6 +84,41 @@ describe("DeviceRepository", () => {
 		expect(firstPage[0]?.mac).not.toBe(secondPage[0]?.mac);
 	});
 
+	it("filtra dispositivos com monitoramento habilitado e armazém vinculado", async () => {
+		await DeviceModel.create([
+			{
+				_id: "AA:BB:CC:DD:EE:19",
+				name: "Sensor monitorado",
+				warehouseId: "0190f1a0-7b00-7000-8000-000000000019",
+				deviceStatus: "online",
+				monitoringStatus: "enabled",
+			},
+			{
+				_id: "AA:BB:CC:DD:EE:1A",
+				name: "Sensor sem monitoramento",
+				warehouseId: "0190f1a0-7b00-7000-8000-000000000019",
+				deviceStatus: "online",
+				monitoringStatus: "disabled",
+			},
+			{
+				_id: "AA:BB:CC:DD:EE:1B",
+				name: "Sensor sem armazém",
+				deviceStatus: "online",
+				monitoringStatus: "enabled",
+			},
+		]);
+
+		const devices = await repo.findAllMonitoringOn();
+
+		expect(devices).toHaveLength(1);
+		expect(devices[0]).toBeInstanceOf(Device);
+		expect(devices[0]).toMatchObject({
+			mac: "AA:BB:CC:DD:EE:19",
+			monitoringStatus: "enabled",
+			warehouseId: "0190f1a0-7b00-7000-8000-000000000019",
+		});
+	});
+
 	it("atualiza apenas os campos recebidos", async () => {
 		await DeviceModel.create({
 			_id: "AA:BB:CC:DD:EE:12",

@@ -1,7 +1,7 @@
 import type { IDeviceRepository } from "@application/repositories/device.interface.js";
 import type { Device } from "@domain/entities/device.js";
 import { DeviceStatus } from "@domain/types/device-status.js";
-import type { MonitoringStatus } from "@domain/types/monitoring-status.js";
+import { MonitoringStatus } from "@domain/types/monitoring-status.js";
 import {
 	deviceToDomain,
 	deviceToPersistence,
@@ -68,6 +68,19 @@ export class DeviceRepository implements IDeviceRepository {
 
 	async findAll(offset: number, limit: number): Promise<Device[]> {
 		const devices = await DeviceModel.find().skip(offset).limit(limit);
+
+		return devices.map((device) => {
+			return deviceToDomain(device);
+		});
+	}
+
+	async findAllMonitoringOn(): Promise<Device[]> {
+		const devices = await DeviceModel.find({
+			monitoringStatus: MonitoringStatus.ENABLE,
+			warehouseId: {
+				$exists: true,
+			},
+		});
 
 		return devices.map((device) => {
 			return deviceToDomain(device);

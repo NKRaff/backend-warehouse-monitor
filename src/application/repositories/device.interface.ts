@@ -16,4 +16,5 @@ export interface IDeviceRepository {
 	}): Promise<void>;
 	deleteById(mac: string): Promise<void>;
 	findAll(offset: number, limit: number): Promise<Device[]>;
+	findAllMonitoringOn(): Promise<Device[]>;
 }

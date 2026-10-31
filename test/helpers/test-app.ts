@@ -201,7 +201,10 @@ export function createTestApp(smtp: SmtpClient) {
 	const getWarehouseUseCase = GetWarehouseUseCase.instance(warehouseRepo);
 	const listAllWarehouseUseCase = ListAllWarehouseUseCase.instance(warehouseRepo);
 	const createDeviceUseCase = CreateDeviceUseCase.instance(deviceRepo);
-	const updateDeviceUseCase = UpdateDeviceUseCase.instance(deviceRepo);
+	const updateDeviceUseCase = UpdateDeviceUseCase.instance(
+		deviceRepo,
+		mqttClient,
+	);
 	const getDeviceUseCase = GetDeviceUseCase.instance(deviceRepo);
 	const listAllDeviceUseCase = ListAllDeviceUseCase.instance(deviceRepo);
 	const deleteDeviceUseCase = DeleteDeviceUseCase.instance(

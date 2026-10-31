@@ -27,14 +27,18 @@ describe("Requisitos de backend pendentes", () => {
 
 	describe("Dispositivos e MQTT", () => {
 		it.todo("RF-BE-015: validar existência do armazém e inscrever MQTT no cadastro vinculado");
-		it.todo("RF-BE-016: desvincular ambiente, validar ambiente ativo e sincronizar inscrições MQTT");
+		it.todo("RF-BE-016: sincronizar inscrições MQTT ao vincular ou desvincular ambiente, não apenas ao alterar monitoringStatus");
+		it.todo("RF-BE-016: rejeitar vínculo com ambiente removido");
+		it.todo("RF-BE-016: reagendar falha MQTT sem reverter alteração persistida");
 		it.todo("RF-BE-017: exclusão lógica do dispositivo em vez de remoção física");
 		it.todo("RF-BE-017: reagendar falhas ao cancelar inscrições MQTT sem impedir exclusão");
 		it.todo("RF-BE-017: preservar alertas ativos vinculados ao dispositivo removido");
 		it.todo("RF-BE-018: orientar cadastro quando não houver dispositivos listados");
 		it.todo("RF-BE-018: apresentar dados da última medição ou indicação de ausência de dados");
 		it.todo("RF-BE-019: permitir reutilizar MAC somente após remoção lógica do dispositivo");
-		it.todo("RF-BE-020: restaurar inscrições MQTT na inicialização");
+		it.todo("RF-BE-020: repetir inscrições MQTT após falha do broker na inicialização");
+		it.todo("RF-BE-020: inscrever dispositivos em lotes durante a inicialização");
+		it.todo("RF-BE-020: auditar dispositivos vinculados a ambientes removidos");
 	});
 
 	describe("Medições, alertas e notificações", () => {

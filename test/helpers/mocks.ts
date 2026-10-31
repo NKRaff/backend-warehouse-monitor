@@ -130,6 +130,9 @@ export function createDeviceRepoMock() {
 			.fn<IDeviceRepository["deleteById"]>()
 			.mockResolvedValue(undefined),
 		findAll: vi.fn<IDeviceRepository["findAll"]>().mockResolvedValue([]),
+		findAllMonitoringOn: vi
+			.fn<IDeviceRepository["findAllMonitoringOn"]>()
+			.mockResolvedValue([]),
 	} satisfies IDeviceRepository;
 }
 

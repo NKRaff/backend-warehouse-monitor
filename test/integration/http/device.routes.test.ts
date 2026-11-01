@@ -149,7 +149,10 @@ describe("PATCH /api/device/update — RF-BE-016", () => {
 		_id: "AA:BB:CC:DD:EE:20",
 		name: "Sensor antigo",
 		warehouseId: "0190f1a0-7b00-7000-8000-000000000020",
-		lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000021",
+		lastMeasurementId: {
+			humidityId: "0190f1a0-7b00-7000-8000-000000000021",
+			temperatureId: "0190f1a0-7b00-7000-8000-000000000021",
+		},
 		deviceStatus: "online" as const,
 		monitoringStatus: "disabled" as const,
 	};
@@ -347,7 +350,10 @@ describe("GET /api/device — RF-BE-018", () => {
 		_id: "AA:BB:CC:DD:EE:50",
 		name: "Sensor sala fria",
 		warehouseId: "0190f1a0-7b00-7000-8000-000000000050",
-		lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000051",
+		lastMeasurementId: {
+			humidityId: "0190f1a0-7b00-7000-8000-000000000051",
+			temperatureId: "0190f1a0-7b00-7000-8000-000000000051",
+		},
 		deviceStatus: "online" as const,
 		monitoringStatus: "enabled" as const,
 	};

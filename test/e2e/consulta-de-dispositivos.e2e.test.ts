@@ -35,7 +35,10 @@ describe("E2E — consulta de dispositivos RF-BE-018", () => {
 			_id: "AA:BB:CC:DD:EE:60",
 			name: "Sensor sala fria",
 			warehouseId: "0190f1a0-7b00-7000-8000-000000000060",
-			lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000061",
+			lastMeasurementId: {
+				humidityId: "0190f1a0-7b00-7000-8000-000000000061",
+				temperatureId: "0190f1a0-7b00-7000-8000-000000000061",
+			},
 			deviceStatus: "online",
 			monitoringStatus: "enabled",
 		});
@@ -48,7 +51,10 @@ describe("E2E — consulta de dispositivos RF-BE-018", () => {
 			mac: "AA:BB:CC:DD:EE:60",
 			name: "Sensor sala fria",
 			warehouseId: "0190f1a0-7b00-7000-8000-000000000060",
-			lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000061",
+			lastMeasurementId: {
+				humidityId: "0190f1a0-7b00-7000-8000-000000000061",
+				temperatureId: "0190f1a0-7b00-7000-8000-000000000061",
+			},
 			deviceStatus: "online",
 			monitoringStatus: "enabled",
 		};

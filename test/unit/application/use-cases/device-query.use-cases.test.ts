@@ -23,7 +23,10 @@ describe("GetDeviceUseCase — RF-BE-018", () => {
 				mac: deviceMac,
 				name: "Sensor sala fria",
 				warehouseId: "0190f1a0-7b00-7000-8000-000000000050",
-				lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000051",
+				lastMeasurementId: {
+					humidityId: "0190f1a0-7b00-7000-8000-000000000051",
+					temperatureId: "0190f1a0-7b00-7000-8000-000000000051",
+				},
 				deviceStatus: "online",
 				monitoringStatus: "enabled",
 			}),
@@ -35,7 +38,10 @@ describe("GetDeviceUseCase — RF-BE-018", () => {
 				mac: deviceMac,
 				name: "Sensor sala fria",
 				warehouseId: "0190f1a0-7b00-7000-8000-000000000050",
-				lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000051",
+				lastMeasurementId: {
+					humidityId: "0190f1a0-7b00-7000-8000-000000000051",
+					temperatureId: "0190f1a0-7b00-7000-8000-000000000051",
+				},
 				deviceStatus: "online",
 				monitoringStatus: "enabled",
 			},

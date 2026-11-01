@@ -6,7 +6,10 @@ const baseProps = () => ({
 	mac: "AA:BB:CC:DD:EE:FF",
 	name: "Sensor câmara 1",
 	warehouseId: "0190f1a0-7b00-7000-8000-000000000001",
-	lastMeasurementId: "measurement-0",
+	lastMeasurementId: {
+		humidityId: "0190f1a0-7b00-7000-8000-000000000002",
+		temperatureId: "0190f1a0-7b00-7000-8000-000000000003",
+	},
 	deviceStatus: "online" as const,
 	monitoringStatus: "enabled" as const,
 });
@@ -87,9 +90,15 @@ describe("Device (Entity)", () => {
 			const device = Device.create(baseProps());
 			device.enableMonitoring();
 
-			device.updateMeasurement("measurement-42");
+			device.updateMeasurement({
+				humidityId: "0190f1a0-7b00-7000-8000-000000000004",
+				temperatureId: "0190f1a0-7b00-7000-8000-000000000005",
+			});
 
-			expect(device.lastMeasurementId).toBe("measurement-42");
+			expect(device.lastMeasurementId).toEqual({
+				humidityId: "0190f1a0-7b00-7000-8000-000000000004",
+				temperatureId: "0190f1a0-7b00-7000-8000-000000000005",
+			});
 		});
 
 		it("updateMeasurement() é ignorado quando o monitoramento está desativado", () => {
@@ -98,9 +107,12 @@ describe("Device (Entity)", () => {
 				monitoringStatus: "disabled",
 			});
 
-			device.updateMeasurement("measurement-42");
+			device.updateMeasurement({
+				humidityId: "0190f1a0-7b00-7000-8000-000000000004",
+				temperatureId: "0190f1a0-7b00-7000-8000-000000000005",
+			});
 
-			expect(device.lastMeasurementId).toBe("measurement-0");
+			expect(device.lastMeasurementId).toEqual(baseProps().lastMeasurementId);
 		});
 	});
 
@@ -121,15 +133,20 @@ describe("Device (Entity)", () => {
 			}).toThrow("Nome do dispositivo deve ter no minimo 4 caracteres");
 		});
 
-		it("normaliza UUID v7 de armazém e última medição", () => {
+		it("normaliza o armazém e valida UUIDs v7 da última medição", () => {
 			const device = Device.create({ mac: baseProps().mac, name: "Sensor antigo" });
 
 			device.warehouseId = "  0190f1a0-7b00-7000-8000-000000000001  ";
-			device.lastMeasurementId =
-				"  0190f1a0-7b00-7000-8000-000000000002  ";
+			device.lastMeasurementId = {
+				humidityId: "  0190f1a0-7b00-7000-8000-000000000002  ",
+				temperatureId: "  0190f1a0-7b00-7000-8000-000000000003  ",
+			};
 
 			expect(device.warehouseId).toBe("0190f1a0-7b00-7000-8000-000000000001");
-			expect(device.lastMeasurementId).toBe("0190f1a0-7b00-7000-8000-000000000002");
+			expect(device.lastMeasurementId).toEqual({
+				humidityId: "  0190f1a0-7b00-7000-8000-000000000002  ",
+				temperatureId: "  0190f1a0-7b00-7000-8000-000000000003  ",
+			});
 		});
 
 		it.each(["warehouse-inválido", "measurement-inválida"])(
@@ -141,7 +158,10 @@ describe("Device (Entity)", () => {
 					device.warehouseId = id;
 				}).toThrow(UnprocessableEntityError);
 				expect(() => {
-					device.lastMeasurementId = id;
+					device.lastMeasurementId = {
+						humidityId: id,
+						temperatureId: "0190f1a0-7b00-7000-8000-000000000003",
+					};
 				}).toThrow(UnprocessableEntityError);
 			},
 		);

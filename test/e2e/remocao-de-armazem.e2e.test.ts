@@ -48,7 +48,7 @@ describe("E2E — remoção de armazém RF-BE-013", () => {
 			_id: "AA:BB:CC:DD:EE:FF",
 			name: "Sensor vinculado",
 			warehouseId: created.body.warehouse.id,
-			lastMeasurementId: "measurement-1",
+			lastMeasurementId: { humidityId: "measurement-humidity-1", temperatureId: "measurement-temperature-1" },
 			deviceStatus: "online",
 			monitoringStatus: "enabled",
 		});

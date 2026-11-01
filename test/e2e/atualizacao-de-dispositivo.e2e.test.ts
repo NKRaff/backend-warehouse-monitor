@@ -42,7 +42,10 @@ describe("E2E — atualização de dispositivo RF-BE-016", () => {
 			_id: "AA:BB:CC:DD:EF:10",
 			name: "Sensor anterior",
 			warehouseId: "0190f1a0-7b00-7000-8000-000000000010",
-			lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000011",
+			lastMeasurementId: {
+				humidityId: "0190f1a0-7b00-7000-8000-000000000011",
+				temperatureId: "0190f1a0-7b00-7000-8000-000000000011",
+			},
 			deviceStatus: "online",
 			monitoringStatus: "disabled",
 		});
@@ -61,14 +64,20 @@ describe("E2E — atualização de dispositivo RF-BE-016", () => {
 			mac: "AA:BB:CC:DD:EF:10",
 			name: "Sensor atualizado",
 			warehouseId,
-			lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000011",
+			lastMeasurementId: {
+				humidityId: "0190f1a0-7b00-7000-8000-000000000011",
+				temperatureId: "0190f1a0-7b00-7000-8000-000000000011",
+			},
 			deviceStatus: "error",
 			monitoringStatus: "enabled",
 		});
 		expect(await DeviceModel.findById("AA:BB:CC:DD:EF:10")).toMatchObject({
 			name: "Sensor atualizado",
 			warehouseId,
-			lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000011",
+			lastMeasurementId: {
+				humidityId: "0190f1a0-7b00-7000-8000-000000000011",
+				temperatureId: "0190f1a0-7b00-7000-8000-000000000011",
+			},
 			deviceStatus: "error",
 			monitoringStatus: "enabled",
 		});

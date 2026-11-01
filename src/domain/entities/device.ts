@@ -1,4 +1,5 @@
 import { DeviceStatus } from "@domain/types/device-status.js";
+import type { lastMeasurements } from "@domain/types/last-measurements-ids.js";
 import { MonitoringStatus } from "@domain/types/monitoring-status.js";
 import { UnprocessableEntityError } from "@shared/errors/unprocessable-entity-error.js";
 
@@ -6,7 +7,7 @@ type DeviceProps = {
 	readonly mac: string;
 	name: string;
 	warehouseId?: string | undefined;
-	lastMeasurementId?: string | undefined;
+	lastMeasurementId?: lastMeasurements | undefined;
 	deviceStatus: DeviceStatus;
 	monitoringStatus: MonitoringStatus;
 };
@@ -59,12 +60,12 @@ export class Device {
 		this.props.monitoringStatus = "disabled";
 	}
 
-	updateMeasurement(measurementId: string): void {
+	updateMeasurement(measurementsId: lastMeasurements): void {
 		if (this.props.monitoringStatus === "disabled") {
 			return;
 		}
 
-		this.props.lastMeasurementId = measurementId;
+		this.props.lastMeasurementId = measurementsId;
 	}
 
 	get mac(): string {
@@ -79,7 +80,7 @@ export class Device {
 		return this.props.warehouseId;
 	}
 
-	get lastMeasurementId(): string | undefined {
+	get lastMeasurementId(): lastMeasurements | undefined {
 		return this.props.lastMeasurementId;
 	}
 
@@ -114,15 +115,24 @@ export class Device {
 		this.props.warehouseId = value.trim();
 	}
 
-	set lastMeasurementId(value: string) {
+	set lastMeasurementId(values: lastMeasurements) {
 		const uuidV7Regex =
 			/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-		if (!uuidV7Regex.test(value.trim())) {
-			throw new UnprocessableEntityError("Id de ambiente invalido");
+		if (!uuidV7Regex.test(values.humidityId.trim())) {
+			throw new UnprocessableEntityError("Id da medição de umidade é invalido");
 		}
 
-		this.props.lastMeasurementId = value.trim();
+		if (!uuidV7Regex.test(values.temperatureId.trim())) {
+			throw new UnprocessableEntityError(
+				"Id da medição de temperatura é invalido",
+			);
+		}
+
+		this.props.lastMeasurementId = {
+			humidityId: values.humidityId,
+			temperatureId: values.temperatureId,
+		};
 	}
 
 	set deviceStatus(value: DeviceStatus) {

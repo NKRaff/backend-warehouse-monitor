@@ -1,6 +1,7 @@
 import type { IDeviceRepository } from "@application/repositories/device.interface.js";
 import type { Device } from "@domain/entities/device.js";
 import { DeviceStatus } from "@domain/types/device-status.js";
+import type { lastMeasurements } from "@domain/types/last-measurements-ids.js";
 import { MonitoringStatus } from "@domain/types/monitoring-status.js";
 import {
 	deviceToDomain,
@@ -43,7 +44,7 @@ export class DeviceRepository implements IDeviceRepository {
 		mac: string;
 		name?: string;
 		warehouseId?: string;
-		lastMeasurementId?: string;
+		lastMeasurementId?: lastMeasurements;
 		deviceStatus?: DeviceStatus;
 		monitoringStatus?: MonitoringStatus;
 	}): Promise<void> {

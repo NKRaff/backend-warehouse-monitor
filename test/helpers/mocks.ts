@@ -8,6 +8,7 @@ import type { ITokenRepository } from "@application/repositories/token.interface
 import type { IUserRepository } from "@application/repositories/user.interface.js";
 import type { IWarehouseRepository } from "@application/repositories/warehouse.interface.js";
 import type { IDeviceRepository } from "@application/repositories/device.interface.js";
+import type { IMeasurementRepository } from "@application/repositories/measurement.interface.js";
 import type { IMqttClient } from "@application/ports/mqtt-client.interface.js";
 import type { NotificationService } from "@application/services/notification.service.js";
 import { vi } from "vitest";
@@ -134,6 +135,15 @@ export function createDeviceRepoMock() {
 			.fn<IDeviceRepository["findAllMonitoringOn"]>()
 			.mockResolvedValue([]),
 	} satisfies IDeviceRepository;
+}
+
+export function createMeasurementRepoMock() {
+	return {
+		save: vi.fn<IMeasurementRepository["save"]>().mockResolvedValue(undefined),
+		saveMany: vi
+			.fn<IMeasurementRepository["saveMany"]>()
+			.mockResolvedValue(undefined),
+	} satisfies IMeasurementRepository;
 }
 
 export function createMqttClientMock() {

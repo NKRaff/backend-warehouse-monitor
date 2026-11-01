@@ -1,5 +1,6 @@
 import type { Device } from "@domain/entities/device.js";
 import type { DeviceStatus } from "@domain/types/device-status.js";
+import type { lastMeasurements } from "@domain/types/last-measurements-ids.js";
 import type { MonitoringStatus } from "@domain/types/monitoring-status.js";
 
 export interface IDeviceRepository {
@@ -10,7 +11,7 @@ export interface IDeviceRepository {
 		mac: string;
 		name?: string;
 		warehouseId?: string;
-		lastMeasurementId?: string;
+		lastMeasurementId?: lastMeasurements;
 		deviceStatus?: DeviceStatus;
 		monitoringStatus?: MonitoringStatus;
 	}): Promise<void>;

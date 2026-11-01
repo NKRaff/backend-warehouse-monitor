@@ -13,7 +13,10 @@ const existingDevice = (monitoringStatus: "disabled" | "enabled" = "disabled") =
 		mac: "AA:BB:CC:DD:EE:20",
 		name: "Sensor antigo",
 		warehouseId: "0190f1a0-7b00-7000-8000-000000000020",
-		lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000021",
+		lastMeasurementId: {
+			humidityId: "0190f1a0-7b00-7000-8000-000000000021",
+			temperatureId: "0190f1a0-7b00-7000-8000-000000000021",
+		},
 		deviceStatus: "online",
 		monitoringStatus,
 	});
@@ -47,7 +50,10 @@ describe("UpdateDeviceUseCase — RF-BE-016", () => {
 				mac: "AA:BB:CC:DD:EE:20",
 				name: "Sensor atualizado",
 				warehouseId: "0190f1a0-7b00-7000-8000-000000000020",
-				lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000021",
+				lastMeasurementId: {
+					humidityId: "0190f1a0-7b00-7000-8000-000000000021",
+					temperatureId: "0190f1a0-7b00-7000-8000-000000000021",
+				},
 				deviceStatus: "online",
 				monitoringStatus: "disabled",
 			},

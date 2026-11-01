@@ -17,14 +17,17 @@ import { ListAllWarehouseUseCase } from "@application/use-cases/list-all-warehou
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
+import { SaveMeasurementUseCase } from "@application/use-cases/save-measurement.use-case.js";
 import { UpdateDeviceUseCase } from "@application/use-cases/update-device.use-case.js";
 import { UpdateUserUseCase } from "@application/use-cases/update-user-use-case.js";
 import { UpdateWarehouseUseCase } from "@application/use-cases/update-warehouse.use-case.js";
 import { DeviceRepository } from "@infrastructure/database/mongodb/repositories/device.repository.js";
+import { MeasurementRepository } from "@infrastructure/database/mongodb/repositories/measurement.repository.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { WarehouseRepository } from "@infrastructure/database/mongodb/repositories/warehouse.repository.js";
 import { createDeviceRoutes } from "@infrastructure/http/express/routes/device.routes.js";
 import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
+import { MqttMessageHandle } from "@infrastructure/messaging/mqtt/handle/mqtt-message.handle.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
 import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
@@ -41,6 +44,7 @@ import { ListAllWarehouseController } from "@presentation/controllers/list-all-w
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
+import { SaveMeasurementController } from "@presentation/controllers/save-measurement.controller.js";
 import { UpdateDeviceController } from "@presentation/controllers/update-device.controller.js";
 import { UpdateUserController } from "@presentation/controllers/update-user.controller.js";
 import { UpdateWarehouseController } from "@presentation/controllers/update-warehouse.controller.js";
@@ -83,6 +87,7 @@ const auditLogRepo = AuditLogRepository.instance();
 const tokenRepo = TokenRepository.instance();
 const warehouseRepo = WarehouseRepository.instance();
 const deviceRepo = DeviceRepository.instance();
+const measurementRepo = MeasurementRepository.instance();
 
 // Adapters
 
@@ -190,6 +195,12 @@ const getDeviceUseCase = GetDeviceUseCase.instance(deviceRepo);
 const listAllDeviceUseCase = ListAllDeviceUseCase.instance(deviceRepo);
 const bootstrapMonitoringDeviceUseCase =
 	BootstrapMonitoringDeviceUseCase.instance(deviceRepo, clientMqtt);
+const saveMeasurementUseCase = SaveMeasurementUseCase.instance(
+	uuidProvider,
+	deviceRepo,
+	warehouseRepo,
+	measurementRepo,
+);
 
 // Controllers
 
@@ -231,6 +242,9 @@ const deleteDeviceController =
 const getDeviceController = GetDeviceController.instance(getDeviceUseCase);
 const listAllDeviceController =
 	ListAllDeviceController.instance(listAllDeviceUseCase);
+const saveMeasurementController = SaveMeasurementController.instance(
+	saveMeasurementUseCase,
+);
 
 // Routes
 
@@ -272,6 +286,13 @@ routes.use("/device", deviceRoutes);
 
 // Socket Handlers
 const warehouseHandler = new WarehouseHandle();
+
+// Mqtt Handlers
+const mqttMessageHandler = MqttMessageHandle.instance(
+	clientMqtt,
+	saveMeasurementController,
+);
+mqttMessageHandler.register();
 
 // Server
 

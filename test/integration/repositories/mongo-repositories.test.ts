@@ -1,6 +1,7 @@
 import { Alert } from "@domain/entities/alert.js";
 import { AuditLog } from "@domain/entities/audit-log.js";
 import { Device } from "@domain/entities/device.js";
+import { Measurement } from "@domain/entities/measurement.js";
 import { Notification } from "@domain/entities/notification.js";
 import { Token } from "@domain/entities/token.js";
 import { User } from "@domain/entities/user.js";
@@ -8,15 +9,18 @@ import { Email } from "@domain/object-values/email.js";
 import { alertToDomain } from "@infrastructure/database/mongodb/mappers/alert.mapper.js";
 import { auditLogToDomain } from "@infrastructure/database/mongodb/mappers/audit-log.mapper.js";
 import { notificationToDomain } from "@infrastructure/database/mongodb/mappers/notification.mapper.js";
+import { measurementToDomain } from "@infrastructure/database/mongodb/mappers/measurement.model.js";
 import { AlertModel } from "@infrastructure/database/mongodb/models/alert.model.js";
 import { AuditLogModel } from "@infrastructure/database/mongodb/models/audit-log.model.js";
 import { DeviceModel } from "@infrastructure/database/mongodb/models/device.model.js";
+import { MeasurementModel } from "@infrastructure/database/mongodb/models/measurement.model.js";
 import { NotificationModel } from "@infrastructure/database/mongodb/models/notification.model.js";
 import { TokenModel } from "@infrastructure/database/mongodb/models/token.model.js";
 import { UserModel } from "@infrastructure/database/mongodb/models/user.model.js";
 import { AlertRepository } from "@infrastructure/database/mongodb/repositories/alert.repository.js";
 import { AuditLogRepository } from "@infrastructure/database/mongodb/repositories/audit-log.repository.js";
 import { DeviceRepository } from "@infrastructure/database/mongodb/repositories/device.repository.js";
+import { MeasurementRepository } from "@infrastructure/database/mongodb/repositories/measurement.repository.js";
 import { NotificationRepository } from "@infrastructure/database/mongodb/repositories/notification.repository.js";
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { UserRepository } from "@infrastructure/database/mongodb/repositories/user.repository.js";
@@ -124,7 +128,10 @@ describe("DeviceRepository", () => {
 			_id: "AA:BB:CC:DD:EE:12",
 			name: "Sensor anterior",
 			warehouseId: "0190f1a0-7b00-7000-8000-000000000012",
-			lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000013",
+			lastMeasurementId: {
+				humidityId: "measurement-humidity-1",
+				temperatureId: "measurement-temperature-1",
+			},
 			deviceStatus: "online",
 			monitoringStatus: "disabled",
 		});
@@ -138,7 +145,10 @@ describe("DeviceRepository", () => {
 		expect(await DeviceModel.findById("AA:BB:CC:DD:EE:12")).toMatchObject({
 			name: "Sensor atualizado",
 			warehouseId: "0190f1a0-7b00-7000-8000-000000000012",
-			lastMeasurementId: "0190f1a0-7b00-7000-8000-000000000013",
+			lastMeasurementId: {
+				humidityId: "measurement-humidity-1",
+				temperatureId: "measurement-temperature-1",
+			},
 			deviceStatus: "online",
 			monitoringStatus: "enabled",
 		});
@@ -188,7 +198,10 @@ describe("DeviceRepository", () => {
 				_id: "AA:BB:CC:DD:EE:01",
 				name: "Sensor vinculado 1",
 				warehouseId: "warehouse-1",
-				lastMeasurementId: "measurement-1",
+				lastMeasurementId: {
+					humidityId: "measurement-humidity-1",
+					temperatureId: "measurement-temperature-1",
+				},
 				deviceStatus: "online",
 				monitoringStatus: "enabled",
 			},
@@ -196,7 +209,10 @@ describe("DeviceRepository", () => {
 				_id: "AA:BB:CC:DD:EE:02",
 				name: "Sensor vinculado 2",
 				warehouseId: "warehouse-1",
-				lastMeasurementId: "measurement-2",
+				lastMeasurementId: {
+					humidityId: "measurement-humidity-2",
+					temperatureId: "measurement-temperature-2",
+				},
 				deviceStatus: "error",
 				monitoringStatus: "disabled",
 			},
@@ -204,7 +220,10 @@ describe("DeviceRepository", () => {
 				_id: "AA:BB:CC:DD:EE:03",
 				name: "Sensor de outro armazém",
 				warehouseId: "warehouse-2",
-				lastMeasurementId: "measurement-3",
+				lastMeasurementId: {
+					humidityId: "measurement-humidity-3",
+					temperatureId: "measurement-temperature-3",
+				},
 				deviceStatus: "online",
 				monitoringStatus: "enabled",
 			},
@@ -233,7 +252,10 @@ describe("DeviceRepository", () => {
 			_id: "AA:BB:CC:DD:EE:04",
 			name: "Sensor independente",
 			warehouseId: "warehouse-2",
-			lastMeasurementId: "measurement-4",
+			lastMeasurementId: {
+				humidityId: "measurement-humidity-4",
+				temperatureId: "measurement-temperature-4",
+			},
 			deviceStatus: "online",
 			monitoringStatus: "enabled",
 		});
@@ -443,6 +465,64 @@ describe("NotificationRepository + notification.mapper", () => {
 		expect(
 			notificationToDomain(doc as NonNullable<typeof doc>).readedAt,
 		).toEqual(readedAt);
+	});
+});
+
+describe("MeasurementRepository + measurement.mapper — RF-BE-021", () => {
+	const repo = MeasurementRepository.instance();
+	const createMeasurement = (overrides: Partial<{
+		id: string;
+		type: "temperature" | "humidity";
+		value: number;
+	}> = {}) =>
+		Measurement.create({
+			id: overrides.id ?? "measurement-1",
+			deviceId: "AA:BB:CC:DD:EE:71",
+			warehouseId: "0190f1a0-7b00-7000-8000-000000000071",
+			type: overrides.type ?? "temperature",
+			value: overrides.value ?? 4.5,
+			createdAt: new Date("2026-03-01T08:00:00.000Z"),
+		});
+
+	it("persiste uma medição e recupera seus dados de domínio", async () => {
+		const measurement = createMeasurement();
+
+		await repo.save(measurement);
+
+		const stored = await MeasurementModel.findById(measurement.id);
+		expect(stored).toMatchObject({
+			_id: measurement.id,
+			deviceId: measurement.deviceId,
+			warehouseId: measurement.warehouseId,
+			type: measurement.type,
+			value: measurement.value,
+		});
+		expect(measurementToDomain(stored!)).toMatchObject({
+			id: measurement.id,
+			deviceId: measurement.deviceId,
+			warehouseId: measurement.warehouseId,
+			type: measurement.type,
+			value: measurement.value,
+			createdAt: measurement.createdAt,
+		});
+	});
+
+	it("persiste em lote medições de tipos diferentes", async () => {
+		await repo.saveMany([
+			createMeasurement(),
+			createMeasurement({
+				id: "measurement-2",
+				type: "humidity",
+				value: 55,
+			}),
+		]);
+
+		const stored = await MeasurementModel.find().sort({ _id: 1 });
+		expect(stored).toHaveLength(2);
+		expect(stored.map(({ _id, type, value }) => ({ _id, type, value }))).toEqual([
+			{ _id: "measurement-1", type: "temperature", value: 4.5 },
+			{ _id: "measurement-2", type: "humidity", value: 55 },
+		]);
 	});
 });
 

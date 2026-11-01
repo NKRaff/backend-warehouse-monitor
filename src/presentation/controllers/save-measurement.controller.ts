@@ -31,10 +31,18 @@ export class SaveMeasurementController
 	}
 
 	async handle(
-		input: unknown,
+		input: {
+			mac: string;
+			payload: Buffer;
+		},
 		_context: RequestContext,
 	): Promise<SaveMeasurementOutputDto> {
-		const data = SaveMeasurementSchema.parse(input);
+		const { mac, payload } = input;
+		const payloadData = JSON.parse(payload.toString());
+		const data = SaveMeasurementSchema.parse({
+			deviceId: mac,
+			payloadData,
+		});
 		return await this.useCase.execute(data);
 	}
 }

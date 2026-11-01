@@ -2,10 +2,13 @@ import { DeviceStatus } from "@domain/types/device-status.js";
 import { MonitoringStatus } from "@domain/types/monitoring-status.js";
 import { type InferSchemaType, model, Schema } from "mongoose";
 
-const lastMeasurementId = new Schema({
-	temperatureId: { type: String, required: true, ref: "Measurement" },
-	humidityId: { type: String, required: true, ref: "Measurement" },
-});
+const lastMeasurementId = new Schema(
+	{
+		temperatureId: { type: String, required: true, ref: "Measurement" },
+		humidityId: { type: String, required: true, ref: "Measurement" },
+	},
+	{ _id: false },
+);
 
 const deviceSchema = new Schema(
 	{

@@ -40,8 +40,8 @@ export class SaveMeasurementController
 		const { mac, payload } = input;
 		const payloadData = JSON.parse(payload.toString());
 		const data = SaveMeasurementSchema.parse({
+			...payloadData,
 			deviceId: mac,
-			payloadData,
 		});
 		return await this.useCase.execute(data);
 	}

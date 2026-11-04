@@ -87,4 +87,129 @@ export class DeviceRepository implements IDeviceRepository {
 			return deviceToDomain(device);
 		});
 	}
+
+	async getAverageMonitoring(warehouseId: string) {
+		const [result] = await DeviceModel.aggregate([
+			{
+				$match: {
+					warehouseId,
+					monitoringStatus: MonitoringStatus.ENABLE,
+					lastMeasurementId: { $exists: true },
+				},
+			},
+			{
+				$project: {
+					measurementIds: [
+						"$lastMeasurementId.temperatureId",
+						"$lastMeasurementId.humidityId",
+					],
+				},
+			},
+			{
+				$unwind: "$measurementIds",
+			},
+			{
+				$lookup: {
+					from: "measurements",
+					localField: "measurementIds",
+					foreignField: "_id",
+					as: "measurement",
+				},
+			},
+			{
+				$unwind: "$measurement",
+			},
+			{
+				$group: {
+					_id: "$measurement.type",
+					average: {
+						$avg: "$measurement.value",
+					},
+				},
+			},
+			{
+				$group: {
+					_id: null,
+					averages: {
+						$push: {
+							type: "$_id",
+							value: "$average",
+						},
+					},
+				},
+			},
+			{
+				$project: {
+					_id: 0,
+					temperature: {
+						$round: [
+							{
+								$ifNull: [
+									{
+										$arrayElemAt: [
+											{
+												$map: {
+													input: {
+														$filter: {
+															input: "$averages",
+															as: "item",
+															cond: {
+																$eq: ["$$item.type", "temperature"],
+															},
+														},
+													},
+													as: "item",
+													in: "$$item.value",
+												},
+											},
+											0,
+										],
+									},
+									null,
+								],
+							},
+							2,
+						],
+					},
+					humidity: {
+						$round: [
+							{
+								$ifNull: [
+									{
+										$arrayElemAt: [
+											{
+												$map: {
+													input: {
+														$filter: {
+															input: "$averages",
+															as: "item",
+															cond: {
+																$eq: ["$$item.type", "humidity"],
+															},
+														},
+													},
+													as: "item",
+													in: "$$item.value",
+												},
+											},
+											0,
+										],
+									},
+									null,
+								],
+							},
+							2,
+						],
+					},
+				},
+			},
+		]);
+
+		return (
+			result ?? {
+				temperature: null,
+				humidity: null,
+			}
+		);
+	}
 }

@@ -123,6 +123,93 @@ describe("DeviceRepository", () => {
 		});
 	});
 
+	it("calcula a média por grandeza apenas dos dispositivos monitorados do armazém", async () => {
+		const targetWarehouse = "0190f1a0-7b00-7000-8000-000000000081";
+		const otherWarehouse = "0190f1a0-7b00-7000-8000-000000000082";
+		const measurements = [
+			{ _id: "average-temperature-1", type: "temperature", value: 2 },
+			{ _id: "average-humidity-1", type: "humidity", value: 40 },
+			{ _id: "average-temperature-2", type: "temperature", value: 6 },
+			{ _id: "average-humidity-2", type: "humidity", value: 60 },
+			{ _id: "average-temperature-ignored", type: "temperature", value: 100 },
+			{ _id: "average-humidity-ignored", type: "humidity", value: 100 },
+		];
+		await MeasurementModel.create(
+			measurements.map(({ _id, type, value }) => ({
+				_id,
+				type,
+				value,
+				deviceId: "AA:BB:CC:DD:EE:81",
+				warehouseId: targetWarehouse,
+				createdAt: new Date("2026-03-01T08:00:00.000Z"),
+			})),
+		);
+		await DeviceModel.create([
+			{
+				_id: "AA:BB:CC:DD:EE:81",
+				name: "Sensor monitorado 1",
+				warehouseId: targetWarehouse,
+				lastMeasurementId: {
+					temperatureId: "average-temperature-1",
+					humidityId: "average-humidity-1",
+				},
+				deviceStatus: "online",
+				monitoringStatus: "enabled",
+			},
+			{
+				_id: "AA:BB:CC:DD:EE:82",
+				name: "Sensor monitorado 2",
+				warehouseId: targetWarehouse,
+				lastMeasurementId: {
+					temperatureId: "average-temperature-2",
+					humidityId: "average-humidity-2",
+				},
+				deviceStatus: "online",
+				monitoringStatus: "enabled",
+			},
+			{
+				_id: "AA:BB:CC:DD:EE:83",
+				name: "Sensor desabilitado",
+				warehouseId: targetWarehouse,
+				lastMeasurementId: {
+					temperatureId: "average-temperature-ignored",
+					humidityId: "average-humidity-ignored",
+				},
+				deviceStatus: "online",
+				monitoringStatus: "disabled",
+			},
+			{
+				_id: "AA:BB:CC:DD:EE:84",
+				name: "Sensor de outro armazém",
+				warehouseId: otherWarehouse,
+				lastMeasurementId: {
+					temperatureId: "average-temperature-ignored",
+					humidityId: "average-humidity-ignored",
+				},
+				deviceStatus: "online",
+				monitoringStatus: "enabled",
+			},
+			{
+				_id: "AA:BB:CC:DD:EE:85",
+				name: "Sensor sem medições",
+				warehouseId: targetWarehouse,
+				deviceStatus: "online",
+				monitoringStatus: "enabled",
+			},
+		]);
+
+		await expect(repo.getAverageMonitoring(targetWarehouse)).resolves.toEqual({
+			temperature: 4,
+			humidity: 50,
+		});
+	});
+
+	it("retorna médias nulas quando o armazém ainda não tem medições", async () => {
+		await expect(
+			repo.getAverageMonitoring("0190f1a0-7b00-7000-8000-000000000083"),
+		).resolves.toEqual({ temperature: null, humidity: null });
+	});
+
 	it("atualiza apenas os campos recebidos", async () => {
 		await DeviceModel.create({
 			_id: "AA:BB:CC:DD:EE:12",

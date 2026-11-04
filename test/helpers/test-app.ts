@@ -18,6 +18,7 @@ import { ListAllDeviceUseCase } from "@application/use-cases/list-all-devices.us
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
+import { SaveMeasurementUseCase } from "@application/use-cases/save-measurement.use-case.js";
 import { UpdateUserUseCase } from "@application/use-cases/update-user-use-case.js";
 import { UpdateWarehouseUseCase } from "@application/use-cases/update-warehouse.use-case.js";
 import { BcryptPasswordHasherAdapter } from "@infrastructure/cryptography/bcrypt-password-hasher.adapter.js";
@@ -29,6 +30,7 @@ import { TokenRepository } from "@infrastructure/database/mongodb/repositories/t
 import { UserRepository } from "@infrastructure/database/mongodb/repositories/user.repository.js";
 import { WarehouseRepository } from "@infrastructure/database/mongodb/repositories/warehouse.repository.js";
 import { DeviceRepository } from "@infrastructure/database/mongodb/repositories/device.repository.js";
+import { MeasurementRepository } from "@infrastructure/database/mongodb/repositories/measurement.repository.js";
 import { ExpressApp } from "@infrastructure/http/express/express.app.js";
 import { createUserRoutes } from "@infrastructure/http/express/routes/user.routes.js";
 import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
@@ -51,11 +53,12 @@ import { GeneratePasswordResetTokenController } from "@presentation/controllers/
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
 import { RegisterUserController } from "@presentation/controllers/register-user.controller.js";
+import { SaveMeasurementController } from "@presentation/controllers/save-measurement.controller.js";
 import { UpdateUserController } from "@presentation/controllers/update-user.controller.js";
 import { UpdateWarehouseController } from "@presentation/controllers/update-warehouse.controller.js";
 import { Router } from "express";
 import { resetSingleton } from "./singleton.js";
-import { createMqttClientMock } from "./mocks.js";
+import { createMqttClientMock, createWebsocketNotifierMock } from "./mocks.js";
 
 /**
  * Composition root de teste que espelha `src/main.ts`, sem broker MQTT,
@@ -70,6 +73,7 @@ export function createTestApp(smtp: SmtpClient) {
 		TokenRepository,
 		WarehouseRepository,
 		DeviceRepository,
+		MeasurementRepository,
 		BcryptPasswordHasherAdapter,
 		JwtTokenAdapter,
 		UuidAdapter,
@@ -107,6 +111,8 @@ export function createTestApp(smtp: SmtpClient) {
 		GetDeviceController,
 		ListAllWarehouseController,
 		ListAllDeviceController,
+		SaveMeasurementUseCase,
+		SaveMeasurementController,
 	);
 
 	const userRepo = UserRepository.instance();
@@ -116,7 +122,9 @@ export function createTestApp(smtp: SmtpClient) {
 	const tokenRepo = TokenRepository.instance();
 	const warehouseRepo = WarehouseRepository.instance();
 	const deviceRepo = DeviceRepository.instance();
+	const measurementRepo = MeasurementRepository.instance();
 	const mqttClient = createMqttClientMock();
+	const websocketNotifier = createWebsocketNotifierMock();
 
 	const passwordHasher = BcryptPasswordHasherAdapter.instance();
 	const tokenProvider = JwtTokenAdapter.instance();
@@ -207,6 +215,13 @@ export function createTestApp(smtp: SmtpClient) {
 	);
 	const getDeviceUseCase = GetDeviceUseCase.instance(deviceRepo);
 	const listAllDeviceUseCase = ListAllDeviceUseCase.instance(deviceRepo);
+	const saveMeasurementUseCase = SaveMeasurementUseCase.instance(
+		uuidProvider,
+		deviceRepo,
+		warehouseRepo,
+		measurementRepo,
+		websocketNotifier,
+	);
 	const deleteDeviceUseCase = DeleteDeviceUseCase.instance(
 		uuidProvider,
 		mqttClient,
@@ -247,6 +262,9 @@ export function createTestApp(smtp: SmtpClient) {
 		ListAllDeviceController.instance(listAllDeviceUseCase);
 	const deleteDeviceController =
 		DeleteDeviceController.instance(deleteDeviceUseCase);
+	const saveMeasurementController = SaveMeasurementController.instance(
+		saveMeasurementUseCase,
+	);
 
 	const routes = Router();
 	routes.use(
@@ -294,5 +312,8 @@ export function createTestApp(smtp: SmtpClient) {
 		passwordHasher,
 		tokenProvider,
 		mqttClient,
+		measurementRepo,
+		saveMeasurementController,
+		websocketNotifier,
 	};
 }

@@ -11,6 +11,7 @@ import type { IDeviceRepository } from "@application/repositories/device.interfa
 import type { IMeasurementRepository } from "@application/repositories/measurement.interface.js";
 import type { IMqttClient } from "@application/ports/mqtt-client.interface.js";
 import type { NotificationService } from "@application/services/notification.service.js";
+import type { WebsocketNotifier } from "@application/ports/websocket-notifier.interface.js";
 import { vi } from "vitest";
 
 /** Gera ids previsíveis: `uuid-1`, `uuid-2`, ... */
@@ -134,7 +135,21 @@ export function createDeviceRepoMock() {
 		findAllMonitoringOn: vi
 			.fn<IDeviceRepository["findAllMonitoringOn"]>()
 			.mockResolvedValue([]),
+		getAverageMonitoring: vi
+			.fn<IDeviceRepository["getAverageMonitoring"]>()
+			.mockResolvedValue({ temperature: 0, humidity: 0 }),
 	} satisfies IDeviceRepository;
+}
+
+export function createWebsocketNotifierMock() {
+	return {
+		sendToChat: vi
+			.fn<WebsocketNotifier["sendToChat"]>()
+			.mockImplementation(() => undefined),
+		broadcast: vi
+			.fn<WebsocketNotifier["broadcast"]>()
+			.mockImplementation(() => undefined),
+	} satisfies WebsocketNotifier;
 }
 
 export function createMeasurementRepoMock() {

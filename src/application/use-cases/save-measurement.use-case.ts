@@ -3,6 +3,7 @@ import type {
 	SaveMeasurementOutputDto,
 } from "@application/dtos/save-measurement.dto.js";
 import type { IUuidProvider } from "@application/ports/uuid-provider.interface.js";
+import type { WebsocketNotifier } from "@application/ports/websocket-notifier.interface.js";
 import type { IDeviceRepository } from "@application/repositories/device.interface.js";
 import type { IMeasurementRepository } from "@application/repositories/measurement.interface.js";
 import type { IWarehouseRepository } from "@application/repositories/warehouse.interface.js";
@@ -22,6 +23,7 @@ export class SaveMeasurementUseCase
 		private readonly deviceRepo: IDeviceRepository,
 		private readonly warehouseRepo: IWarehouseRepository,
 		private readonly measurementRepo: IMeasurementRepository,
+		private readonly webSocketNotifier: WebsocketNotifier,
 	) {}
 
 	static instance(
@@ -29,6 +31,7 @@ export class SaveMeasurementUseCase
 		userRepo: IDeviceRepository,
 		warehouseRepo: IWarehouseRepository,
 		measurementRepo: IMeasurementRepository,
+		webSocketNotifier: WebsocketNotifier,
 	): SaveMeasurementUseCase {
 		if (!SaveMeasurementUseCase._instance) {
 			SaveMeasurementUseCase._instance = new SaveMeasurementUseCase(
@@ -36,6 +39,7 @@ export class SaveMeasurementUseCase
 				userRepo,
 				warehouseRepo,
 				measurementRepo,
+				webSocketNotifier,
 			);
 		}
 		return SaveMeasurementUseCase._instance;
@@ -102,6 +106,22 @@ export class SaveMeasurementUseCase
 			measurementTemperature,
 			measurementHumidity,
 		]);
+
+		const average = await this.deviceRepo.getAverageMonitoring(warehouse.id);
+
+		this.webSocketNotifier.broadcast("telemetry.updated", {
+			warehouse: {
+				id: warehouse.id,
+				average,
+			},
+			device: {
+				mac: device.mac,
+				lastMeasurement: {
+					temperature: input.values.temperature,
+					humidity: input.values.humidity,
+				},
+			},
+		});
 
 		return {
 			message: "Mendições salvas com sucesso",

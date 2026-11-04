@@ -5,19 +5,25 @@ import type { WebsocketHandler } from "./handle/websocket-handler.interface.js";
 
 export class SocketIO implements WebsocketNotifier {
 	private static _instance: SocketIO;
-	private io: SocketServer;
+	private _io: SocketServer | null = null;
 
-	private constructor(httpServer: HttpServer) {
-		this.io = new SocketServer(httpServer, {
-			cors: { origin: "*" },
-		});
-	}
+	private constructor() {}
 
-	static instance(httpServer: HttpServer): SocketIO {
+	static instance(): SocketIO {
 		if (!SocketIO._instance) {
-			SocketIO._instance = new SocketIO(httpServer);
+			SocketIO._instance = new SocketIO();
 		}
 		return SocketIO._instance;
+	}
+
+	initialize(httpServer: HttpServer) {
+		if (this._io) {
+			throw new Error("Socket.IO já foi inicializado");
+		}
+
+		this._io = new SocketServer(httpServer, {
+			cors: { origin: "*" },
+		});
 	}
 
 	connect(handlers: WebsocketHandler[]) {
@@ -45,5 +51,13 @@ export class SocketIO implements WebsocketNotifier {
 
 	broadcast(event: string, payload: unknown): void {
 		this.io.emit(event, payload);
+	}
+
+	private get io(): SocketServer {
+		if (!this._io) {
+			throw new Error("Socket.IO ainda não foi inicializado");
+		}
+
+		return this._io;
 	}
 }

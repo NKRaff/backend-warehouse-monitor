@@ -78,6 +78,8 @@ await clientMqtt.connect();
 
 const clientSmtp = NodemailerAdapter.instance();
 
+const socketServer = SocketIO.instance();
+
 // Repositories
 
 const userRepo = UserRepository.instance();
@@ -200,6 +202,7 @@ const saveMeasurementUseCase = SaveMeasurementUseCase.instance(
 	deviceRepo,
 	warehouseRepo,
 	measurementRepo,
+	socketServer,
 );
 
 // Controllers
@@ -301,7 +304,7 @@ const httpServer = HttpServer.instance(app);
 
 httpServer.connect();
 
-const socketServer = SocketIO.instance(httpServer.server());
+socketServer.initialize(httpServer.server());
 socketServer.connect([warehouseHandler]);
 
 // Bootstrap admin

@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	createDeviceRepoMock,
 	createMeasurementRepoMock,
+	createWebsocketNotifierMock,
 	createWarehouseRepoMock,
 } from "../../../helpers/mocks.js";
 import { resetSingleton } from "../../../helpers/singleton.js";
@@ -25,6 +26,7 @@ describe("SaveMeasurementUseCase — RF-BE-021", () => {
 	let devices: ReturnType<typeof createDeviceRepoMock>;
 	let warehouses: ReturnType<typeof createWarehouseRepoMock>;
 	let measurements: ReturnType<typeof createMeasurementRepoMock>;
+	let websocket: ReturnType<typeof createWebsocketNotifierMock>;
 	let useCase: SaveMeasurementUseCase;
 
 	beforeEach(() => {
@@ -32,12 +34,14 @@ describe("SaveMeasurementUseCase — RF-BE-021", () => {
 		devices = createDeviceRepoMock();
 		warehouses = createWarehouseRepoMock();
 		measurements = createMeasurementRepoMock();
+		websocket = createWebsocketNotifierMock();
 		let index = 0;
 		useCase = SaveMeasurementUseCase.instance(
 			{ generate: vi.fn(() => ids[index++]!) },
 			devices,
 			warehouses,
 			measurements,
+			websocket,
 		);
 	});
 
@@ -68,6 +72,7 @@ describe("SaveMeasurementUseCase — RF-BE-021", () => {
 		const device = linkedDevice();
 		devices.findById.mockResolvedValue(device);
 		warehouses.findById.mockResolvedValue(warehouse());
+		devices.getAverageMonitoring.mockResolvedValue({ temperature: 4, humidity: 55 });
 
 		await useCase.execute(input);
 
@@ -81,6 +86,7 @@ describe("SaveMeasurementUseCase — RF-BE-021", () => {
 			},
 		});
 		expect(measurements.saveMany).toHaveBeenCalledOnce();
+		expect(devices.getAverageMonitoring).toHaveBeenCalledExactlyOnceWith(warehouseId);
 		const saved = measurements.saveMany.mock.calls[0]![0];
 		expect(saved).toHaveLength(2);
 		expect(saved).toEqual([
@@ -101,6 +107,19 @@ describe("SaveMeasurementUseCase — RF-BE-021", () => {
 				createdAt: input.createdAt,
 			}),
 		]);
+		expect(websocket.broadcast).toHaveBeenCalledExactlyOnceWith(
+			"telemetry.updated",
+			{
+				warehouse: {
+					id: warehouseId,
+					average: { temperature: 4, humidity: 55 },
+				},
+				device: {
+					mac: input.deviceId,
+					lastMeasurement: input.values,
+				},
+			},
+		);
 	});
 
 	it("retorna NotFoundError quando o dispositivo não existe", async () => {
@@ -108,6 +127,7 @@ describe("SaveMeasurementUseCase — RF-BE-021", () => {
 		expect(warehouses.findById).not.toHaveBeenCalled();
 		expect(devices.updateById).not.toHaveBeenCalled();
 		expect(measurements.saveMany).not.toHaveBeenCalled();
+		expect(websocket.broadcast).not.toHaveBeenCalled();
 	});
 
 	it("rejeita dispositivo sem armazém vinculado", async () => {
@@ -125,6 +145,7 @@ describe("SaveMeasurementUseCase — RF-BE-021", () => {
 		);
 		expect(warehouses.findById).not.toHaveBeenCalled();
 		expect(measurements.saveMany).not.toHaveBeenCalled();
+		expect(websocket.broadcast).not.toHaveBeenCalled();
 	});
 
 	it("retorna NotFoundError quando o armazém vinculado não existe", async () => {
@@ -133,6 +154,7 @@ describe("SaveMeasurementUseCase — RF-BE-021", () => {
 		await expect(useCase.execute(input)).rejects.toBeInstanceOf(NotFoundError);
 		expect(devices.updateById).not.toHaveBeenCalled();
 		expect(measurements.saveMany).not.toHaveBeenCalled();
+		expect(websocket.broadcast).not.toHaveBeenCalled();
 	});
 
 	it("rejeita medições quando o armazém está inativo", async () => {
@@ -144,6 +166,7 @@ describe("SaveMeasurementUseCase — RF-BE-021", () => {
 		);
 		expect(devices.updateById).not.toHaveBeenCalled();
 		expect(measurements.saveMany).not.toHaveBeenCalled();
+		expect(websocket.broadcast).not.toHaveBeenCalled();
 	});
 
 	it("não salva as medições se falhar a atualização do dispositivo", async () => {

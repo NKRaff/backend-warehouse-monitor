@@ -18,4 +18,7 @@ export interface IDeviceRepository {
 	deleteById(mac: string): Promise<void>;
 	findAll(offset: number, limit: number): Promise<Device[]>;
 	findAllMonitoringOn(): Promise<Device[]>;
+	getAverageMonitoring(
+		warehouseId: string,
+	): Promise<{ temperature: number; humidity: number }>;
 }

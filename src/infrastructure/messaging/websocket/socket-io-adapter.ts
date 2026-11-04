@@ -17,7 +17,7 @@ export class SocketIO implements WebsocketNotifier {
 	}
 
 	initialize(httpServer: HttpServer) {
-		if (this.io) {
+		if (this._io) {
 			throw new Error("Socket.IO já foi inicializado");
 		}
 

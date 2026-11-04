@@ -20,5 +20,5 @@ export interface IDeviceRepository {
 	findAllMonitoringOn(): Promise<Device[]>;
 	getAverageMonitoring(
 		warehouseId: string,
-	): Promise<{ temperature: number; humidity: number }>;
+	): Promise<{ temperature: number | null; humidity: number | null }>;
 }

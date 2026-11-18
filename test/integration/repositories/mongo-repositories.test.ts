@@ -561,6 +561,7 @@ describe("MeasurementRepository + measurement.mapper — RF-BE-021", () => {
 		id: string;
 		type: "temperature" | "humidity";
 		value: number;
+		createdAt: Date;
 	}> = {}) =>
 		Measurement.create({
 			id: overrides.id ?? "measurement-1",
@@ -568,7 +569,7 @@ describe("MeasurementRepository + measurement.mapper — RF-BE-021", () => {
 			warehouseId: "0190f1a0-7b00-7000-8000-000000000071",
 			type: overrides.type ?? "temperature",
 			value: overrides.value ?? 4.5,
-			createdAt: new Date("2026-03-01T08:00:00.000Z"),
+			createdAt: overrides.createdAt ?? new Date("2026-03-01T08:00:00.000Z"),
 		});
 
 	it("persiste uma medição e recupera seus dados de domínio", async () => {
@@ -610,6 +611,103 @@ describe("MeasurementRepository + measurement.mapper — RF-BE-021", () => {
 			{ _id: "measurement-1", type: "temperature", value: 4.5 },
 			{ _id: "measurement-2", type: "humidity", value: 55 },
 		]);
+	});
+
+	it("filtra por dispositivo, armazém, tipo e intervalo inclusivo em ordem cronológica", async () => {
+		const startDate = new Date("2026-03-01T08:00:00.000Z");
+		const endDate = new Date("2026-03-01T10:00:00.000Z");
+		await MeasurementModel.create([
+			{
+				_id: "measurement-in-range-late",
+				deviceId: "AA:BB:CC:DD:EE:71",
+				warehouseId: "0190f1a0-7b00-7000-8000-000000000071",
+				type: "temperature",
+				value: 5,
+				createdAt: endDate,
+			},
+			{
+				_id: "measurement-in-range-early",
+				deviceId: "AA:BB:CC:DD:EE:71",
+				warehouseId: "0190f1a0-7b00-7000-8000-000000000071",
+				type: "temperature",
+				value: 4,
+				createdAt: startDate,
+			},
+			{
+				_id: "measurement-before-range",
+				deviceId: "AA:BB:CC:DD:EE:71",
+				warehouseId: "0190f1a0-7b00-7000-8000-000000000071",
+				type: "temperature",
+				value: 3,
+				createdAt: new Date("2026-03-01T07:59:59.999Z"),
+			},
+			{
+				_id: "measurement-other-device",
+				deviceId: "AA:BB:CC:DD:EE:72",
+				warehouseId: "0190f1a0-7b00-7000-8000-000000000071",
+				type: "temperature",
+				value: 6,
+				createdAt: startDate,
+			},
+			{
+				_id: "measurement-other-warehouse",
+				deviceId: "AA:BB:CC:DD:EE:71",
+				warehouseId: "0190f1a0-7b00-7000-8000-000000000072",
+				type: "temperature",
+				value: 7,
+				createdAt: startDate,
+			},
+			{
+				_id: "measurement-other-type",
+				deviceId: "AA:BB:CC:DD:EE:71",
+				warehouseId: "0190f1a0-7b00-7000-8000-000000000071",
+				type: "humidity",
+				value: 55,
+				createdAt: startDate,
+			},
+		]);
+
+		const found = await repo.findAll(
+			{
+				deviceId: "AA:BB:CC:DD:EE:71",
+				warehouseId: "0190f1a0-7b00-7000-8000-000000000071",
+				type: "temperature",
+				startDate,
+				endDate,
+			},
+			null,
+		);
+
+		expect(found.map(({ id }) => id)).toEqual([
+			"measurement-in-range-early",
+			"measurement-in-range-late",
+		]);
+		expect(found.every((measurement) => measurement instanceof Measurement)).toBe(
+			true,
+		);
+	});
+
+	it("aplica paginação e devolve lista vazia quando os filtros não encontram medições", async () => {
+		await repo.saveMany([
+			createMeasurement({
+				id: "measurement-page-1",
+				createdAt: new Date("2026-03-01T08:00:00.000Z"),
+			}),
+			createMeasurement({
+				id: "measurement-page-2",
+				type: "humidity",
+				value: 55,
+				createdAt: new Date("2026-03-01T09:00:00.000Z"),
+			}),
+		]);
+
+		const page = await repo.findAll({}, { offSet: 1, limit: 1 });
+		const empty = await repo.findAll({ deviceId: "AA:BB:CC:DD:EE:99" }, null);
+
+		expect(page).toHaveLength(1);
+		expect(page[0]).toBeInstanceOf(Measurement);
+		expect(page[0]?.id).toBe("measurement-page-2");
+		expect(empty).toEqual([]);
 	});
 });
 

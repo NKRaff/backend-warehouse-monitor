@@ -15,6 +15,7 @@ import { ListAllWarehouseUseCase } from "@application/use-cases/list-all-warehou
 import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/generate-password-reset-token.use-case.js";
 import { GetDeviceUseCase } from "@application/use-cases/get-device.use-case.js";
 import { ListAllDeviceUseCase } from "@application/use-cases/list-all-devices.use-case.js";
+import { ListAllMeasurementUseCase } from "@application/use-cases/list-all-measurement.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
 import { RegisterUserUseCase } from "@application/use-cases/register-user.use-case.js";
@@ -35,6 +36,7 @@ import { ExpressApp } from "@infrastructure/http/express/express.app.js";
 import { createUserRoutes } from "@infrastructure/http/express/routes/user.routes.js";
 import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
 import { createDeviceRoutes } from "@infrastructure/http/express/routes/device.routes.js";
+import { createMeasurementRoutes } from "@infrastructure/http/express/routes/measurement.routes.js";
 import { UuidAdapter } from "@infrastructure/identifier/uuid.adapter.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
@@ -48,6 +50,7 @@ import { DeleteWarehouseController } from "@presentation/controllers/delete-ware
 import { GetDeviceController } from "@presentation/controllers/get-device.controller.js";
 import { GetWarehouseController } from "@presentation/controllers/get-warehouse.controller.js";
 import { ListAllDeviceController } from "@presentation/controllers/list-all-device.controller.js";
+import { ListAllMeasurementController } from "@presentation/controllers/list-all-measurement.controller.js";
 import { ListAllWarehouseController } from "@presentation/controllers/list-all-warehouse.controller.js";
 import { GeneratePasswordResetTokenController } from "@presentation/controllers/generate-password-reset-token.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
@@ -96,6 +99,7 @@ export function createTestApp(smtp: SmtpClient) {
 		GetDeviceUseCase,
 		ListAllWarehouseUseCase,
 		ListAllDeviceUseCase,
+		ListAllMeasurementUseCase,
 		RegisterUserController,
 		LoginController,
 		ChangePasswordController,
@@ -111,6 +115,7 @@ export function createTestApp(smtp: SmtpClient) {
 		GetDeviceController,
 		ListAllWarehouseController,
 		ListAllDeviceController,
+		ListAllMeasurementController,
 		SaveMeasurementUseCase,
 		SaveMeasurementController,
 	);
@@ -215,6 +220,8 @@ export function createTestApp(smtp: SmtpClient) {
 	);
 	const getDeviceUseCase = GetDeviceUseCase.instance(deviceRepo);
 	const listAllDeviceUseCase = ListAllDeviceUseCase.instance(deviceRepo);
+	const listAllMeasurementUseCase =
+		ListAllMeasurementUseCase.instance(measurementRepo);
 	const saveMeasurementUseCase = SaveMeasurementUseCase.instance(
 		uuidProvider,
 		deviceRepo,
@@ -260,6 +267,8 @@ export function createTestApp(smtp: SmtpClient) {
 	const getDeviceController = GetDeviceController.instance(getDeviceUseCase);
 	const listAllDeviceController =
 		ListAllDeviceController.instance(listAllDeviceUseCase);
+	const listAllMeasurementController =
+		ListAllMeasurementController.instance(listAllMeasurementUseCase);
 	const deleteDeviceController =
 		DeleteDeviceController.instance(deleteDeviceUseCase);
 	const saveMeasurementController = SaveMeasurementController.instance(
@@ -304,6 +313,14 @@ export function createTestApp(smtp: SmtpClient) {
 			deleteDeviceController,
 			getDeviceController,
 			listAllDeviceController,
+		),
+	);
+	routes.use(
+		"/measurement",
+		createMeasurementRoutes(
+			tokenProvider,
+			authorizationPolicy,
+			listAllMeasurementController,
 		),
 	);
 

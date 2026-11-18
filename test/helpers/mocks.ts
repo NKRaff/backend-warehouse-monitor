@@ -158,6 +158,9 @@ export function createMeasurementRepoMock() {
 		saveMany: vi
 			.fn<IMeasurementRepository["saveMany"]>()
 			.mockResolvedValue(undefined),
+		findAll: vi
+			.fn<IMeasurementRepository["findAll"]>()
+			.mockResolvedValue([]),
 	} satisfies IMeasurementRepository;
 }
 

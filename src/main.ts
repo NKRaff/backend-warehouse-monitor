@@ -13,6 +13,7 @@ import { GeneratePasswordResetTokenUseCase } from "@application/use-cases/genera
 import { GetDeviceUseCase } from "@application/use-cases/get-device.use-case.js";
 import { GetWarehouseUseCase } from "@application/use-cases/get-warehouse.use-case.js";
 import { ListAllDeviceUseCase } from "@application/use-cases/list-all-devices.use-case.js";
+import { ListAllMeasurementUseCase } from "@application/use-cases/list-all-measurement.use-case.js";
 import { ListAllWarehouseUseCase } from "@application/use-cases/list-all-warehouse.use-case.js";
 import { LoginUseCase } from "@application/use-cases/login.use-case.js";
 import { RefreshTokenUseCase } from "@application/use-cases/refresh-token.use-case.js";
@@ -26,6 +27,7 @@ import { MeasurementRepository } from "@infrastructure/database/mongodb/reposito
 import { TokenRepository } from "@infrastructure/database/mongodb/repositories/token.repository.js";
 import { WarehouseRepository } from "@infrastructure/database/mongodb/repositories/warehouse.repository.js";
 import { createDeviceRoutes } from "@infrastructure/http/express/routes/device.routes.js";
+import { createMeasurementRoutes } from "@infrastructure/http/express/routes/measurement.routes.js";
 import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
 import { MqttMessageHandle } from "@infrastructure/messaging/mqtt/handle/mqtt-message.handle.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
@@ -40,6 +42,7 @@ import { GeneratePasswordResetTokenController } from "@presentation/controllers/
 import { GetDeviceController } from "@presentation/controllers/get-device.controller.js";
 import { GetWarehouseController } from "@presentation/controllers/get-warehouse.controller.js";
 import { ListAllDeviceController } from "@presentation/controllers/list-all-device.controller.js";
+import { ListAllMeasurementController } from "@presentation/controllers/list-all-measurement.controller.js";
 import { ListAllWarehouseController } from "@presentation/controllers/list-all-warehouse.controller.js";
 import { LoginController } from "@presentation/controllers/login.controller.js";
 import { RefreshTokenController } from "@presentation/controllers/refresh-token.controller.js";
@@ -204,6 +207,8 @@ const saveMeasurementUseCase = SaveMeasurementUseCase.instance(
 	measurementRepo,
 	socketServer,
 );
+const listAllMeasurementUseCase =
+	ListAllMeasurementUseCase.instance(measurementRepo);
 
 // Controllers
 
@@ -248,6 +253,9 @@ const listAllDeviceController =
 const saveMeasurementController = SaveMeasurementController.instance(
 	saveMeasurementUseCase,
 );
+const listAllMeasurementController = ListAllMeasurementController.instance(
+	listAllMeasurementUseCase,
+);
 
 // Routes
 
@@ -282,10 +290,16 @@ const deviceRoutes = createDeviceRoutes(
 	getDeviceController,
 	listAllDeviceController,
 );
+const measurementRoutes = createMeasurementRoutes(
+	tokenProvider,
+	authorizationPolicyService,
+	listAllMeasurementController,
+);
 
 routes.use("/user", userRoutes);
 routes.use("/warehouse", warehouseRoutes);
 routes.use("/device", deviceRoutes);
+routes.use("/measurement", measurementRoutes);
 
 // Socket Handlers
 const warehouseHandler = new WarehouseHandle();

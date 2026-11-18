@@ -46,15 +46,18 @@ export class MeasurementRepository implements IMeasurementRepository {
 		},
 		pagination: { offSet: number; limit: number } | null,
 	): Promise<Measurement[]> {
+		const createdAt = {
+			...(filter.startDate && { $gte: filter.startDate }),
+			...(filter.endDate && { $lte: filter.endDate }),
+		};
 		const query: QueryFilter<MeasurementDocument> = {
 			...(filter.deviceId && { deviceId: filter.deviceId }),
 			...(filter.warehouseId && { warehouseId: filter.warehouseId }),
 			...(filter.type && { type: filter.type }),
-			...(filter.startDate && { createdAt: { $gte: filter.startDate } }),
-			...(filter.endDate && { createdAt: { $lte: filter.endDate } }),
+			...(Object.keys(createdAt).length > 0 && { createdAt }),
 		};
 
-		let request = MeasurementModel.find(query);
+		let request = MeasurementModel.find(query).sort({ createdAt: 1, _id: 1 });
 
 		if (pagination) {
 			request = request.skip(pagination.offSet).limit(pagination.limit);

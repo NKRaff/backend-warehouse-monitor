@@ -13,7 +13,7 @@ export interface IMeasurementRepository {
 			endDate?: Date;
 		},
 		pagination: {
-			offset: number;
+			offSet: number;
 			limit: number;
 		} | null,
 	): Promise<Measurement[]>;

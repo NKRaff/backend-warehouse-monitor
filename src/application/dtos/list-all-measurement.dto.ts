@@ -2,16 +2,18 @@ import type { MeasurementType } from "@domain/types/measurement-type.js";
 
 export type ListAllMeasurementInputDto = {
 	filter: {
-		deviceId?: string;
-		warehouseId?: string;
-		type?: MeasurementType;
-		startDate?: Date;
-		endDate?: Date;
+		deviceId?: string | undefined;
+		warehouseId?: string | undefined;
+		type?: MeasurementType | undefined;
+		startDate?: Date | undefined;
+		endDate?: Date | undefined;
 	};
-	pagination?: {
-		offset: number;
-		limit: number;
-	};
+	pagination?:
+		| {
+				offSet: number;
+				limit: number;
+		  }
+		| undefined;
 };
 
 export type ListAllMeasurementOutputDto = {

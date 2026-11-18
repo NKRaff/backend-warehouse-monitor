@@ -11,8 +11,8 @@ export const ListAllMeasurementSchema = z.object({
 				"Tipo de medição escolhida invalida",
 			)
 			.optional(),
-		startDate: z.date("Data de inicio invalida").optional(),
-		endDate: z.date("Data do final invalido").optional(),
+		startDate: z.coerce.date("Data de inicio invalida").optional(),
+		endDate: z.coerce.date("Data do final invalido").optional(),
 	}),
 	pagination: z
 		.object({

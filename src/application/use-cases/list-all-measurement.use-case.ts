@@ -40,7 +40,14 @@ export class ListAllMeasurementUseCase
 
 		return {
 			message: "Lista de medições encontradas",
-			measurements,
+			measurements: measurements.map((measurement) => ({
+				id: measurement.id,
+				deviceId: measurement.deviceId,
+				warehouseId: measurement.warehouseId,
+				type: measurement.type,
+				value: measurement.value,
+				createdAt: measurement.createdAt,
+			})),
 		};
 	}
 }

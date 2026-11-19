@@ -464,6 +464,41 @@ describe("UserRepository + user.mapper", () => {
 		expect(await UserModel.countDocuments()).toBe(0);
 	});
 
+	it("persiste a preferência de e-mail desativada e ativada no usuário recuperado", async () => {
+		const user = newUser();
+		user.email.verify();
+		user.email.changeNotification();
+		await repo.save(user);
+
+		await repo.updateEmailNotification(user.id, false);
+		expect((await repo.findById(user.id))?.email.enableNotification).toBe(
+			false,
+		);
+		expect((await UserModel.findById(user.id))?.emailNotification).toBe(false);
+
+		await repo.updateEmailNotification(user.id, true);
+		expect((await repo.findById(user.id))?.email.enableNotification).toBe(true);
+	});
+
+	it("usa a preferência desativada para registros sem o campo persistido", async () => {
+		await UserModel.create({
+			_id: "user-without-email-preference",
+			name: "Maria Silva",
+			email: "maria@empresa.com",
+			password: "hash",
+			role: "operator",
+			emailVerified: false,
+		});
+		await UserModel.updateOne(
+			{ _id: "user-without-email-preference" },
+			{ $unset: { emailNotification: 1 } },
+		);
+
+		const found = await repo.findById("user-without-email-preference");
+
+		expect(found?.email.enableNotification).toBe(false);
+	});
+
 	it("é um Singleton", () => {
 		expect(UserRepository.instance()).toBe(repo);
 	});

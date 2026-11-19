@@ -33,8 +33,10 @@ export function makeUser(overrides: UserOverrides = {}): User {
 export function makeNotificationMessage(
 	overrides: Partial<NotificationMessage> = {},
 ): NotificationMessage {
+	const recipient = makeUser({ verified: true });
+	recipient.email.changeNotification();
 	return {
-		recipient: makeUser(),
+		recipient,
 		title: "Título da notificação",
 		message: "Mensagem da notificação",
 		type: "measurement_out_of_limits",

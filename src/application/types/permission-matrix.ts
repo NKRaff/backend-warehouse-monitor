@@ -14,6 +14,7 @@ export const PermissionMatrix: Record<UserRole, readonly Permission[]> = {
 		Permission.MANAGE_DEVICE,
 		Permission.LIST_DEVICE,
 		Permission.LIST_MEASUREMENT,
+		Permission.CHANGE_EMAIL_NOTIFICATION,
 	],
 
 	manager: [
@@ -25,6 +26,7 @@ export const PermissionMatrix: Record<UserRole, readonly Permission[]> = {
 		Permission.MANAGE_DEVICE,
 		Permission.LIST_DEVICE,
 		Permission.LIST_MEASUREMENT,
+		Permission.CHANGE_EMAIL_NOTIFICATION,
 	],
 
 	operator: [
@@ -34,5 +36,6 @@ export const PermissionMatrix: Record<UserRole, readonly Permission[]> = {
 		Permission.LIST_WAREHOUSE,
 		Permission.LIST_DEVICE,
 		Permission.LIST_MEASUREMENT,
+		Permission.CHANGE_EMAIL_NOTIFICATION,
 	],
 } as const;

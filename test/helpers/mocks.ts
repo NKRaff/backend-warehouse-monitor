@@ -54,6 +54,9 @@ export function createUserRepoMock() {
 		updatePassword: vi
 			.fn<IUserRepository["updatePassword"]>()
 			.mockResolvedValue(undefined),
+		updateEmailNotification: vi
+			.fn<IUserRepository["updateEmailNotification"]>()
+			.mockResolvedValue(undefined),
 		updateUser: vi.fn<IUserRepository["updateUser"]>().mockResolvedValue(undefined),
 		updateRole: vi.fn<IUserRepository["updateRole"]>().mockResolvedValue(undefined),
 		deleteById: vi.fn<IUserRepository["deleteById"]>().mockResolvedValue(undefined),

@@ -16,6 +16,10 @@ export function userToDomain(raw: UserDocument): User {
 		user.email.verify();
 	}
 
+	if (user.email.enableNotification !== (raw.emailNotification ?? false)) {
+		user.email.changeNotification();
+	}
+
 	return user;
 }
 
@@ -27,6 +31,7 @@ export function userToPersistence(
 		name: user.name,
 		email: user.email.value,
 		emailVerified: user.email.isVerified,
+		emailNotification: user.email.enableNotification,
 		password: user.passwordHasher,
 		role: user.role,
 		...(user.deletedAt && { deletedAt: user.deletedAt }),

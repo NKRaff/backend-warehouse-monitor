@@ -9,5 +9,6 @@ export interface IUserRepository {
 	updateUser(user: User): Promise<void>;
 	updateRole(id: string, role: UserRole): Promise<void>;
 	updatePassword(userId: string, password: string): Promise<void>;
+	updateEmailNotification(userId: string, enable: boolean): Promise<void>;
 	deleteById(id: string): Promise<void>;
 }

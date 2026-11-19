@@ -11,7 +11,7 @@ export class Email {
 		}
 		this._value = email;
 		this._isVerified = false;
-		this._enableNotification = true;
+		this._enableNotification = false;
 	}
 
 	private isValid(email: string): boolean {
@@ -28,7 +28,7 @@ export class Email {
 	}
 
 	get enableNotification(): boolean {
-		return this.enableNotification;
+		return this._enableNotification;
 	}
 
 	verify(): void {
@@ -36,6 +36,11 @@ export class Email {
 	}
 
 	changeNotification(): void {
+		if (!this._isVerified) {
+			this._enableNotification = false;
+			return;
+		}
+
 		this._enableNotification = !this._enableNotification;
 	}
 }

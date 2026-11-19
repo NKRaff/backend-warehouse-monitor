@@ -9,7 +9,7 @@ const userSchema = new Schema(
 		password: { type: String, required: true },
 		role: { type: String, enum: Object.values(UserRole), required: true },
 		emailVerified: { type: Boolean, required: true, default: false },
-		emailNotification: { type: Boolean, required: true, default: true },
+		emailNotification: { type: Boolean, required: true, default: false },
 		deletedAt: { type: Date, require: false },
 	},
 	{

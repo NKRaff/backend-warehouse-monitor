@@ -16,7 +16,7 @@ export function userToDomain(raw: UserDocument): User {
 		user.email.verify();
 	}
 
-	if (user.email.enableNotification !== raw.emailNotification) {
+	if (user.email.enableNotification !== (raw.emailNotification ?? false)) {
 		user.email.changeNotification();
 	}
 

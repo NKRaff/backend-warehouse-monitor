@@ -1,3 +1,4 @@
+import type { ChangeEmailNotificationOutputDto } from "@application/dtos/change-email-notification.dto.js";
 import type { ChangePasswordOutputDto } from "@application/dtos/change-password.dto.js";
 import type { ChangeRoleOutputDto } from "@application/dtos/change-role-user.dto.js";
 import type { DeleteUserOutputDto } from "@application/dtos/delete-user.dto.js";
@@ -26,6 +27,7 @@ export function createUserRoutes(
 	updateUserController: IController<UpdateUserOutputDto>,
 	changeRoleController: IController<ChangeRoleOutputDto>,
 	deleteUserController: IController<DeleteUserOutputDto>,
+	changeEmailNotification: IController<ChangeEmailNotificationOutputDto>,
 ): Router {
 	const routes = Router();
 
@@ -184,6 +186,25 @@ export function createUserRoutes(
 					actorId: req.user?.id,
 				});
 
+				return res.status(200).json(result);
+			} catch (error) {
+				next(error);
+			}
+		},
+	);
+
+	routes.get(
+		"/change-email-notification",
+		authorizationMiddleware(
+			tokenProvider,
+			authorizationPolicy,
+			Permission.CHANGE_EMAIL_NOTIFICATION,
+		),
+		async (req, res, next) => {
+			try {
+				const result = await changeEmailNotification.handle(undefined, {
+					actorId: req.user?.id,
+				});
 				return res.status(200).json(result);
 			} catch (error) {
 				next(error);

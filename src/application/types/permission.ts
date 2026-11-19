@@ -10,6 +10,7 @@ export const Permission = {
 	MANAGE_DEVICE: "manage_device",
 	LIST_DEVICE: "list_device",
 	LIST_MEASUREMENT: "list_measurement",
+	CHANGE_EMAIL_NOTIFICATION: "change_email_notification",
 } as const;
 
 export type Permission = (typeof Permission)[keyof typeof Permission];

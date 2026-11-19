@@ -80,4 +80,13 @@ export class UserRepository implements IUserRepository {
 			deletedAt: new Date(),
 		});
 	}
+
+	async updateEmailNotification(
+		userId: string,
+		enable: boolean,
+	): Promise<void> {
+		await UserModel.findByIdAndUpdate(userId, {
+			emailNotification: enable,
+		});
+	}
 }

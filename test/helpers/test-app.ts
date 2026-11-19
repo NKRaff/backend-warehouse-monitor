@@ -2,6 +2,7 @@ import type { SmtpClient } from "@application/ports/smtp-client.interface.js";
 import { AuthorizationPolicy } from "@application/services/authorization-policy.js";
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
+import { ChangeEmailNotificationUseCase } from "@application/use-cases/change-email-notification.dto.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
 import { CreateWarehouseUseCase } from "@application/use-cases/create-warehouse.use-case.js";
@@ -39,6 +40,7 @@ import { createDeviceRoutes } from "@infrastructure/http/express/routes/device.r
 import { createMeasurementRoutes } from "@infrastructure/http/express/routes/measurement.routes.js";
 import { UuidAdapter } from "@infrastructure/identifier/uuid.adapter.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
+import { ChangeEmailNotificationController } from "@presentation/controllers/change-email-notification.controller.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
 import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
 import { CreateWarehouseController } from "@presentation/controllers/create-warehouse.controller.js";
@@ -87,6 +89,7 @@ export function createTestApp(smtp: SmtpClient) {
 		RegisterUserUseCase,
 		LoginUseCase,
 		ChangePasswordUseCase,
+		ChangeEmailNotificationUseCase,
 		RefreshTokenUseCase,
 		GeneratePasswordResetTokenUseCase,
 		CreateWarehouseUseCase,
@@ -103,6 +106,7 @@ export function createTestApp(smtp: SmtpClient) {
 		RegisterUserController,
 		LoginController,
 		ChangePasswordController,
+		ChangeEmailNotificationController,
 		RefreshTokenController,
 		GeneratePasswordResetTokenController,
 		CreateWarehouseController,
@@ -166,6 +170,8 @@ export function createTestApp(smtp: SmtpClient) {
 		tokenRepo,
 		passwordPolicyService,
 	);
+	const changeEmailNotificationUseCase =
+		ChangeEmailNotificationUseCase.instance(userRepo);
 	const refreshTokenUseCase = RefreshTokenUseCase.instance(
 		tokenProvider,
 		tokenRepo,
@@ -242,6 +248,8 @@ export function createTestApp(smtp: SmtpClient) {
 	const changePasswordController = ChangePasswordController.instance(
 		changePasswordUseCase,
 	);
+	const changeEmailNotificationController =
+		ChangeEmailNotificationController.instance(changeEmailNotificationUseCase);
 	const refreshTokenController =
 		RefreshTokenController.instance(refreshTokenUseCase);
 	const generatePasswordResetTokenController =
@@ -289,6 +297,7 @@ export function createTestApp(smtp: SmtpClient) {
 			updateUserController,
 			changeRoleController,
 			deleteUserController,
+			changeEmailNotificationController,
 		),
 	);
 	routes.use(

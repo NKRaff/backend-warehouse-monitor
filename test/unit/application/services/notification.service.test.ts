@@ -61,6 +61,33 @@ describe("NotificationService — RF-BE-025/026", () => {
 		expect(email.send).not.toHaveBeenCalled();
 	});
 
+	it("respeita a preferência desativada para alertas por e-mail e mantém o canal interno", async () => {
+		const email = createSender("email");
+		const inApp = createSender("in_app");
+		const service = NotificationService.instance([email, inApp]);
+		const message = makeNotificationMessage({ channels: ["email", "in_app"] });
+		message.recipient.email.changeNotification();
+
+		await service.notify(message);
+
+		expect(email.send).not.toHaveBeenCalled();
+		expect(inApp.send).toHaveBeenCalledExactlyOnceWith(message);
+	});
+
+	it("envia redefinição de senha mesmo com notificações de alerta desativadas", async () => {
+		const email = createSender("email");
+		const service = NotificationService.instance([email]);
+		const message = makeNotificationMessage({
+			type: "password_reset",
+			channels: ["email"],
+		});
+		message.recipient.email.changeNotification();
+
+		await service.notify(message);
+
+		expect(email.send).toHaveBeenCalledExactlyOnceWith(message);
+	});
+
 	it("propaga a falha de um canal para quem chamou", async () => {
 		const email = createSender("email");
 		email.send.mockRejectedValue(new Error("SMTP indisponível"));

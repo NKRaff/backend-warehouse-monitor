@@ -77,6 +77,9 @@ describe("AuthorizationPolicy (RBAC) — RF-BE-007", () => {
 			["administrator", "manage_warehouse", true],
 			["manager", "manage_warehouse", true],
 			["operator", "manage_warehouse", false],
+			["administrator", "change_email_notification", true],
+			["manager", "change_email_notification", true],
+			["operator", "change_email_notification", true],
 		];
 
 		it.each(matrix)("%s + %s => %s", async (role, permission, allowed) => {

@@ -12,6 +12,7 @@ describe("Email (Value Object)", () => {
 
 		it("nasce como não verificado", () => {
 			expect(new Email("maria@empresa.com").isVerified).toBe(false);
+			expect(new Email("maria@empresa.com").enableNotification).toBe(false);
 		});
 
 		it.each([
@@ -52,6 +53,27 @@ describe("Email (Value Object)", () => {
 			email.verify();
 
 			expect(email.value).toBe("maria@empresa.com");
+		});
+	});
+
+	describe("changeNotification()", () => {
+		it("mantém desativada a preferência enquanto o endereço não foi verificado", () => {
+			const email = new Email("maria@empresa.com");
+
+			email.changeNotification();
+
+			expect(email.enableNotification).toBe(false);
+		});
+
+		it("permite ativar e desativar depois da verificação", () => {
+			const email = new Email("maria@empresa.com");
+			email.verify();
+
+			email.changeNotification();
+			expect(email.enableNotification).toBe(true);
+
+			email.changeNotification();
+			expect(email.enableNotification).toBe(false);
 		});
 	});
 });

@@ -1,4 +1,4 @@
-import { ChangeEmailNotificationUseCase } from "@application/use-cases/change-email-notification.dto.js";
+import { ChangeEmailNotificationUseCase } from "@application/use-cases/change-email-notification.use-case.js";
 import { NotFoundError } from "@shared/errors/not-found-error.js";
 import { beforeEach, describe, expect, it } from "vitest";
 import { makeUser } from "../../../helpers/factories.js";

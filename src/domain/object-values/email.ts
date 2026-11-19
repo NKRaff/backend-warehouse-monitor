@@ -2,6 +2,7 @@ import { UnprocessableEntityError } from "@shared/errors/unprocessable-entity-er
 
 export class Email {
 	private _isVerified: boolean;
+	private _enableNotification: boolean;
 
 	constructor(private _value: string) {
 		const email = _value.toLocaleLowerCase().trim();
@@ -10,6 +11,7 @@ export class Email {
 		}
 		this._value = email;
 		this._isVerified = false;
+		this._enableNotification = true;
 	}
 
 	private isValid(email: string): boolean {
@@ -25,7 +27,15 @@ export class Email {
 		return this._isVerified;
 	}
 
+	get enableNotification(): boolean {
+		return this.enableNotification;
+	}
+
 	verify(): void {
 		this._isVerified = true;
+	}
+
+	changeNotification(): void {
+		this._enableNotification = !this._enableNotification;
 	}
 }

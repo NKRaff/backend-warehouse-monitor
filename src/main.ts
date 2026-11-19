@@ -2,6 +2,7 @@ import { AuthorizationPolicy } from "@application/services/authorization-policy.
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
 import { BootstrapMonitoringDeviceUseCase } from "@application/use-cases/bootstrap-monitoring-device.use-case.js";
+import { ChangeEmailNotificationUseCase } from "@application/use-cases/change-email-notification.dto.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
 import { CreateDeviceUseCase } from "@application/use-cases/create-device.use-case.js";
@@ -31,6 +32,7 @@ import { createMeasurementRoutes } from "@infrastructure/http/express/routes/mea
 import { createWarehouseRoutes } from "@infrastructure/http/express/routes/warehouse.routes.js";
 import { MqttMessageHandle } from "@infrastructure/messaging/mqtt/handle/mqtt-message.handle.js";
 import { EmailNotificationChannel } from "@infrastructure/notification/email/email-channel.js";
+import { ChangeEmailNotificationController } from "@presentation/controllers/change-email-notification.controller.js";
 import { ChangePasswordController } from "@presentation/controllers/change-password.controller.js";
 import { ChangeRoleController } from "@presentation/controllers/change-role.controller.js";
 import { CreateDeviceController } from "@presentation/controllers/create-device.controller.js";
@@ -209,6 +211,8 @@ const saveMeasurementUseCase = SaveMeasurementUseCase.instance(
 );
 const listAllMeasurementUseCase =
 	ListAllMeasurementUseCase.instance(measurementRepo);
+const changeEmailNotificationUseCase =
+	ChangeEmailNotificationUseCase.instance(userRepo);
 
 // Controllers
 
@@ -256,6 +260,8 @@ const saveMeasurementController = SaveMeasurementController.instance(
 const listAllMeasurementController = ListAllMeasurementController.instance(
 	listAllMeasurementUseCase,
 );
+const changeEmailNotificationController =
+	ChangeEmailNotificationController.instance(changeEmailNotificationUseCase);
 
 // Routes
 
@@ -271,6 +277,7 @@ const userRoutes = createUserRoutes(
 	updateUserController,
 	changeRoleController,
 	deleteUserController,
+	changeEmailNotificationController,
 );
 const warehouseRoutes = createWarehouseRoutes(
 	tokenProvider,

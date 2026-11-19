@@ -2,7 +2,7 @@ import { AuthorizationPolicy } from "@application/services/authorization-policy.
 import { NotificationService } from "@application/services/notification.service.js";
 import { PasswordPolicyService } from "@application/services/password-policy.service.js";
 import { BootstrapMonitoringDeviceUseCase } from "@application/use-cases/bootstrap-monitoring-device.use-case.js";
-import { ChangeEmailNotificationUseCase } from "@application/use-cases/change-email-notification.dto.js";
+import { ChangeEmailNotificationUseCase } from "@application/use-cases/change-email-notification.use-case.js";
 import { ChangePasswordUseCase } from "@application/use-cases/change-password.use-case.js";
 import { ChangeRoleUseCase } from "@application/use-cases/change-role.use-case.js";
 import { CreateDeviceUseCase } from "@application/use-cases/create-device.use-case.js";
